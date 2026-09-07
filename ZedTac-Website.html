@@ -13746,6 +13746,205 @@ if (THREE) (function () {
   window.ztNavigate = navigate;
 })();
 </script>
+
+<script>
+/* ============================================================================
+   VOICE LAYER FOR THE WEBCHAT
+
+   Botpress has no voice mode. The widget ships one mic button that dictates
+   into the text box, and the bot itself never speaks. So "click the bubble and
+   it talks to you" is built here, out of the browser's own two speech APIs:
+   SpeechRecognition for the visitor's turn, speechSynthesis for the bot's.
+
+   Turn-taking is the whole design. The mic is stopped before the bot speaks
+   and restarted when it finishes, because an open mic transcribes the reply
+   coming out of the speakers and answers itself.
+
+   Text is hidden rather than removed, and only while speech is genuinely
+   working. Firefox has no SpeechRecognition at all, and a visitor can refuse
+   the mic in any browser; in both cases a voice-only panel would be a dead
+   box, so the keyboard comes straight back. That is why this reads the
+   capability instead of assuming it.
+   ========================================================================= */
+(function(){
+  'use strict';
+
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var synth = window.speechSynthesis;
+
+  /* No speech engine -- leave the widget exactly as it ships. */
+  if (!SR || !synth) return;
+
+  /* Spoken the instant the bubble is clicked, before the network is involved,
+     so the click has a voice answer straight away. The bot's own opening
+     message is spoken too, when it arrives. Set this to '' to let the bot's
+     opener be the only greeting. */
+  var GREETING = 'Welcome to ZedTac.';
+  var LANG = 'en-US';
+
+  var rec = null, listening = false, speaking = false, textRestored = false;
+
+  function shadow(){
+    var host = document.getElementById('fab-root');
+    return (host && host.shadowRoot) ? host.shadowRoot : null;
+  }
+
+  /* ---- text composer ------------------------------------------------- */
+  function hideText(){
+    var sr = shadow();
+    if (!sr || textRestored || sr.getElementById('zt-voice-only')) return;
+    var st = document.createElement('style');
+    st.id = 'zt-voice-only';
+    st.textContent = '.bpComposerContainer{display:none!important}';
+    sr.appendChild(st);
+  }
+  function restoreText(){
+    textRestored = true;
+    var sr = shadow();
+    var st = sr && sr.getElementById('zt-voice-only');
+    if (st) st.remove();
+  }
+
+  /* ---- the bot's turn -------------------------------------------------- */
+  function speak(text, done){
+    if (!text){ done && done(); return; }
+    try { synth.cancel(); } catch (e) {}
+
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = LANG;
+    speaking = true;
+
+    var finished = false, guard;
+    function finish(){
+      if (finished) return;
+      finished = true;
+      speaking = false;
+      clearTimeout(guard);
+      done && done();
+    }
+
+    /* onend cannot be relied on. A machine with no audio output never fires
+       it -- seen while testing this -- and so can a cancelled utterance or a
+       tab backgrounded mid-sentence. Since the mic is only handed back on
+       finish, a missing onend leaves the visitor with no way to speak and,
+       with the composer hidden, nothing to type into either: a dead panel.
+       The estimate is deliberately loose; it only has to fire when the event
+       does not. */
+    guard = setTimeout(finish, Math.min(30000, 1500 + text.split(/\s+/).length * 450));
+
+    u.onend = u.onerror = finish;
+    try { synth.speak(u); } catch (e) { finish(); }
+  }
+
+  /* ---- the visitor's turn ---------------------------------------------- */
+  function stopListening(){
+    listening = false;
+    if (rec){ try { rec.abort(); } catch (e) {} }
+  }
+
+  function startListening(){
+    if (listening || speaking) return;
+    if (!rec){
+      rec = new SR();
+      rec.lang = LANG;
+      rec.interimResults = false;
+      rec.continuous = false;
+
+      rec.onresult = function(e){
+        var said = '';
+        for (var i = e.resultIndex; i < e.results.length; i++){
+          if (e.results[i].isFinal) said += e.results[i][0].transcript;
+        }
+        said = said.trim();
+        if (said) window.botpress.sendMessage(said);
+      };
+
+      rec.onend = function(){ listening = false; };
+
+      rec.onerror = function(e){
+        listening = false;
+        /* A refused or unavailable mic leaves nothing to type into, so the
+           keyboard is handed back for good rather than leaving a panel the
+           visitor cannot use at all. 'no-speech' is just silence -- not a
+           failure, and not a reason to give up on voice. */
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed' ||
+            e.error === 'audio-capture'){
+          restoreText();
+        }
+      };
+    }
+    try { rec.start(); listening = true; } catch (e) { listening = false; }
+  }
+
+  /* ---- wiring ---------------------------------------------------------- */
+  function bind(){
+    var host = document.getElementById('fab-root');
+    var bp = window.botpress;
+    if (!host || !host.shadowRoot || !bp || typeof bp.on !== 'function') return false;
+    if (host.__ztVoiceBound) return true;
+    host.__ztVoiceBound = true;
+
+    /* Clicks inside the shadow root are composed, so they reach the host with
+       the user gesture still live -- which is what lets speech start without
+       being blocked.
+
+       Capture, not bubble. Botpress's own handler sits on the button inside
+       the shadow tree and flips state before a bubbling listener on the host
+       ever runs, so by then every click looks like the panel was already open
+       and the greeting never fires. Capturing on the host runs ahead of the
+       target, where state still describes the panel this click is about to
+       open.
+
+       Only the bubble itself counts. Once the panel is open its own clicks --
+       composer, a message, the emoji picker -- travel the same path, and
+       treating those as a close would cut the visitor off mid-sentence. */
+    host.addEventListener('click', function(e){
+      var path = (e.composedPath && e.composedPath()) || [];
+      var onFab = path.some(function(n){
+        return n && n.classList &&
+               (n.classList.contains('bpFab') || n.classList.contains('bpFabWrapper'));
+      });
+      if (!onFab) return;
+
+      if (bp.state === 'opened'){
+        try { synth.cancel(); } catch (err) {}
+        stopListening();
+        return;
+      }
+      hideText();
+      speak(GREETING, startListening);
+    }, true);
+
+    bp.on('message', function(m){
+      var me = (bp.user && bp.user.id) || null;
+      if (!m || (me && m.authorId === me)) return;      /* our own echo */
+      var b = m.block;
+      if (!b || b.type !== 'text' || !b.text) return;
+      stopListening();
+      speak(b.text, startListening);
+    });
+
+    return true;
+  }
+
+  if (!bind()){
+    var tries = 0;
+    var t = setInterval(function(){
+      if (bind() || ++tries > 60) clearInterval(t);
+    }, 250);
+  }
+
+  /* Console handles for checking this without a microphone. */
+  window.ztVoice = {
+    say: speak,
+    listen: startListening,
+    stop: stopListening,
+    showText: restoreText,
+    hideText: hideText,
+    state: function(){ return { listening: listening, speaking: speaking, textRestored: textRestored }; }
+  };
+})();
+</script>
 </body>
 
 </html>
