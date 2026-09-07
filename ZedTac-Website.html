@@ -8541,6 +8541,93 @@
     .zt-voice-fab{ transition:none; }
     .zt-voice-fab .zt-vf-dot{ animation:none; }
   }
+
+  /* ---------- CHAT MODE CHOOSER ----------
+     Voice cannot be the only way in. It needs a microphone the visitor may
+     not want to grant, and Firefox has no SpeechRecognition at all, so the
+     launcher asks instead of assuming. Sits above the pill, inside
+     .bpChatContainer, so it shares the widget's stacking context and stays
+     under the nav with everything else.
+
+     Width is capped against a percentage rather than 100vw: on Windows a
+     classic scrollbar is inside the viewport but outside a percentage, and
+     vw would push this a scrollbar's width off the screen. */
+  .zt-chat-chooser{
+    position:fixed; right:24px;
+    bottom:calc(88px + var(--zt-bp-lift, 0px));
+    width:min(292px, calc(100% - 48px));
+    padding:16px 16px 14px;
+    border-radius:18px;
+    background:#191615;
+    border:1px solid rgba(255,255,255,0.085);
+    box-shadow:0 26px 60px -20px rgba(0,0,0,.62), 0 4px 14px rgba(0,0,0,.34);
+    color:#fff;
+    animation:ztChooserIn .26s var(--ease, cubic-bezier(.16,1,.3,1));
+  }
+  /* Transform only. An entrance that fades from opacity 0 leaves the panel
+     invisible for as long as the animation fails to advance -- the same trap
+     the chat panel's own entrance fell into. */
+  @keyframes ztChooserIn{
+    from{ transform:translateY(10px) scale(.97); }
+    to  { transform:none; }
+  }
+
+  .zt-chat-chooser .zt-cc-head{
+    margin:0 0 12px; font-size:12px; font-weight:600;
+    letter-spacing:.02em; color:rgba(255,255,255,0.62);
+  }
+  .zt-chat-chooser .zt-cc-opts{ display:flex; flex-direction:column; gap:8px; }
+  .zt-chat-chooser .zt-cc-opt{
+    display:flex; align-items:center; gap:12px; width:100%;
+    padding:11px 13px; border-radius:12px; cursor:pointer;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.075);
+    color:#fff; font-family:inherit; text-align:left;
+    transition:background .16s var(--ease, ease), border-color .16s var(--ease, ease);
+  }
+  .zt-chat-chooser .zt-cc-opt:hover{
+    background:rgba(255,148,71,0.13); border-color:rgba(255,148,71,0.42);
+  }
+  .zt-chat-chooser .zt-cc-opt:focus-visible{
+    outline:2px solid var(--zt-orange-btn,#FF9447); outline-offset:2px;
+  }
+  .zt-chat-chooser .zt-cc-ico{
+    flex:0 0 auto; width:34px; height:34px; border-radius:50%;
+    background:var(--zt-orange-btn,#FF9447); color:#26170B;
+    display:grid; place-items:center;
+  }
+  .zt-chat-chooser .zt-cc-ico svg{ width:17px; height:17px; display:block; }
+  .zt-chat-chooser .zt-cc-lab{ display:flex; flex-direction:column; gap:1px; }
+  .zt-chat-chooser .zt-cc-lab b{ font-size:13.5px; font-weight:700; }
+  .zt-chat-chooser .zt-cc-lab i{
+    font-style:normal; font-size:11px; color:rgba(255,255,255,0.55);
+  }
+
+  .zt-chat-chooser .zt-cc-langs{
+    display:flex; gap:7px; margin-top:13px;
+    padding-top:12px; border-top:1px solid rgba(255,255,255,0.075);
+  }
+  .zt-chat-chooser .zt-cc-lang{
+    flex:1; padding:7px 10px; border-radius:9px; cursor:pointer;
+    background:transparent; border:1px solid rgba(255,255,255,0.13);
+    color:rgba(255,255,255,0.66); font-family:inherit; font-size:12px; font-weight:600;
+    transition:background .16s var(--ease, ease), color .16s var(--ease, ease),
+               border-color .16s var(--ease, ease);
+  }
+  .zt-chat-chooser .zt-cc-lang:hover{ color:#fff; border-color:rgba(255,255,255,0.3); }
+  .zt-chat-chooser .zt-cc-lang.is-on{
+    background:var(--zt-orange-btn,#FF9447); border-color:var(--zt-orange-btn,#FF9447);
+    color:#26170B;
+  }
+  /* The Urdu label is Nastaliq; it needs the extra line height to avoid
+     clipping its descenders against the button edge. */
+  .zt-chat-chooser .zt-cc-lang[lang="ur"]{ font-size:13px; line-height:1.5; }
+
+  @media (prefers-reduced-motion:reduce){
+    .zt-chat-chooser{ animation:none; }
+    .zt-chat-chooser .zt-cc-opt,
+    .zt-chat-chooser .zt-cc-lang{ transition:none; }
+  }
 </style>
 </head>
 <body>
@@ -13836,12 +13923,21 @@ if (THREE) (function () {
      widget never appears there is nothing to bind and nothing to style. */
   var boundBot = bindBot(), styledFab = styleFab();
   if (!boundBot || !styledFab){
-    var tries = 0;
-    var timer = setInterval(function(){
+    /* Same deadline problem as the launcher: the widget can mount well past
+       twenty seconds, and a poll that expires first leaves the panel with no
+       skin and the bot with no way to move the page. Watch for it, and poll
+       slowly underneath. */
+    var settle = function(){
       if (!boundBot)  boundBot  = bindBot();
       if (!styledFab) styledFab = styleFab();
-      if ((boundBot && styledFab) || ++tries > 40) clearInterval(timer);
-    }, 250);
+      return boundBot && styledFab;
+    };
+    var obs = new MutationObserver(function(){ if (settle()) obs.disconnect(); });
+    obs.observe(document.body, { childList: true, subtree: true });
+    var tries = 0;
+    var timer = setInterval(function(){
+      if (settle() || ++tries > 240){ clearInterval(timer); obs.disconnect(); }
+    }, 500);
   }
 
   /* ---- keep the bubble clear of the cookie banner ----------------------
@@ -13897,69 +13993,101 @@ if (THREE) (function () {
 
 <script>
 /* ============================================================================
-   VOICE LAYER FOR THE WEBCHAT
+   VOICE + TEXT LAYER FOR THE WEBCHAT
 
    Botpress has no voice mode. The widget ships one mic button that dictates
-   into the text box, and the bot itself never speaks. So "click the bubble and
-   it talks to you" is built here, out of the browser's own two speech APIs:
-   SpeechRecognition for the visitor's turn, speechSynthesis for the bot's.
+   into the text box, and the bot never speaks, so talking is built here out of
+   the browser's own two speech APIs: SpeechRecognition for the visitor's turn,
+   speechSynthesis for the bot's.
 
-   Turn-taking is the whole design. The mic is stopped before the bot speaks
-   and restarted when it finishes, because an open mic transcribes the reply
-   coming out of the speakers and answers itself.
+   Nothing is forced. Clicking the launcher opens a chooser -- talk or type,
+   English or Urdu -- because voice needs a microphone the visitor may not want
+   to grant, and because a browser without SpeechRecognition (Firefox) cannot
+   offer it at all. The choice is remembered, and typing always remains
+   available inside the panel whatever was picked.
 
-   Text is hidden rather than removed, and only while speech is genuinely
-   working. Firefox has no SpeechRecognition at all, and a visitor can refuse
-   the mic in any browser; in both cases a voice-only panel would be a dead
-   box, so the keyboard comes straight back. That is why this reads the
-   capability instead of assuming it.
+   Turn-taking is the design in voice mode: the mic stops before the bot speaks
+   and restarts when it finishes, because an open mic transcribes the reply
+   coming out of the speakers and the bot answers itself.
    ========================================================================= */
 (function(){
   'use strict';
 
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   var synth = window.speechSynthesis;
+  var canSpeak = !!(SR && synth);
 
-  /* No speech engine -- leave the widget exactly as it ships. */
-  if (!SR || !synth) return;
+  /* Urdu, Arabic and Persian all sit in these blocks. Reply language is the
+     bot's decision, so the script it comes back in is what is read, not
+     whatever the visitor picked at the door. */
+  var RTL_SCRIPT = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
 
-  /* Spoken the instant the bubble is clicked, before the network is involved,
-     so the click has a voice answer straight away. The bot's own opening
-     message is spoken too, when it arrives. Set this to '' to let the bot's
-     opener be the only greeting. */
-  var GREETING = 'Welcome to ZedTac.';
-  var LANG = 'en-US';
+  var LANGS = {
+    en: { rec: 'en-US', voice: /^en/i,            greet: 'Welcome to ZedTac.' },
+    ur: { rec: 'ur-PK', voice: /^(ur|ar)/i,       greet: 'زیڈٹیک میں خوش آمدید۔' }
+  };
 
-  var rec = null, listening = false, speaking = false, textRestored = false;
+  var PREF_KEY = 'ztChatPrefs';
+  var prefs = { mode: null, lang: 'en' };
+  try {
+    var saved = JSON.parse(localStorage.getItem(PREF_KEY) || 'null');
+    if (saved && typeof saved === 'object'){
+      if (saved.mode === 'voice' || saved.mode === 'text') prefs.mode = saved.mode;
+      if (LANGS[saved.lang]) prefs.lang = saved.lang;
+    }
+  } catch (e) {}
+  function savePrefs(){
+    try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {}
+  }
+
+  var rec = null, listening = false, speaking = false, micRefused = false;
+  var pill = null, chooser = null;
 
   function shadow(){
     var host = document.getElementById('fab-root');
     return (host && host.shadowRoot) ? host.shadowRoot : null;
   }
 
-  /* ---- text composer ------------------------------------------------- */
-  function hideText(){
+  /* ---- the text composer ---------------------------------------------- */
+  /* Hidden only while voice is the active mode and the mic is actually
+     working. The moment either stops being true the keyboard comes back: a
+     panel with no way in is worse than one that looks busier than intended. */
+  function setComposerHidden(hidden){
     var sr = shadow();
-    if (!sr || textRestored || sr.getElementById('zt-voice-only')) return;
-    var st = document.createElement('style');
-    st.id = 'zt-voice-only';
-    st.textContent = '.bpComposerContainer{display:none!important}';
-    sr.appendChild(st);
-  }
-  function restoreText(){
-    textRestored = true;
-    var sr = shadow();
-    var st = sr && sr.getElementById('zt-voice-only');
-    if (st) st.remove();
+    if (!sr) return;
+    var st = sr.getElementById('zt-voice-only');
+    if (hidden && !micRefused){
+      if (!st){
+        st = document.createElement('style');
+        st.id = 'zt-voice-only';
+        st.textContent = '.bpComposerContainer{display:none!important}';
+        sr.appendChild(st);
+      }
+    } else if (st){
+      st.remove();
+    }
   }
 
   /* ---- the bot's turn -------------------------------------------------- */
-  function speak(text, done){
-    if (!text){ done && done(); return; }
-    try { synth.cancel(); } catch (e) {}
+  function voiceFor(text){
+    var list = synth.getVoices() || [];
+    var wanted = RTL_SCRIPT.test(text) ? LANGS.ur.voice : LANGS.en.voice;
+    for (var i = 0; i < list.length; i++) if (wanted.test(list[i].lang)) return list[i];
+    /* Urdu with no Urdu or Arabic voice installed has nothing that can read
+       the script -- an English voice would produce noise, so it is left
+       unspoken and simply read on screen. macOS ships no Urdu voice at all;
+       Windows does once the language pack is present. */
+    return RTL_SCRIPT.test(text) ? null : (list[0] || null);
+  }
 
+  function speak(text, done){
+    if (!text || !canSpeak){ done && done(); return; }
+    var picked = voiceFor(text);
+    if (!picked && RTL_SCRIPT.test(text)){ done && done(); return; }
+
+    try { synth.cancel(); } catch (e) {}
     var u = new SpeechSynthesisUtterance(text);
-    u.lang = LANG;
+    if (picked){ u.voice = picked; u.lang = picked.lang; }
     speaking = true;
 
     var finished = false, guard;
@@ -13970,16 +14098,12 @@ if (THREE) (function () {
       clearTimeout(guard);
       done && done();
     }
-
-    /* onend cannot be relied on. A machine with no audio output never fires
-       it -- seen while testing this -- and so can a cancelled utterance or a
+    /* onend cannot be relied on. A machine with no audio output never fires it
+       -- seen while building this -- and nor does a cancelled utterance or a
        tab backgrounded mid-sentence. Since the mic is only handed back on
-       finish, a missing onend leaves the visitor with no way to speak and,
-       with the composer hidden, nothing to type into either: a dead panel.
-       The estimate is deliberately loose; it only has to fire when the event
-       does not. */
+       finish, a missing event would leave the visitor unable to speak and,
+       with the composer hidden, nothing to type into either. */
     guard = setTimeout(finish, Math.min(30000, 1500 + text.split(/\s+/).length * 450));
-
     u.onend = u.onerror = finish;
     try { synth.speak(u); } catch (e) { finish(); }
   }
@@ -13991,10 +14115,9 @@ if (THREE) (function () {
   }
 
   function startListening(){
-    if (listening || speaking) return;
+    if (prefs.mode !== 'voice' || micRefused || listening || speaking || !SR) return;
     if (!rec){
       rec = new SR();
-      rec.lang = LANG;
       rec.interimResults = false;
       rec.continuous = false;
 
@@ -14006,33 +14129,135 @@ if (THREE) (function () {
         said = said.trim();
         if (said) window.botpress.sendMessage(said);
       };
-
       rec.onend = function(){ listening = false; };
-
       rec.onerror = function(e){
         listening = false;
-        /* A refused or unavailable mic leaves nothing to type into, so the
-           keyboard is handed back for good rather than leaving a panel the
-           visitor cannot use at all. 'no-speech' is just silence -- not a
-           failure, and not a reason to give up on voice. */
+        /* A refused or missing mic ends voice for this visit rather than
+           retrying into a permission wall. Silence is not a failure. */
         if (e.error === 'not-allowed' || e.error === 'service-not-allowed' ||
             e.error === 'audio-capture'){
-          restoreText();
+          micRefused = true;
+          setComposerHidden(false);
         }
       };
     }
+    rec.lang = LANGS[prefs.lang].rec;
     try { rec.start(); listening = true; } catch (e) { listening = false; }
   }
 
-  /* ---- the launcher ---------------------------------------------------- */
-  var pill = null;
+  /* ---- opening in a mode ----------------------------------------------- */
+  function openWith(mode, lang){
+    prefs.mode = mode;
+    if (lang) prefs.lang = lang;
+    savePrefs();
+    hideChooser();
 
+    window.botpress.open();
+    syncPill();
+
+    if (mode === 'voice' && canSpeak){
+      setComposerHidden(true);
+      speak(LANGS[prefs.lang].greet, startListening);   /* still in the gesture */
+    } else {
+      setComposerHidden(false);
+      try { synth && synth.cancel(); } catch (e) {}
+      stopListening();
+    }
+  }
+
+  function closePanel(){
+    try { synth && synth.cancel(); } catch (e) {}
+    stopListening();
+    window.botpress.close();
+    syncPill();
+  }
+
+  /* ---- launcher + chooser ---------------------------------------------- */
   var MIC_SVG =
-    '<svg viewBox="0 0 24 24" fill="none" stroke="#26170B" stroke-width="2.1" ' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" ' +
     'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
     '<rect x="9" y="2" width="6" height="11" rx="3"></rect>' +
     '<path d="M5 10a7 7 0 0 0 14 0"></path>' +
     '<line x1="12" y1="17" x2="12" y2="22"></line></svg>';
+
+  var CHAT_SVG =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.3-.6L3 21l1.8-5a8.3 8.3 0 0 1-.8-3.6 8.4 8.4 0 0 1 8.5-8.4 8.4 8.4 0 0 1 8.5 8.4z"></path></svg>';
+
+  function buildChooser(){
+    if (chooser) return chooser;
+    chooser = document.createElement('div');
+    chooser.className = 'zt-chat-chooser';
+    chooser.hidden = true;
+    chooser.setAttribute('role', 'dialog');
+    chooser.setAttribute('aria-label', 'Choose how to talk to ZedTac');
+
+    /* Voice is offered only where the browser can run it. Firefox has no
+       SpeechRecognition, so showing the option there would be a button that
+       does nothing. */
+    var voiceBtn = canSpeak
+      ? '<button type="button" class="zt-cc-opt" data-mode="voice">' +
+          '<span class="zt-cc-ico">' + MIC_SVG + '</span>' +
+          '<span class="zt-cc-lab"><b>Talk</b><i>Speak and listen</i></span>' +
+        '</button>'
+      : '';
+
+    chooser.innerHTML =
+      '<p class="zt-cc-head">How would you like to chat?</p>' +
+      '<div class="zt-cc-opts">' + voiceBtn +
+        '<button type="button" class="zt-cc-opt" data-mode="text">' +
+          '<span class="zt-cc-ico">' + CHAT_SVG + '</span>' +
+          '<span class="zt-cc-lab"><b>Type</b><i>Use the keyboard</i></span>' +
+        '</button>' +
+      '</div>' +
+      '<div class="zt-cc-langs" role="group" aria-label="Language">' +
+        '<button type="button" class="zt-cc-lang" data-lang="en">English</button>' +
+        '<button type="button" class="zt-cc-lang" data-lang="ur" lang="ur">اردو</button>' +
+      '</div>';
+
+    chooser.addEventListener('click', function(e){
+      var opt = e.target.closest('.zt-cc-opt');
+      if (opt){ openWith(opt.getAttribute('data-mode')); return; }
+      var lang = e.target.closest('.zt-cc-lang');
+      if (lang){
+        prefs.lang = lang.getAttribute('data-lang');
+        savePrefs();
+        markLangs();
+      }
+    });
+
+    document.querySelector('.bpChatContainer').appendChild(chooser);
+    markLangs();
+    return chooser;
+  }
+
+  function markLangs(){
+    if (!chooser) return;
+    [].forEach.call(chooser.querySelectorAll('.zt-cc-lang'), function(b){
+      var on = b.getAttribute('data-lang') === prefs.lang;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  function showChooser(){
+    buildChooser();
+    chooser.hidden = false;
+    document.addEventListener('click', onOutside, true);
+    document.addEventListener('keydown', onEsc, true);
+  }
+  function hideChooser(){
+    if (!chooser) return;
+    chooser.hidden = true;
+    document.removeEventListener('click', onOutside, true);
+    document.removeEventListener('keydown', onEsc, true);
+  }
+  function onOutside(e){
+    if (chooser && !chooser.hidden &&
+        !chooser.contains(e.target) && !(pill && pill.contains(e.target))) hideChooser();
+  }
+  function onEsc(e){ if (e.key === 'Escape') hideChooser(); }
 
   function buildPill(){
     var container = document.querySelector('.bpChatContainer');
@@ -14040,8 +14265,8 @@ if (THREE) (function () {
     if (!container || !sr || pill) return;
 
     /* Botpress's own circle is hidden rather than removed: it is React's
-       element, and taking it out from underneath would only invite it back on
-       the next render. */
+       element, and taking it out would only invite it back on the next
+       render. */
     if (!sr.getElementById('zt-hide-fab')){
       var st = document.createElement('style');
       st.id = 'zt-hide-fab';
@@ -14052,37 +14277,30 @@ if (THREE) (function () {
     pill = document.createElement('button');
     pill.type = 'button';
     pill.className = 'zt-voice-fab';
-    pill.setAttribute('aria-label', 'Talk to ZedTac');
+    pill.setAttribute('aria-label', 'Chat with ZedTac');
     pill.innerHTML =
-      '<span class="zt-vf-mic">' + MIC_SVG + '</span>' +
+      '<span class="zt-vf-mic">' + (canSpeak ? MIC_SVG : CHAT_SVG) + '</span>' +
       '<span class="zt-vf-copy">' +
-        '<span class="zt-vf-title">Talk to us</span>' +
+        '<span class="zt-vf-title">' + (canSpeak ? 'Talk to us' : 'Chat with us') + '</span>' +
         '<span class="zt-vf-status"><span class="zt-vf-dot"></span>Available now</span>' +
       '</span>';
 
     pill.addEventListener('click', function(){
-      if (window.botpress.state === 'opened'){
-        try { synth.cancel(); } catch (e) {}
-        stopListening();
-        window.botpress.close();
-      } else {
-        hideText();
-        window.botpress.open();
-        speak(GREETING, startListening);   /* still inside the click gesture */
-      }
-      syncPill();
+      if (window.botpress.state === 'opened'){ closePanel(); return; }
+      if (!chooser || chooser.hidden) showChooser(); else hideChooser();
     });
 
     container.appendChild(pill);
     syncPill();
   }
 
-  /* The panel covers the corner while it is open, so the pill would only peek
-     out from behind it. Hidden by state rather than by a guess at the panel's
+  /* The panel covers the corner while open, so the pill would only peek out
+     from behind it. Keyed off state rather than a guess at the panel's
      geometry, which differs between the phone and desktop layouts. */
   function syncPill(){
-    if (!pill) return;
-    pill.hidden = (window.botpress && window.botpress.state === 'opened');
+    var open = !!(window.botpress && window.botpress.state === 'opened');
+    if (pill) pill.hidden = open;
+    if (open) hideChooser();
   }
 
   /* ---- wiring ---------------------------------------------------------- */
@@ -14093,42 +14311,16 @@ if (THREE) (function () {
     if (host.__ztVoiceBound) return true;
     host.__ztVoiceBound = true;
 
-    /* Clicks inside the shadow root are composed, so they reach the host with
-       the user gesture still live -- which is what lets speech start without
-       being blocked.
-
-       Capture, not bubble. Botpress's own handler sits on the button inside
-       the shadow tree and flips state before a bubbling listener on the host
-       ever runs, so by then every click looks like the panel was already open
-       and the greeting never fires. Capturing on the host runs ahead of the
-       target, where state still describes the panel this click is about to
-       open.
-
-       Only the bubble itself counts. Once the panel is open its own clicks --
-       composer, a message, the emoji picker -- travel the same path, and
-       treating those as a close would cut the visitor off mid-sentence. */
-    host.addEventListener('click', function(e){
-      var path = (e.composedPath && e.composedPath()) || [];
-      var onFab = path.some(function(n){
-        return n && n.classList &&
-               (n.classList.contains('bpFab') || n.classList.contains('bpFabWrapper'));
-      });
-      if (!onFab) return;
-
-      if (bp.state === 'opened'){
-        try { synth.cancel(); } catch (err) {}
-        stopListening();
-        return;
-      }
-      hideText();
-      speak(GREETING, startListening);
-    }, true);
-
     bp.on('message', function(m){
+      if (prefs.mode !== 'voice' || !canSpeak) return;   /* typing: stay quiet */
       var me = (bp.user && bp.user.id) || null;
-      if (!m || (me && m.authorId === me)) return;      /* our own echo */
+      if (!m || (me && m.authorId === me)) return;       /* our own echo */
       var b = m.block;
       if (!b || b.type !== 'text' || !b.text) return;
+
+      /* The bot decides the reply language; the mic follows it, so a visitor
+         answered in Urdu is then listened to in Urdu. */
+      prefs.lang = RTL_SCRIPT.test(b.text) ? 'ur' : prefs.lang;
       stopListening();
       speak(b.text, startListening);
     });
@@ -14136,8 +14328,8 @@ if (THREE) (function () {
     buildPill();
 
     /* The visitor can also close from inside the panel, where there is no
-       event to listen for, so the pill is resynced whenever the widget's own
-       DOM changes. Debounced: the message list mutates on every token of a
+       event to listen for, so the pill resyncs on the widget's own DOM
+       changes. Debounced: the message list mutates on every token of a
        streamed reply. */
     var queued = false;
     new MutationObserver(function(){
@@ -14150,20 +14342,31 @@ if (THREE) (function () {
   }
 
   if (!bind()){
+    /* The widget mounts on its own schedule, and it is not quick: on a cold
+       load here it has taken past twenty seconds, further than the short poll
+       this used to rely on. When the poll gave up first the launcher never
+       appeared at all and the chat was simply unreachable. So watch for it
+       arriving instead of betting on a deadline, and keep a slow poll as the
+       backstop for anything the observer cannot see. */
+    var obs = new MutationObserver(function(){ if (bind()) obs.disconnect(); });
+    obs.observe(document.body, { childList: true, subtree: true });
     var tries = 0;
     var t = setInterval(function(){
-      if (bind() || ++tries > 60) clearInterval(t);
-    }, 250);
+      if (bind() || ++tries > 240){ clearInterval(t); obs.disconnect(); }
+    }, 500);
   }
 
   /* Console handles for checking this without a microphone. */
   window.ztVoice = {
+    open: openWith,
     say: speak,
     listen: startListening,
     stop: stopListening,
-    showText: restoreText,
-    hideText: hideText,
-    state: function(){ return { listening: listening, speaking: speaking, textRestored: textRestored }; }
+    prefs: function(){ return { mode: prefs.mode, lang: prefs.lang }; },
+    state: function(){
+      return { listening: listening, speaking: speaking, micRefused: micRefused,
+               canSpeak: canSpeak, mode: prefs.mode, lang: prefs.lang };
+    }
   };
 })();
 </script>
