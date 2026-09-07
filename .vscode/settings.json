@@ -1,0 +1,23 @@
+{
+  // Commit in VS Code and it pushes by itself. Without this, "Commit" only
+  // writes locally and you have to remember a second Sync click -- the edit
+  // sits on the laptop looking done while the live site still shows the old
+  // page. "sync" makes the commit button mean "publish".
+  "git.postCommitCommand": "sync",
+  "git.confirmSync": false,
+
+  // Stage-less commits: with nothing staged, Commit takes every change in the
+  // working tree. Matches how publish.sh behaves, so both routes ship the
+  // same thing.
+  "git.enableSmartCommit": true,
+  "git.suggestSmartCommit": false,
+
+  // Keep the branch indicator honest about what is already live.
+  "git.autofetch": true,
+  "git.autofetchPeriod": 180,
+
+  // `main` is the deploy branch, so VS Code should open on it and not warn
+  // about committing straight to it -- committing straight to it is the point.
+  "git.branchProtection": [],
+  "git.showPushSuccessNotification": true
+}
