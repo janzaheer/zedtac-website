@@ -8660,12 +8660,19 @@
     bottom:calc(94px + var(--zt-bp-lift, 0px));
     width:min(400px, calc(100% - 48px));
     /* Ends clear of the nav for the same reason the floating panel does: it is
-       stacked below the bar, and at full height its own header goes behind it. */
-    height:min(560px, calc(100dvh - var(--nav-h, 74px) - 190px));
-    border-radius:24px; overflow:hidden;
-    background:#191615;
-    border:1px solid rgba(255,255,255,0.075);
-    box-shadow:0 34px 80px -24px rgba(0,0,0,.62), 0 4px 14px rgba(0,0,0,.34);
+       stacked below the bar, and at full height its own header goes behind it.
+       --zt-bp-lift belongs in this sum, not just in the offset below: the
+       cookie banner pushes the panel up, and a height that ignores it drove
+       the top edge off the screen on a phone, where the banner is tallest. */
+    --zt-panel-h:min(560px, calc(100dvh - var(--nav-h, 74px) - var(--zt-bp-lift, 0px) - 118px));
+    height:var(--zt-panel-h);
+    /* A positioning frame only -- no background, no border, no clipping. The
+       widget lays its own container out slightly taller than this box and
+       offset a little from the top, so clipping here shaved the footer off the
+       bottom edge. The rounding, the surface and the shadow are given to that
+       container instead, which is the box the visitor actually sees, and
+       nothing is cut. */
+    background:transparent; border:0; overflow:visible;
     animation:ztPanelDock .42s var(--ease, cubic-bezier(.16,1,.3,1));
   }
   /* Transform only -- an entrance that fades from 0 leaves the panel invisible
@@ -8677,7 +8684,8 @@
   @media (max-width:520px){
     .zt-embed-panel{
       right:12px; width:calc(100% - 24px);
-      height:min(70dvh, calc(100dvh - var(--nav-h, 64px) - 160px));
+      --zt-panel-h:min(70dvh, calc(100dvh - var(--nav-h, 64px) - var(--zt-bp-lift, 0px) - 118px));
+      height:var(--zt-panel-h);
     }
   }
   @media (prefers-reduced-motion:reduce){ .zt-embed-panel{ animation:none; } }
@@ -13895,9 +13903,13 @@ if (THREE) (function () {
      the edge -- invisible on this Mac, obvious on the laptops this gets
      checked on. */
   var PANEL_SKIN = [
-    /* depth, and an edge so the panel reads as a surface above the page */
+    /* Depth, and an edge so the panel reads as a surface above the page. The
+       radius and shadow sit on .bpContainer as well as .bpWebchat because
+       embedded mode has no .bpWebchat -- the container is the visible box
+       there, and it is the one that has to be rounded and lifted. */
     '.bpWebchat{box-shadow:0 34px 80px -24px rgba(0,0,0,.62),0 4px 14px rgba(0,0,0,.34)!important}',
-    '.bpContainer{border:1px solid rgba(255,255,255,.075)}',
+    '.bpContainer{border:1px solid rgba(255,255,255,.075);border-radius:24px;overflow:hidden;' +
+      'background:#191615;box-shadow:0 34px 80px -24px rgba(0,0,0,.62),0 4px 14px rgba(0,0,0,.34)}',
 
     /* The panel is deliberately stacked below the nav so it can never cover a
        menu link. Left at full height that buries its own header -- the bot's
@@ -13935,6 +13947,36 @@ if (THREE) (function () {
     '.bpHeaderContainer{border-bottom:1px solid rgba(255,255,255,.08)}',
     '.bpHeaderContainer::after{content:"";position:absolute;inset:0;pointer-events:none;' +
       'background:linear-gradient(180deg,rgba(255,148,71,.11),rgba(255,148,71,0))}',
+
+    /* The emoji picker is absolutely positioned against the 30px emoji button
+       and is about 354px wide. Anchored from that button's left edge it starts
+       roughly two thirds of the way across a 390px panel and runs past the
+       right edge, where an ancestor with overflow:clip cuts it off -- silently,
+       so the picker simply appears with its right-hand columns missing and
+       nothing reports an error. Anchoring it to the composer's right edge
+       instead puts the whole picker inside the panel at every width tested,
+       375 through 1280.
+
+       auto rather than the hidden it ships with, so if the grid is ever wider
+       than the space it scrolls instead of losing columns. The height cap is
+       for short windows, where a 415px picker would otherwise run past the
+       panel. !important because these fight the widget's own rules inside the
+       same shadow root, where load order is not something to rely on. */
+    '.bpComposerEmojiPickerContainer{position:static!important}',
+    '.bpComposerEmojiPicker{left:auto!important;right:0!important;' +
+      'max-width:calc(100% - 8px)!important;' +
+      /* Sized against the panel rather than a flat 420px: the picker opens
+         upward from the composer, and a cap taller than the room above it put
+         its top 40px outside the panel, where the rounding clips. --zt-panel-h
+         is published on the wrapper and inherits across the shadow boundary,
+         which selectors cannot. The subtraction is the composer plus its
+         footer. */
+      'max-height:calc(var(--zt-panel-h, 520px) - 140px)!important;' +
+      'overflow:auto!important}',
+    /* The grid is a separate custom element with a width of its own, so
+       constraining only the wrapper left it hanging past the panel edge on a
+       phone -- 23px out at 375. */
+    '.bpComposerEmojiPicker em-emoji-picker{max-width:100%!important;width:100%!important}',
 
     /* Composer: give focus somewhere to land. */
     '.bpComposerInputContainer{transition:box-shadow .18s cubic-bezier(.4,0,.2,1)}',
