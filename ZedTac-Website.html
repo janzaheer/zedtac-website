@@ -13735,18 +13735,98 @@ if (THREE) (function () {
      inside that root instead. Only the rule needs injecting, not the value:
      --zt-bp-lift is set on :root below and custom properties inherit straight
      through a shadow boundary. */
+  /* The panel's own skin. Botpress themes itself from a token ramp -- the
+     config's colour already lands on --bpPrimary-500, so the hue is right and
+     nothing here touches it. What it ships without is depth and motion: a
+     4px/24px shadow at 0.15 alpha barely separates a dark panel from a dark
+     page, and it simply appears rather than arriving.
+
+     Scrollbars are styled deliberately. On Windows the list draws a full
+     classic scrollbar, which on a near-black panel reads as a grey slab down
+     the edge -- invisible on this Mac, obvious on the laptops this gets
+     checked on. */
+  var PANEL_SKIN = [
+    /* depth, and an edge so the panel reads as a surface above the page */
+    '.bpWebchat{box-shadow:0 34px 80px -24px rgba(0,0,0,.62),0 4px 14px rgba(0,0,0,.34)!important}',
+    '.bpContainer{border:1px solid rgba(255,255,255,.075)}',
+
+    /* The panel is deliberately stacked below the nav so it can never cover a
+       menu link. Left at full height that buries its own header -- the bot's
+       name, and the close button -- behind the bar, so it is capped to end
+       clear of it. --nav-h is measured by the page at runtime and inherits
+       through the shadow boundary, so this tracks the bar through the 1024px
+       layout switch instead of guessing at a height. */
+    '.bpWebchat{max-height:calc(100dvh - var(--nav-h, 74px) - 40px)!important}',
+
+    /* Arrival. The inner container is animated, never .bpWebchat itself:
+       that one is position:fixed, and a transform on it would become the
+       containing block for every fixed thing the widget draws inside. */
+    /* Motion is carried entirely by transform. Nothing here animates opacity,
+       and that is the whole point: an entrance that fades in from 0 leaves
+       the content invisible for as long as the animation fails to advance,
+       and a chat panel or a reply that cannot be read is a far worse failure
+       than one that does not glide in.
+
+       This is not hypothetical. Fading was tried first, both with
+       fill-mode:both and without it, and under throttled frames every message
+       in the panel -- and the panel itself -- sat at opacity 0 while the
+       animation reported itself as running at 0ms. Dropping the fill mode did
+       not help, because the freeze happens inside the animation's active
+       window, where the keyframes still win. A transform-only entrance cannot
+       fail that way: frozen at its first frame it is a readable panel offset
+       by a few pixels. */
+    '@keyframes ztPanelIn{from{transform:translateY(16px) scale(.975)}to{transform:none}}',
+    '.bpContainer{animation:ztPanelIn .42s cubic-bezier(.16,1,.3,1)}',
+
+    '@keyframes ztMsgIn{from{transform:translateY(9px)}to{transform:none}}',
+    '.bpMessageContainer{animation:ztMsgIn .34s cubic-bezier(.16,1,.3,1)}',
+
+    /* Header: a warm wash off the brand colour and a hairline to sit the
+       conversation under, instead of a flat slab. */
+    '.bpHeaderContainer{border-bottom:1px solid rgba(255,255,255,.08)}',
+    '.bpHeaderContainer::after{content:"";position:absolute;inset:0;pointer-events:none;' +
+      'background:linear-gradient(180deg,rgba(255,148,71,.11),rgba(255,148,71,0))}',
+
+    /* Composer: give focus somewhere to land. */
+    '.bpComposerInputContainer{transition:box-shadow .18s cubic-bezier(.4,0,.2,1)}',
+    '.bpComposerInputContainer:focus-within{box-shadow:0 0 0 2px rgba(255,148,71,.34)}',
+
+    /* Scrollbar -- see the note above. */
+    '.bpMessageListViewport{scrollbar-width:thin;scrollbar-color:rgba(255,148,71,.42) transparent}',
+    '.bpMessageListViewport::-webkit-scrollbar{width:8px;height:8px}',
+    '.bpMessageListViewport::-webkit-scrollbar-track{background:transparent}',
+    '.bpMessageListViewport::-webkit-scrollbar-thumb{background:rgba(255,148,71,.38);border-radius:99px}',
+    '.bpMessageListViewport::-webkit-scrollbar-thumb:hover{background:rgba(255,148,71,.62)}',
+
+    '@media (prefers-reduced-motion:reduce){' +
+      '.bpContainer,.bpMessageContainer{animation:none}' +
+      '.bpComposerInputContainer{transition:none}}'
+  ].join('');
+
   function styleFab(){
     var host = document.getElementById('fab-root');
     if (!host || !host.shadowRoot) return false;
-    if (host.shadowRoot.getElementById('zt-bp-lift')) return true;
-    var st = document.createElement('style');
-    st.id = 'zt-bp-lift';
-    st.textContent =
-      '.bpFabWrapper{' +
-        'transform:translateY(calc(-1 * var(--zt-bp-lift, 0px)));' +
-        'transition:transform .28s cubic-bezier(.4,0,.2,1);' +
-      '}';
-    host.shadowRoot.appendChild(st);
+    var sr = host.shadowRoot;
+
+    if (!sr.getElementById('zt-bp-lift')){
+      var lift = document.createElement('style');
+      lift.id = 'zt-bp-lift';
+      lift.textContent =
+        '.bpFabWrapper{' +
+          'transform:translateY(calc(-1 * var(--zt-bp-lift, 0px)));' +
+          'transition:transform .28s cubic-bezier(.4,0,.2,1);' +
+        '}';
+      sr.appendChild(lift);
+    }
+
+    /* Injected here rather than in the voice layer, which returns early on a
+       browser with no speech engine -- the panel still needs its skin there. */
+    if (!sr.getElementById('zt-bp-theme')){
+      var skin = document.createElement('style');
+      skin.id = 'zt-bp-theme';
+      skin.textContent = PANEL_SKIN;
+      sr.appendChild(skin);
+    }
     return true;
   }
 
