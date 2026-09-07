@@ -8501,6 +8501,14 @@
     transition:transform .28s var(--ease, cubic-bezier(.4,0,.2,1)),
                box-shadow .2s var(--ease, cubic-bezier(.4,0,.2,1));
   }
+  /* A class that sets display beats the browser's own [hidden]{display:none},
+     so hiding these by attribute silently does nothing without this. The pill
+     was still on screen next to an open panel because of it -- invisible in
+     the floating layout only because the panel happened to cover it. */
+  .zt-voice-fab[hidden],
+  .zt-chat-chooser[hidden],
+  .zt-embed-panel[hidden]{ display:none !important; }
+
   .zt-voice-fab:hover{ box-shadow:0 20px 44px -12px rgba(0,0,0,.62); }
   .zt-voice-fab:focus-visible{ outline:2px solid var(--zt-orange-btn,#FF9447); outline-offset:3px; }
 
@@ -8627,6 +8635,60 @@
     .zt-chat-chooser{ animation:none; }
     .zt-chat-chooser .zt-cc-opt,
     .zt-chat-chooser .zt-cc-lang{ transition:none; }
+  }
+
+  /* ---------- EMBEDDED-MODE FALLBACK ----------
+     The webchat's dashboard configuration decides whether it floats or embeds.
+     Set to embed, it never builds a bubble or a container of its own: it waits
+     for an element the page is expected to provide, and if that element is
+     missing it simply never mounts and the chat is invisible with no error.
+     That is exactly what happened here.
+
+     So the page provides the host itself and gives it the geometry the
+     floating panel had. The widget renders the same interface into it either
+     way -- same .bpWebchat, .bpContainer, header, list and composer -- so the
+     skin and the launcher carry over unchanged, and the site no longer depends
+     on which mode the dashboard is left in.
+
+     #zt-chat-dock stands in for .bpChatContainer, which only exists in
+     floating mode. It carries the same stacking context, so the chat stays
+     under the nav and the mobile drawer in both modes. */
+  #zt-chat-dock{ position:relative; z-index:120; }
+
+  .zt-embed-panel{
+    position:fixed; right:24px;
+    bottom:calc(94px + var(--zt-bp-lift, 0px));
+    width:min(400px, calc(100% - 48px));
+    /* Ends clear of the nav for the same reason the floating panel does: it is
+       stacked below the bar, and at full height its own header goes behind it. */
+    height:min(560px, calc(100dvh - var(--nav-h, 74px) - 190px));
+    border-radius:24px; overflow:hidden;
+    background:#191615;
+    border:1px solid rgba(255,255,255,0.075);
+    box-shadow:0 34px 80px -24px rgba(0,0,0,.62), 0 4px 14px rgba(0,0,0,.34);
+    animation:ztPanelDock .42s var(--ease, cubic-bezier(.16,1,.3,1));
+  }
+  /* Transform only -- an entrance that fades from 0 leaves the panel invisible
+     for as long as the animation fails to advance. */
+  @keyframes ztPanelDock{
+    from{ transform:translateY(16px) scale(.975); }
+    to  { transform:none; }
+  }
+  @media (max-width:520px){
+    .zt-embed-panel{
+      right:12px; width:calc(100% - 24px);
+      height:min(70dvh, calc(100dvh - var(--nav-h, 64px) - 160px));
+    }
+  }
+  @media (prefers-reduced-motion:reduce){ .zt-embed-panel{ animation:none; } }
+
+  /* The widget binds its open/close to this element by id. It is kept out of
+     sight and out of the tab order because the pill is the real control --
+     but it must stay laid out, since a display:none button cannot be clicked
+     programmatically. */
+  .zt-embed-toggle{
+    position:fixed; left:-9999px; top:0;
+    width:1px; height:1px; padding:0; border:0; opacity:0;
   }
 </style>
 </head>
@@ -13891,9 +13953,14 @@ if (THREE) (function () {
   ].join('');
 
   function styleFab(){
-    var host = document.getElementById('fab-root');
-    if (!host || !host.shadowRoot) return false;
-    var sr = host.shadowRoot;
+    /* #fab-root when the widget floats, #webchat-root when it is embedded --
+       the interface inside is the same either way, so the skin fits both. */
+    var sr = null, ids = ['fab-root', 'webchat-root'];
+    for (var i = 0; i < ids.length && !sr; i++){
+      var el = document.getElementById(ids[i]);
+      if (el && el.shadowRoot) sr = el.shadowRoot;
+    }
+    if (!sr) return false;
 
     if (!sr.getElementById('zt-bp-lift')){
       var lift = document.createElement('style');
@@ -14043,9 +14110,59 @@ if (THREE) (function () {
   var rec = null, listening = false, speaking = false, micRefused = false;
   var pill = null, chooser = null;
 
+  /* Floating mode builds everything inside #fab-root's shadow root; embedded
+     mode renders the same interface inside #webchat-root's. Either way this is
+     where the skin and the composer rule have to be injected. */
   function shadow(){
-    var host = document.getElementById('fab-root');
-    return (host && host.shadowRoot) ? host.shadowRoot : null;
+    var ids = ['fab-root', 'webchat-root'];
+    for (var i = 0; i < ids.length; i++){
+      var el = document.getElementById(ids[i]);
+      if (el && el.shadowRoot) return el.shadowRoot;
+    }
+    return null;
+  }
+
+  /* .bpChatContainer is built only in floating mode, so the launcher needs a
+     home that exists in both. Same stacking context either way, so the chat
+     stays under the nav and the mobile drawer regardless of the mode. */
+  function dock(){
+    var d = document.querySelector('.bpChatContainer');
+    if (d) return d;
+    d = document.getElementById('zt-chat-dock');
+    if (!d){
+      d = document.createElement('div');
+      d.id = 'zt-chat-dock';
+      document.body.appendChild(d);
+    }
+    return d;
+  }
+
+  /* The host an embedded configuration waits for. Created up front, before the
+     widget looks for it: configured to embed and finding nothing, the widget
+     never mounts at all and the chat is invisible with no error anywhere --
+     which is exactly how it disappeared. Harmless when the widget floats, as
+     nothing then references these ids. */
+  var embedPanel = null;
+  function ensureEmbedHost(){
+    if (embedPanel) return embedPanel;
+    embedPanel = document.getElementById('bp-embedded-webchat');
+    if (embedPanel) return embedPanel;
+
+    var d = dock();
+    embedPanel = document.createElement('div');
+    embedPanel.id = 'bp-embedded-webchat';
+    embedPanel.className = 'zt-embed-panel';
+    embedPanel.hidden = true;
+    d.appendChild(embedPanel);
+
+    var t = document.createElement('button');
+    t.id = 'bp-toggle-chat';
+    t.type = 'button';
+    t.className = 'zt-embed-toggle';
+    t.tabIndex = -1;
+    t.setAttribute('aria-hidden', 'true');
+    d.appendChild(t);
+    return embedPanel;
   }
 
   /* ---- the text composer ---------------------------------------------- */
@@ -14227,7 +14344,7 @@ if (THREE) (function () {
       }
     });
 
-    document.querySelector('.bpChatContainer').appendChild(chooser);
+    dock().appendChild(chooser);
     markLangs();
     return chooser;
   }
@@ -14260,13 +14377,14 @@ if (THREE) (function () {
   function onEsc(e){ if (e.key === 'Escape') hideChooser(); }
 
   function buildPill(){
-    var container = document.querySelector('.bpChatContainer');
+    var container = dock();
     var sr = shadow();
     if (!container || !sr || pill) return;
 
     /* Botpress's own circle is hidden rather than removed: it is React's
        element, and taking it out would only invite it back on the next
-       render. */
+       render. (Embedded mode draws no circle at all, so this is a no-op
+       there.) */
     if (!sr.getElementById('zt-hide-fab')){
       var st = document.createElement('style');
       st.id = 'zt-hide-fab';
@@ -14300,16 +14418,21 @@ if (THREE) (function () {
   function syncPill(){
     var open = !!(window.botpress && window.botpress.state === 'opened');
     if (pill) pill.hidden = open;
+    /* In floating mode the widget shows and hides its own panel. In embedded
+       mode it just renders into the host and leaves it there, so the host is
+       what has to follow the open state. */
+    if (embedPanel) embedPanel.hidden = !open;
     if (open) hideChooser();
   }
 
   /* ---- wiring ---------------------------------------------------------- */
+  var bound = false;
   function bind(){
-    var host = document.getElementById('fab-root');
     var bp = window.botpress;
-    if (!host || !host.shadowRoot || !bp || typeof bp.on !== 'function') return false;
-    if (host.__ztVoiceBound) return true;
-    host.__ztVoiceBound = true;
+    var sr = shadow();
+    if (!sr || !bp || typeof bp.on !== 'function') return false;
+    if (bound) return true;
+    bound = true;
 
     bp.on('message', function(m){
       if (prefs.mode !== 'voice' || !canSpeak) return;   /* typing: stay quiet */
@@ -14336,10 +14459,12 @@ if (THREE) (function () {
       if (queued) return;
       queued = true;
       setTimeout(function(){ queued = false; syncPill(); }, 150);
-    }).observe(host.shadowRoot, { childList: true, subtree: true });
+    }).observe(sr, { childList: true, subtree: true });
 
     return true;
   }
+
+  ensureEmbedHost();
 
   if (!bind()){
     /* The widget mounts on its own schedule, and it is not quick: on a cold
