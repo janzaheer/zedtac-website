@@ -8473,6 +8473,74 @@
      the end of <body>. --zt-bp-lift is still published on :root from here,
      because custom properties do inherit through a shadow boundary even
      though selectors do not reach across it. */
+
+  /* ---------- VOICE LAUNCHER ----------
+     Replaces Botpress's 64px circle with a pill that says what it does, the
+     way focusteck.com's does: mic, a label, and a live availability dot. A
+     bare circle gives a visitor no reason to expect speech, which matters
+     here because clicking it starts talking at them.
+
+     It lives inside .bpChatContainer on purpose, so it inherits that
+     element's stacking context and stays under the nav and the mobile drawer
+     with the rest of the widget -- see the block above. It also rides the
+     same --zt-bp-lift as the bubble it replaces, so the cookie banner pushes
+     both out of the way together.
+
+     Only built when the browser can actually run speech; otherwise Botpress's
+     own circle is left alone, because a button promising to talk is worse
+     than a plain one that opens a chat you can type into. */
+  .zt-voice-fab{
+    position:fixed; bottom:24px; right:24px;
+    display:flex; align-items:center; gap:11px;
+    padding:8px 20px 8px 8px;
+    border:0; border-radius:999px;
+    background:var(--zt-ink-fixed,#26170B); color:#fff;
+    cursor:pointer; font-family:inherit; text-align:left;
+    box-shadow:0 16px 38px -12px rgba(0,0,0,.55);
+    transform:translateY(calc(-1 * var(--zt-bp-lift, 0px)));
+    transition:transform .28s var(--ease, cubic-bezier(.4,0,.2,1)),
+               box-shadow .2s var(--ease, cubic-bezier(.4,0,.2,1));
+  }
+  .zt-voice-fab:hover{ box-shadow:0 20px 44px -12px rgba(0,0,0,.62); }
+  .zt-voice-fab:focus-visible{ outline:2px solid var(--zt-orange-btn,#FF9447); outline-offset:3px; }
+
+  .zt-voice-fab .zt-vf-mic{
+    flex:0 0 auto; width:38px; height:38px; border-radius:50%;
+    background:var(--zt-orange-btn,#FF9447);
+    display:grid; place-items:center;
+  }
+  .zt-voice-fab .zt-vf-mic svg{ width:19px; height:19px; display:block; }
+
+  .zt-voice-fab .zt-vf-copy{ display:flex; flex-direction:column; gap:2px; }
+  .zt-voice-fab .zt-vf-title{
+    font-size:14px; font-weight:700; line-height:1.15; letter-spacing:.1px;
+  }
+  .zt-voice-fab .zt-vf-status{
+    display:flex; align-items:center; gap:5px;
+    font-size:9px; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
+    color:rgba(255,255,255,0.72);
+  }
+  .zt-voice-fab .zt-vf-dot{
+    width:6px; height:6px; border-radius:50%; background:#2FD07A;
+    box-shadow:0 0 0 0 rgba(47,208,122,.6);
+    animation:ztVfPulse 2.2s var(--ease, ease-out) infinite;
+  }
+  @keyframes ztVfPulse{
+    0%   { box-shadow:0 0 0 0 rgba(47,208,122,.55); }
+    70%  { box-shadow:0 0 0 7px rgba(47,208,122,0); }
+    100% { box-shadow:0 0 0 0 rgba(47,208,122,0); }
+  }
+  /* The label is the point of the pill, so it survives as long as it fits.
+     Under 400px the copy is dropped rather than wrapped -- a two-line pill
+     eats the corner of a phone screen. */
+  @media (max-width:400px){
+    .zt-voice-fab{ padding:8px; gap:0; }
+    .zt-voice-fab .zt-vf-copy{ display:none; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .zt-voice-fab{ transition:none; }
+    .zt-voice-fab .zt-vf-dot{ animation:none; }
+  }
 </style>
 </head>
 <body>
@@ -13876,6 +13944,67 @@ if (THREE) (function () {
     try { rec.start(); listening = true; } catch (e) { listening = false; }
   }
 
+  /* ---- the launcher ---------------------------------------------------- */
+  var pill = null;
+
+  var MIC_SVG =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#26170B" stroke-width="2.1" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<rect x="9" y="2" width="6" height="11" rx="3"></rect>' +
+    '<path d="M5 10a7 7 0 0 0 14 0"></path>' +
+    '<line x1="12" y1="17" x2="12" y2="22"></line></svg>';
+
+  function buildPill(){
+    var container = document.querySelector('.bpChatContainer');
+    var sr = shadow();
+    if (!container || !sr || pill) return;
+
+    /* Botpress's own circle is hidden rather than removed: it is React's
+       element, and taking it out from underneath would only invite it back on
+       the next render. */
+    if (!sr.getElementById('zt-hide-fab')){
+      var st = document.createElement('style');
+      st.id = 'zt-hide-fab';
+      st.textContent = '.bpFabWrapper{display:none!important}';
+      sr.appendChild(st);
+    }
+
+    pill = document.createElement('button');
+    pill.type = 'button';
+    pill.className = 'zt-voice-fab';
+    pill.setAttribute('aria-label', 'Talk to ZedTac');
+    pill.innerHTML =
+      '<span class="zt-vf-mic">' + MIC_SVG + '</span>' +
+      '<span class="zt-vf-copy">' +
+        '<span class="zt-vf-title">Talk to us</span>' +
+        '<span class="zt-vf-status"><span class="zt-vf-dot"></span>Available now</span>' +
+      '</span>';
+
+    pill.addEventListener('click', function(){
+      if (window.botpress.state === 'opened'){
+        try { synth.cancel(); } catch (e) {}
+        stopListening();
+        window.botpress.close();
+      } else {
+        hideText();
+        window.botpress.open();
+        speak(GREETING, startListening);   /* still inside the click gesture */
+      }
+      syncPill();
+    });
+
+    container.appendChild(pill);
+    syncPill();
+  }
+
+  /* The panel covers the corner while it is open, so the pill would only peek
+     out from behind it. Hidden by state rather than by a guess at the panel's
+     geometry, which differs between the phone and desktop layouts. */
+  function syncPill(){
+    if (!pill) return;
+    pill.hidden = (window.botpress && window.botpress.state === 'opened');
+  }
+
   /* ---- wiring ---------------------------------------------------------- */
   function bind(){
     var host = document.getElementById('fab-root');
@@ -13923,6 +14052,19 @@ if (THREE) (function () {
       stopListening();
       speak(b.text, startListening);
     });
+
+    buildPill();
+
+    /* The visitor can also close from inside the panel, where there is no
+       event to listen for, so the pill is resynced whenever the widget's own
+       DOM changes. Debounced: the message list mutates on every token of a
+       streamed reply. */
+    var queued = false;
+    new MutationObserver(function(){
+      if (queued) return;
+      queued = true;
+      setTimeout(function(){ queued = false; syncPill(); }, 150);
+    }).observe(host.shadowRoot, { childList: true, subtree: true });
 
     return true;
   }
