@@ -1,0 +1,13 @@
+# Netlify serves index.html at a directory root, but this site's single file
+# is ZedTac-Website.html, so the root URL had nothing to serve and returned
+# 404 -- the page was only reachable at /ZedTac-Website.html.
+#
+# A 200 rewrite serves that file at every path without changing its name or
+# the URL in the address bar. Netlify matches real files first, so /images/*
+# and the guide still resolve normally; everything else falls through to the
+# app, which is also what the client-side routes need for deep links and
+# reloads to work.
+[[redirects]]
+  from = "/*"
+  to = "/ZedTac-Website.html"
+  status = 200

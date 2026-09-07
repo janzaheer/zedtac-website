@@ -12,3 +12,6 @@ node_modules/
 # The ERP application is a separate project with its own repository:
 # https://github.com/zedtac/erp
 erp/
+
+# Claude Code local tooling
+.claude/

@@ -7,11 +7,18 @@
 <meta name="description" content="ZedTac is an enterprise ERP and business automation platform: a governed ledger across finance, inventory, supply chain, manufacturing and HR, plus 11 automation modules for collections, approvals, payroll, CRM and scheduled reporting.">
 <meta name="keywords" content="ERP solutions, business automation platform, ERP implementation, workflow automation, event-driven automation, accounts payable automation, receivables collections automation, expense approval automation, CRM automation, HR and payroll automation, cloud ERP, supply chain management">
 <!-- ┌───────────────────────────────────────────────────────────────────────┐
-     │ SITE ORIGIN — change in all four places below if the live domain      │
-     │ differs. It is inferred from the contact address (admin@zedtac.com);  │
-     │ nothing else in this file states the production URL. A canonical or   │
-     │ og:url pointing at the wrong origin is worse than none at all, so     │
-     │ confirm this before the site goes live.                               │
+     │ SITE ORIGIN — https://zedtac.com/ appears in SIX places below, not    │
+     │ four: canonical, og:url, og:image, twitter:image, and the JSON-LD     │
+     │ url and logo. Change all six together if the live domain differs.     │
+     │                                                                       │
+     │ Checked 31 Aug 2026: the domain is ours — the apex A records          │
+     │ resolve and the MX records carry admin@zedtac.com. But the web        │
+     │ root still serves a parked registrar lander, and HTTPS completes      │
+     │ on neither the apex nor www (the certificate does not match the       │
+     │ name). So these tags describe where the site is going, not where      │
+     │ it is yet. They become true on deploy — get HTTPS serving this        │
+     │ page at the apex before launch, or canonical and og:url both          │
+     │ point at a URL no crawler can fetch.                                  │
      └───────────────────────────────────────────────────────────────────────┘ -->
 <link rel="canonical" href="https://zedtac.com/">
 <meta name="robots" content="index, follow, max-image-preview:large">
@@ -131,6 +138,32 @@
   }
   window.addEventListener('resize', navHeight);
   window.addEventListener('load', navHeight);
+
+  /* Usable viewport width, scrollbar excluded -- see --vw in the stylesheet.
+     documentElement.clientWidth is the document's own width, which is what
+     the full-bleed rules actually want. Kept live on resize and on zoom,
+     which changes the CSS-pixel width without always firing resize. */
+  function viewportWidth(){
+    var w = document.documentElement.clientWidth;
+    if (w) document.documentElement.style.setProperty('--vw', w + 'px');
+  }
+  window.addEventListener('resize', viewportWidth, { passive: true });
+  window.addEventListener('load', viewportWidth);
+  viewportWidth();
+  if (window.ResizeObserver){
+    /* body, not documentElement: when a scrollbar appears because the page
+       grew past one viewport, documentElement's observed box does not
+       change, but body's width drops by the scrollbar's width. Observing
+       both means --vw is right whether the scrollbar is there from the
+       first layout or turns up later. */
+    var vwRO = new ResizeObserver(viewportWidth);
+    vwRO.observe(document.documentElement);
+    if (document.body) vwRO.observe(document.body);
+    else document.addEventListener('DOMContentLoaded', function(){
+      if (document.body) vwRO.observe(document.body);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', viewportWidth);
   /* The bar's height changes for reasons a resize listener never sees: the
      webfonts landing after first paint (which left --nav-h 4px short, so the
      hero at 100svh - --nav-h overshot the fold by exactly that), and the
@@ -689,7 +722,18 @@
   .dash-bars i:nth-child(5){ animation-delay:.6s; }
   .dash-bars i:nth-child(6){ animation-delay:.75s; }
   @keyframes rise{ from{ transform:scaleY(.55); } to{ transform:scaleY(1); } }
-  .dash-bars i{ transform-origin:bottom; }
+
+  /* The card ran short beside the copy column, so the hero's copy of it is
+     given a little more height. Most of it goes to the chart -- a taller plot
+     is worth more than deeper padding -- with a few pixels around the edges so
+     the extra does not all land in one place.
+
+     Scoped to the hero rather than edited into the .dash-card and .dash-bars
+     rules above: those are shared, and this is only wanted here. */
+  .hero .holo .dash-card{ padding:42px; }
+  .hero .holo .dash-grid{ margin-bottom:30px; }
+  .hero .holo .dash-stat{ padding:24px; }
+  .hero .holo .dash-bars{ height:268px; }
 
   /* The card ran short beside the copy column, so the hero's copy of it is
      given a little more height. Most of it goes to the chart -- a taller plot
@@ -835,6 +879,76 @@
     box-shadow:0 34px 60px -24px rgba(38,23,11,0.32); border-color:transparent;
   }
   .portfolio-thumb{ height:170px; position:relative; overflow:hidden; }
+  /* ---- deployment artwork + this section's own hover ----------------------
+     The cards were introduced by the light case-study illustrations. Each
+     deployment already carries a dark drawing of its own story on the same
+     data entry -- three plants resolving onto one line, two sales channels
+     merging into a single stock bar, a nine-day billing gap closing to two --
+     drawn for the Eight Sectors row and never used here. They are used here
+     now, so the picture and the case beneath it are about the same thing.
+
+     The hover is deliberately not the one the insights row uses. There the
+     cards resize and the row redistributes; here nothing moves sideways.
+     The card tilts on its own axis, the drawing pushes in behind it, and a
+     light sweeps diagonally across the artwork -- a card being picked up and
+     turned to the light, rather than a row rearranging itself. */
+  #case-studies .portfolio-card{
+    transform-style:preserve-3d;
+    transition:transform .5s var(--ease), box-shadow .5s var(--ease),
+               border-color .5s var(--ease);
+  }
+  #case-studies .portfolio-thumb .pf-scene{ position:absolute; inset:0; z-index:0; }
+  #case-studies .portfolio-thumb .pf-scene svg{
+    position:absolute; inset:0; width:100%; height:100%; display:block;
+    transition:transform .6s var(--ease);
+  }
+  /* Settles the drawing into the card body instead of ending on a hard edge,
+     and gives the category chip a ground dark enough to read on. */
+  /* The drawings are 16:9. The thumb was a fixed 170px, so at the card's width
+     the scene was scaled to cover and lost a slice off both sides; matching the
+     ratio instead means the whole drawing is shown and nothing is cropped.
+     !important because a media query further down sets this height again at
+     the same weight. */
+  #case-studies .portfolio-thumb{
+    height:auto !important;
+    aspect-ratio:16 / 9;
+  }
+  /* The veil started at 48% and reached .72, which put a heavy wash over the
+     lower half of every drawing -- the half most of them put their result in.
+     It now starts low and stays light: enough ground for the category chip,
+     not enough to swallow the picture. */
+  #case-studies .portfolio-thumb .pf-veil{
+    position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:linear-gradient(180deg, rgba(8,8,10,0) 68%, rgba(8,8,10,.46) 100%);
+  }
+  /* The sweep. Parked off the left edge and sent across on hover; a single
+     transform, so it composites. */
+  #case-studies .portfolio-thumb .pf-sheen{
+    position:absolute; top:-40%; bottom:-40%; left:-70%; width:55%;
+    z-index:1; pointer-events:none;
+    background:linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,.16), rgba(255,255,255,0));
+    transform:translateX(0) skewX(-14deg);
+    transition:transform .85s var(--ease);
+  }
+
+  @media (hover:hover) and (pointer:fine){
+    #case-studies .portfolio-card{ perspective:1000px; }
+    #case-studies .portfolio-card:hover{
+      transform:translateY(-10px) rotateX(4deg) rotateY(-4deg);
+      box-shadow:0 38px 66px -30px rgba(38,23,11,.45);
+      border-color:var(--zt-primary);
+    }
+    #case-studies .portfolio-card:hover .pf-scene svg{ transform:scale(1.1); }
+    #case-studies .portfolio-card:hover .pf-sheen{ transform:translateX(320%) skewX(-14deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #case-studies .portfolio-card,
+    #case-studies .portfolio-thumb .pf-scene svg,
+    #case-studies .portfolio-thumb .pf-sheen{ transition:none; }
+    #case-studies .portfolio-card:hover{ transform:none; }
+  }
+
   .portfolio-thumb img{
     position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
     transition:transform .5s cubic-bezier(.22,1,.36,1);
@@ -1014,6 +1128,54 @@
     transform:translateY(-6px) scale(1.015);
     box-shadow:var(--zt-shadow); border-color:var(--zt-orange-light);
   }
+  /* ---- this section's own hover ------------------------------------------
+     The cards are narrower than the site's other rows, and the one under the
+     cursor widens where it stands while its neighbours give up the room. The
+     card never leaves its place, so nothing jumps and the eye does not have to
+     find it again -- the row simply redistributes.
+
+     Width rather than transform: a scaled card would overlap its neighbours
+     instead of displacing them, and overlapping is what made the earlier
+     centre-stage version feel like a different component bolted on. Here the
+     row stays a row.
+
+     flex:0 0 auto with an explicit width, because width transitions cleanly in
+     a flex line where a flex-basis on a shorthand does not always. */
+  /* .blog-section prefixed, not just .blog-track: two later rules in this
+     stylesheet size these cards at the same two-class weight -- one at 20vw
+     and a wider one inside a media query -- so an equal selector here loses on
+     source order and the width silently stays theirs. Three classes clears
+     both wherever they sit. */
+  .blog-section .blog-track .blog-card{
+    flex:0 0 auto !important;
+    width:clamp(206px, 21vw, 262px);
+    transition:width .45s var(--ease), opacity .45s var(--ease),
+               border-color .45s var(--ease), box-shadow .45s var(--ease);
+  }
+
+  @media (hover:hover) and (pointer:fine){
+    /* The neighbours narrow and step back a little. Dimming through
+       :not(:hover) rather than dimming all and undoing it, so the hovered card
+       never carries the property at all. */
+    .blog-section .blog-track:hover .blog-card:not(:hover){
+      width:clamp(178px, 17vw, 220px);
+      opacity:.62;
+    }
+    .blog-section .blog-track .blog-card:hover{
+      width:clamp(320px, 33vw, 430px);
+      border-color:var(--zt-primary);
+      box-shadow:0 26px 54px -26px rgba(38,23,11,.42);
+    }
+    /* The artwork has more room to fill, so it gets a little more height. */
+    .blog-section .blog-track .blog-card:hover .blog-thumb{ height:196px; }
+  }
+
+  /* Touch has no hover to leave: the row would keep one card wide and five
+     narrow after a tap. Reduced motion keeps the widths, drops the easing. */
+  @media (prefers-reduced-motion: reduce){
+    .blog-section .blog-track .blog-card{ transition:none; }
+  }
+
   .blog-thumb{
     height:150px; background:var(--grad); position:relative;
     display:flex; align-items:flex-end; padding:14px; overflow:hidden;
@@ -1030,6 +1192,33 @@
     transition:transform .5s cubic-bezier(.22,1,.36,1);
   }
   .blog-card:hover .blog-thumb img{ transform:scale(1.09) rotate(0.5deg); }
+  /* ---- article artwork ----------------------------------------------------
+     Each card used to borrow one of the method illustrations -- the same six
+     light drawings that appear on the ERP services page -- so a piece on data
+     migration and a piece on user adoption were introduced by pictures that
+     belonged to neither. They are now drawn per article, dark, in the same
+     language as the Eight Sectors scenes: #0b0b0d ground, white hairlines and
+     one orange accent carrying whatever the piece is actually about.
+
+     Inline SVG on the post's own data entry rather than six more files: it
+     scales to any card width, costs no request, and keeps the drawing next to
+     the words it illustrates. */
+  .blog-thumb .blog-scene{ position:absolute; inset:0; z-index:0; }
+  .blog-thumb .blog-scene svg{
+    position:absolute; inset:0; width:100%; height:100%; display:block;
+    transition:transform .5s var(--ease);
+  }
+  /* Settles the drawing into the card body rather than ending it on a hard
+     edge, and gives the category chip a ground dark enough to read on. */
+  .blog-thumb .blog-veil{
+    position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:linear-gradient(180deg, rgba(8,8,10,0) 46%, rgba(8,8,10,.72) 100%);
+  }
+  .blog-card:hover .blog-scene svg{ transform:scale(1.05); }
+  @media (prefers-reduced-motion: reduce){
+    .blog-thumb .blog-scene svg{ transition:none; }
+  }
+
   .blog-cat{
     font-family:'JetBrains Mono',monospace; font-size:11px; color:#fff;
     background:rgba(0,0,0,0.35); padding:5px 10px; border-radius:var(--r-pill); position:relative; z-index:1;
@@ -1186,7 +1375,7 @@
   }
   .modal-box{
     background:var(--zt-white); border-radius:var(--r-lg); width:100%;
-    max-width:min(640px, 100vw - 48px);
+    max-width:min(640px, var(--vw) - 48px);
     max-height:85vh; max-height:85dvh; overflow-y:auto; padding:38px;
   }
   @media (max-width:560px){ .modal-box{ padding:28px 22px; border-radius:var(--r-md); } }
@@ -1935,6 +2124,52 @@
   #architecture .arch-node-points li{ color:rgba(255,255,255,.6); }
   #architecture .arch-rail-line{ opacity:.75; }
 
+  /* ==========================================================================
+     PERFORMANCE -- paint that cannot show, and work done off screen
+     Measured on the live page with getComputedStyle, not guessed. Numbers in
+     the comments are what was counted on 2026-08-31.
+     ========================================================================== */
+
+  /* 26 backdrop-filters that render nothing. Each of these elements paints an
+     opaque background over its own blur, so the browser sampled and blurred a
+     backdrop for every one of them and then covered it completely. Checked per
+     element: EVERY instance of these classes is opaque, not merely some, which
+     is why this can be a flat list. The .zt-rc-chip and .zt-rc-wash blurs are
+     genuinely visible and are deliberately not in it.
+     !important because these blurs come from shared card presets that several
+     id-scoped rules also touch; a plain class selector loses to them. */
+  .portfolio-card, .auto-card, .blog-card, .btn,
+  .dash-card, .solution-split, .cookie-banner{
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  }
+
+  /* NO content-visibility on the footer. It was tried here -- the footer is
+     3563px tall and runs 24 infinite animations -- and it made the footer
+     content hide and reappear while scrolling. The footer subtree gets
+     skipped and unskipped as it nears the viewport, its layout is thrown away
+     and rebuilt each time, and contain-intrinsic-size can only ever be a
+     guess at a height that changes with the route, so the reserved space and
+     the real space disagree and the block jumps.
+
+     It is not worth it, because the win it was bought for is already had
+     elsewhere: .zt-idle below parks those same 24 animations when the footer
+     is off screen, and does it by touching animation-play-state only, which
+     drives neither layout nor paint and so cannot make anything disappear. */
+
+  /* Decorative motion outside the viewport is work nobody can see. A small
+     module marks off-screen blocks with .zt-idle and everything animating
+     inside them parks until it returns. Only animation-play-state is touched:
+     no layout, no paint, and each animation resumes where it stopped instead
+     of restarting.
+     NOT content-visibility for these, unlike the footer: several of these
+     blocks paint a full-bleed ::before band wider than their own box, and the
+     paint containment content-visibility implies would clip it. */
+  .zt-idle, .zt-idle *,
+  .zt-idle::before, .zt-idle::after,
+  .zt-idle *::before, .zt-idle *::after{
+    animation-play-state:paused !important;
+  }
+
   /* ---------- THREE LAYERS -- scroll-linked lift -------------------------
      The only thing this adds to the section is movement, driven by scroll
      position alone -- there is no hover or cursor behaviour here or in the
@@ -1949,7 +2184,7 @@
      effect could introduce horizontal overflow. Transforming the child leaves
      the band completely alone.
 
-     Scale never exceeds 1. The section rises 16px and eases UP to its natural
+     Scale never exceeds 1. The section rises 52px and eases UP to its natural
      size as it comes into focus, then eases slightly back as it leaves, so
      the content is never larger than it is at rest and cannot overflow its
      container. That is also what makes it read as coming forward rather than
@@ -1959,8 +2194,40 @@
      script block); the only job here is the origin, and taking will-change
      off again the moment the section is out of view, so the compositor layer
      is not held for the whole page. */
+  /* .arch-node inherits saturate(1.75) blur(20px) from the glass card preset,
+     but here the card paints an opaque #0b0b0d ground and .zt-rc-visual lays a
+     second opaque layer over it: the blur has nothing to sample and renders
+     nothing, while still costing a backdrop re-rasterisation of every card on
+     every frame this section is scaled. Verified before removing. */
+  #architecture .arch-node{ -webkit-backdrop-filter:none; backdrop-filter:none; }
+
   .arch-stage{ transform-origin:50% 42%; }
   .arch-stage.is-live{ will-change:transform; }
+
+  /* ---- what made the zoom stutter -------------------------------------
+     A backdrop-filter has to resample and re-blur its backdrop at every
+     intermediate scale, so nine of them inside a section that is being
+     scaled every frame is the single most expensive thing on this page.
+
+     .arch-node inherits saturate(1.75) blur(20px) from the glass card
+     preset, but in THIS section the card paints an opaque #0b0b0d ground and
+     .zt-rc-visual lays a second opaque layer over that. The blur therefore
+     has nothing to sample and renders nothing at all -- it was pure cost.
+     Verified with getComputedStyle before removing: background is
+     rgb(11,11,13) on all three cards. */
+  #architecture .arch-node{ -webkit-backdrop-filter:none; backdrop-filter:none; }
+
+  /* There was an .is-moving class here that switched the remaining blurs off
+     while the transform was running. It was removed: toggling a class every
+     time the motion started and stopped invalidated style on six elements and
+     forced a repaint at exactly the moment the eye was settling, and near the
+     settle threshold it could flip on and off across consecutive frames. The
+     cure was worse than the disease.
+
+     The blurs are handled statically instead. The wash only carries its blur
+     when it is actually visible (see the .zt-rc-wash rules), and the three
+     chips keep theirs -- three small elements at 3px is not what was costing
+     anything. */
   /* The effect is motion and nothing else, so reduced-motion drops it wholly.
      The module also refuses to start, but this guarantees a neutral transform
      even if the preference is turned on mid-session. */
@@ -2185,7 +2452,7 @@
     top:calc(var(--nav-h, 102px) + 8px);
     left:50%;
     transform:translateX(-50%) translateY(10px);
-    width:min(720px, calc(100vw - 40px));
+    width:min(720px, calc(var(--vw) - 40px));
     max-width:none;
   }
   .nav-item.has-mega:hover .nav-dropdown{ transform:translateX(-50%) translateY(0); }
@@ -2607,7 +2874,7 @@
      =================================================================== */
   .hero-scene{
     position:absolute; top:0; bottom:0;
-    left:50%; width:100vw; margin-left:-50vw;   /* full bleed, no seam */
+    left:50%; width:var(--vw); margin-left:calc(var(--vw) / -2);   /* full bleed, no seam */
     z-index:0; pointer-events:none; overflow:hidden;
     perspective:1200px; transform-style:preserve-3d;
     --px:0; --py:0; --sy:0;                     /* pointer x/y (-1..1), scroll */
@@ -3406,6 +3673,62 @@
   .logo-text{ letter-spacing:-.022em; }
   .nav .logo-text{ color:#fff; }
 
+  /* ---- header wordmark ---------------------------------------------------
+     There is no .logo-mark element in the nav markup -- the header logo is
+     type and nothing else -- so the type carries it.
+
+     A mark briefly lived here and was removed on request: the header is the
+     wordmark and nothing else, which is how it started. The .logo-mark preset
+     further up stays unused -- it is shared with the footer, so it is not
+     dead code, just not called from here.
+
+     WHAT IS ALREADY THERE, because it is easy to miss and it decides what can
+     be added: .logo-text paints linear-gradient(96deg, ...) with
+     background-clip:text and a transparent -webkit-text-fill-color, in BOTH
+     the over-hero and the stuck state. -webkit-text-fill-color is inherited,
+     so the per-letter rules further up (.logo-text .z at #B24600, .t at
+     #FF9447) never actually render -- the whole word is painted by the
+     parent's single gradient sweep. They are dead but harmless, and are left
+     alone here rather than quietly deleted.
+
+     So nothing is added that would fight that sweep. Putting a second
+     gradient on just the Z and the T would give two letters their own ramp
+     and break the one continuous run across ZEDTAC. Instead:
+
+     1. A hairline that sweeps in under the word on hover and keyboard focus.
+        Decorative, so it carries no contrast requirement of its own.
+     2. Tracking that opens a touch on hover.
+     3. A gentle lift of the existing gradient on hover -- saturation and
+        brightness only, so the gradient's geometry is untouched and the rest
+        state is byte-for-byte what it was.
+
+     All three are hover/focus only, so they cost nothing at rest, and nothing
+     animates on its own: the bar already runs one infinite animation for the
+     mark aura and does not need a second. */
+  .nav .logo{ position:relative; }
+
+  .nav .logo-text{
+    transition:letter-spacing var(--dur-2) var(--ease),
+               filter var(--dur-2) var(--ease);
+  }
+  .nav .logo::after{
+    content:''; position:absolute; left:6px; right:6px; bottom:1px; height:1.5px;
+    border-radius:2px; pointer-events:none;
+    background:linear-gradient(90deg, var(--zt-primary), transparent);
+    transform:scaleX(0); transform-origin:left center;
+    transition:transform var(--dur-2) var(--ease);
+  }
+  .nav .logo:hover::after,
+  .nav .logo:focus-visible::after{ transform:scaleX(1); }
+  .nav .logo:hover .logo-text,
+  .nav .logo:focus-visible .logo-text{
+    letter-spacing:-.008em;
+    filter:saturate(1.16) brightness(1.06);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .nav .logo-text, .nav .logo::after{ transition:none; }
+  }
+
   /* ---------- LINKS -------------------------------------------------------- */
   .nav-links{
     background:transparent; border:none; box-shadow:none; padding:0;
@@ -3499,7 +3822,7 @@
       position:absolute;
       top:calc(100% + 12px);
       left:0;
-      width:min(360px, calc(100vw - 32px));
+      width:min(360px, calc(var(--vw) - 32px));
       max-width:none;
       transform:translateY(12px) scale(.985);
     }
@@ -3984,7 +4307,7 @@
   /* Contrast guard: a faint scrim under the copy column so the headline and
      sub keep their ratio even where layer 3's counter-glow lifts the black. */
   .hero-content::before{
-    content:''; position:absolute; inset:-8% -6% -8% -50vw; z-index:-1;
+    content:''; position:absolute; inset:-8% -6% -8% calc(var(--vw) / -2); z-index:-1;
     pointer-events:none;
     background:linear-gradient(90deg, rgba(4,4,6,.62) 0%, rgba(4,4,6,.40) 62%, transparent 100%);
   }
@@ -4804,13 +5127,13 @@
     .nav-dropdown{
       width:max-content;
       min-width:210px;
-      max-width:min(320px, calc(100vw - 32px));
+      max-width:min(320px, calc(var(--vw) - 32px));
       padding:10px;
     }
     .nav-item.has-mega .nav-dropdown{
       width:max-content;
       min-width:260px;
-      max-width:min(560px, calc(100vw - 40px));
+      max-width:min(560px, calc(var(--vw) - 40px));
       padding:16px;
     }
     /* Labels are short enough to sit on one line; the base rule allowed
@@ -4944,7 +5267,7 @@
   .zt-bleed::before, #case-studies::before, #architecture::before, #faq::before{
     content:'';
     position:absolute; top:0; bottom:0;
-    left:50%; width:100vw; margin-left:-50vw;
+    left:50%; width:var(--vw); margin-left:calc(var(--vw) / -2);
     z-index:-1; pointer-events:none;
     background:var(--zt-bleed, transparent);
   }
@@ -5019,14 +5342,25 @@
      nav with a negative top margin so it starts at y=0, and pads the content
      back down by the measured nav height so nothing hides underneath. Total
      height stays exactly one viewport, so the fold gains no extra scroll. */
-  :root{ --zt-cap:clamp(1440px, 1200px + 12vw, 1760px); }
+  :root{
+    --zt-cap:clamp(1440px, 1200px + 12vw, 1760px);
+    /* The width the page can actually use. 100vw INCLUDES the classic
+       scrollbar that Windows and Linux laptops render, so every 100vw
+       full-bleed was ~15px wider than the document and sat half that off
+       centre -- the hero and the tinted bands drifted left and had their
+       right edge clipped by body's overflow-x:clip. Invisible on macOS,
+       where the scrollbar is an overlay and 100vw is correct. The head
+       script republishes this as the real clientWidth; the 100vw here is
+       the pre-JS fallback, i.e. exactly today's behaviour. */
+    --vw:100vw;
+  }
 
   .hero{
     position:relative;
     left:50%;
-    width:100vw;
-    margin-left:-50vw;
-    margin-right:-50vw;
+    width:var(--vw);
+    margin-left:calc(var(--vw) / -2);
+    margin-right:calc(var(--vw) / -2);
     margin-top:calc(-1 * var(--nav-h, 74px));
 
     min-height:100vh;    /* fallback first -- older engines ignore the next */
@@ -5035,7 +5369,7 @@
     padding-top:calc(var(--nav-h, 74px) + clamp(24px, 4vh, 56px));
     padding-bottom:clamp(28px, 5vh, 64px);
     /* container padding + whatever it takes to centre the content box */
-    padding-inline:calc(clamp(20px, 4vw, 64px) + max(0px, (100vw - var(--zt-cap)) / 2));
+    padding-inline:calc(clamp(20px, 4vw, 64px) + max(0px, (var(--vw) - var(--zt-cap)) / 2));
   }
 
   /* The scene used to reach up past the hero to sit behind the bar. The hero
@@ -5666,13 +6000,27 @@
   .ft-social a{ display:inline-flex; align-items:center; gap:10px; }
   .ft-social svg{ width:18px; height:18px; flex:none; }
 
+  /* The Download column borrows .ft-social's icon-and-label row but stays
+     inert: no store listings exist yet, so the rows are spans rather than
+     links. The dimmed colour carries "not clickable" and the caption says
+     why, which fills the fifth grid track without promising a download. */
+  .ft-stores .is-soon{
+    display:inline-flex; align-items:center; gap:10px;
+    font-size:15px; color:rgba(255,255,255,.55);
+  }
+  .ft-stores svg{ width:18px; height:18px; flex:none; }
+  .ft-stores-note{
+    margin:16px 0 0; font-size:12px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase;
+    color:var(--zt-primary);
+  }
+
   /* Row 3: legal base. */
   .ft-base{ padding:clamp(18px, 2vw, 28px) 0 clamp(20px, 2.2vw, 32px); }
   .ft-base-copy{ font-size:14px; color:#FFFFFF; font-weight:600; margin:0 0 14px; }
   .ft-base p{ font-size:13.5px; line-height:1.75; color:rgba(255,255,255,.55); margin:0 0 14px; max-width:1180px; }
   .ft-base a{ color:rgba(255,255,255,.8); text-decoration:underline; }
   .ft-base a:hover{ color:var(--zt-primary); }
-  .ft-disclaimer{ margin-bottom:0 !important; }
 
   @media (max-width:1040px){
     .ft-cols{ grid-template-columns:repeat(3, 1fr); row-gap:34px; }
@@ -6797,7 +7145,7 @@
   #carousel-industries::before{
     content:'';
     position:absolute; top:0; bottom:0;
-    left:50%; width:100vw; margin-left:-50vw;
+    left:50%; width:var(--vw); margin-left:calc(var(--vw) / -2);
     z-index:-1; pointer-events:none;
     background:var(--zt-bleed, transparent);
   }
@@ -7033,7 +7381,10 @@
   :is(#architecture, #carousel-industries) .zt-reveal-card .zt-rc-wash{
     position:absolute; inset:0; opacity:0;
     background:rgba(8,8,10,.42);
-    -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
+    /* No backdrop-filter at rest. The wash sits at opacity 0 unless the card
+       is hovered, so a blur declared here was a live backdrop the browser had
+       to maintain on every card, at all times, to render nothing. It is
+       attached to the visible states below instead. */
     /* Fades from the foot up, so the drawing stays legible at the top of the
        card while the copy at the bottom gets a solid ground. */
     -webkit-mask-image:linear-gradient(to top, #000 52%, transparent 100%);
@@ -7041,7 +7392,10 @@
     transition:opacity .4s var(--ease);
   }
   :is(#architecture, #carousel-industries) .zt-reveal-card:hover .zt-rc-wash,
-  :is(#architecture, #carousel-industries) .zt-reveal-card:focus-within .zt-rc-wash{ opacity:1; }
+  :is(#architecture, #carousel-industries) .zt-reveal-card:focus-within .zt-rc-wash{
+    opacity:1;
+    -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
+  }
   :is(#architecture, #carousel-industries) .zt-reveal-card:hover .zt-rc-scene svg,
   :is(#architecture, #carousel-industries) .zt-reveal-card:focus-within .zt-rc-scene svg{ transform:scale(1.06); }
 
@@ -7145,7 +7499,10 @@
   @media (hover: none){
     :is(#architecture, #carousel-industries) .zt-reveal-card .zt-rc-panel{ grid-template-rows:1fr; }
     :is(#architecture, #carousel-industries) .zt-reveal-card .zt-rc-panel-inner{ opacity:1; transform:none; }
-    :is(#architecture, #carousel-industries) .zt-reveal-card .zt-rc-wash{ opacity:1; }
+    :is(#architecture, #carousel-industries) .zt-reveal-card .zt-rc-wash{
+      opacity:1;
+      -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
+    }
     :is(#architecture, #carousel-industries) .zt-reveal-card .zt-rc-toggle{ display:none; }
     :is(#architecture, #carousel-industries) .zt-reveal-card .zt-rc-title{ padding-right:0; }
     :is(#architecture, #carousel-industries) .zt-reveal-card .zt-rc-tag{ max-width:100%; }
@@ -7233,7 +7590,7 @@
       align-content:start;
     }
     #carousel-deployed .carousel-viewport{
-      margin-right:calc(50% - 50vw);
+      margin-right:calc(50% - var(--vw) / 2);
       /* The cards are shorter than the rail now, so they sit centred against
          it rather than hanging from its top edge -- equal air above and
          below, with the rail's heading reading across the middle of them. */
@@ -7615,27 +7972,17 @@
     background:rgba(255,255,255,.5);
   }
 
-  /* ---- the head: sector and index ---------------------------------------
-     A numeral, not a picture. It sits opposite the sector label on a hairline
-     rule, which is what gives the top of the card a structure now that the
-     image has moved away from it. */
+  /* ---- the head: sector --------------------------------------------------
+     The sector label on a hairline rule. The rule is what gives the top of
+     the card its structure now that the image has moved away from it, so it
+     stays on even though the numeral that sat opposite it is gone. */
   #carousel-deployed .dep-index{
-    display:flex; align-items:baseline; justify-content:space-between;
+    display:flex; align-items:baseline;
     gap:12px;
     padding-bottom:12px;
     border-bottom:1px solid rgba(38,23,11,.12);
   }
   #carousel-deployed .industry-cat{ line-height:1.3; display:block; }
-  #carousel-deployed .dep-num{
-    font-size:clamp(26px, 2.4vw, 34px);
-    line-height:1;
-    font-weight:500;
-    color:rgba(38,23,11,.16);
-    letter-spacing:-0.02em;
-    flex:none;
-    transition:color .22s var(--ease);
-  }
-  #carousel-deployed .industry-card:hover .dep-num{ color:rgba(255,148,71,.75); }
 
   #carousel-deployed .industry-card > h3{ margin-top:12px; }
 
@@ -7904,6 +8251,187 @@
     }
   }
 
+
+  /* ==========================================================================
+     MOBILE RHYTHM
+     Measured at 390x844 before writing this: every section carried 118px of
+     padding above and 34px below. Padding that uneven is what makes a page
+     read as "spacing everywhere" -- each section opens with a gap the size of
+     an eighth of the screen and then runs straight into the next one. The
+     hero alone ran 1.7 screens and Three Layers 2, so the page was 10.7
+     screens of scrolling on a phone.
+
+     This sets one rhythm for small screens and lets every section share it.
+     It sits at the end of the stylesheet on purpose: roughly thirty media
+     queries above it size these same things, and the last equal-weight rule
+     wins. The selectors carry an id so they also clear the two-class rules
+     among them.
+     ========================================================================== */
+  /* ONE CONTINUOUS RHYTHM, not three regimes.
+     Measured across the three sizes before writing this. The gutter already
+     held a steady 4% of the viewport at every width, but the section padding
+     did not: 9.2% of the viewport on a laptop, 17.3% on a tablet, 12.3% on a
+     phone. That is why the tablet looked like a different design -- nearly
+     double the laptop's proportion of dead band above every section -- and why
+     the heading gap there (24px) was tighter than the phone's (28px), which is
+     backwards.
+
+     A clamp tied to viewport width holds one proportion the whole way instead
+     of jumping at breakpoints: about 9vw, floored so it does not collapse on a
+     small phone and capped so it does not run away on a wide monitor. It lands
+     at 129px at 1440, 75px at 834 and 48px at 390 -- the same design, scaled.
+
+     Only the vertical sides are set: the hero is deliberately full-bleed, with
+     a -50vw margin either side so its background can span the viewport, and it
+     insets its own copy with horizontal padding. A blanket `padding: X 0`
+     wipes that and the headline runs off both edges. */
+  #main .wrap > section{
+    padding-top:clamp(48px, 9vw, 132px) !important;
+    padding-bottom:clamp(48px, 9vw, 132px) !important;
+  }
+  #main .sec-head{ margin-bottom:clamp(26px, 2.6vw, 40px); }
+
+  /* The hero takes whichever is larger: the shared rhythm, or enough room to
+     clear the bar that sits over it. The bar is fixed and about 84px tall, so
+     between roughly 550px and 1030px wide the rhythm alone is shorter than the
+     bar and the first line of the headline ends up behind it -- which is what
+     was happening on a tablet, by nine pixels.
+
+     Written at three classes because the hero is itself a section inside a
+     .wrap: the rule above, at two classes and an element, outranks a plain
+     .hero even with !important. */
+  #main .wrap > section.hero{
+    padding-top:max(calc(var(--nav-h, 84px) + 20px), clamp(48px, 9vw, 132px)) !important;
+  }
+
+  @media (max-width:720px){
+    #main .sec-head h2{ font-size:clamp(24px, 6.6vw, 30px); line-height:1.15; }
+    #main .sec-head p{ font-size:15.5px; line-height:1.55; margin-top:12px; }
+
+    /* Hero: the copy was filling more than a screen before the card came into
+       view, so the type steps down and the gaps between its parts close up. */
+    /* The top padding has to clear the bar, which is fixed over the hero and
+       about 76px tall here. A flat value put the first line of the headline
+       behind it. --nav-h is measured at runtime; the fallback covers the frame
+       before that measurement lands. */
+    .hero h1{ font-size:clamp(30px, 8.6vw, 40px) !important; line-height:1.06; }
+    .hero .hero-sub{ font-size:15.5px; line-height:1.55; margin-top:16px; }
+    .hero .hero-cta{ margin-top:24px; gap:12px; }
+    .hero .hero-pillars{ margin-top:26px; padding-top:20px; }
+
+    /* Cards in the scrolling rows were sized for a tablet. */
+    .blog-section .blog-track .blog-card{ width:78vw !important; }
+    .portfolio-track .portfolio-card{ flex:0 0 82vw !important; }
+    .industry-slider-track .auto-card{ flex:0 0 82vw !important; }
+    .deployed-slider-track .industry-card{ flex:0 0 82vw !important; }
+  }
+
+  /* Small phones: the side gutter is the first thing to give. */
+  @media (max-width:400px){
+    .wrap{ padding:0 16px; }
+    #main .wrap > section{ padding-top:48px !important; padding-bottom:48px !important; }
+  }
+
+  /* ==========================================================================
+     LABEL SCALE
+     The small uppercase labels -- category chips, tags, table keys, the mono
+     eyebrows -- were all written at a fixed 10 to 11px. Measured across the
+     range, that is the one part of the type that does not respond: identical
+     on a 390px phone and a 2560px monitor, where it reads as a rendering
+     mistake rather than a small label.
+
+     One clamp gives them the same behaviour as the rest of the type. The floor
+     is 11px rather than the 10 some carried, since 10px uppercase on a phone
+     is below what is comfortable to read; the ceiling stops them growing into
+     body copy on a large screen.
+
+     Scoped by class rather than by editing thirty declarations in place: those
+     sit in different blocks with different weights, and one rule here at the
+     end of the stylesheet reaches all of them without disturbing the rest.
+     ========================================================================== */
+  .hp-key, .dash-tag, .zt-rc-chip, .zt-rc-tag, .sb-label,
+  .industry-cat, .portfolio-cat, .blog-cat, .case-label,
+  .pricing-badge, .consult-tag, .d-keytitle, .ft-stores-note,
+  .dash-live, .blog-date, .dep-num{
+    font-size:clamp(11px, 0.74vw, 14px);
+  }
+
+  /* The reveal cards' chip and tag are set through an id-scoped selector, so a
+     plain class here loses to them and they stayed at 10 and 11px on a 2560
+     screen while everything around them scaled. Matched at the same weight. */
+  :is(#architecture, #carousel-industries) .zt-reveal-card :is(.zt-rc-chip, .zt-rc-tag){
+    font-size:clamp(11px, 0.74vw, 14px);
+  }
+
+  /* The comparison tables carry real content at label size. They get their own
+     step, a little larger, because this is copy a buyer actually reads. */
+  .cap-table td, .compare-table td, .compare-scroll td{
+    font-size:clamp(12.5px, 0.86vw, 15px);
+  }
+
+  /* ==========================================================================
+     CAROUSEL EDGE ON SMALL SCREENS
+     The scrolling rows were clipped at the wrap's padding, so on a phone the
+     cut fell 16px inside the screen and left a strip of page down the right of
+     every carousel while the text sections beside them ended at 19px. Two
+     different right edges on the same page is what reads as broken spacing.
+
+     On desktop these rows deliberately run off the screen so they read as
+     continuing rather than ending. This restores that on a phone: the track
+     bleeds out to the true edge with a negative margin, and takes the same
+     amount back as padding so the first card still lines up with the heading
+     above it and the last card still stops on the gutter.
+     ========================================================================== */
+  @media (max-width:720px){
+    #main .slider-track{
+      margin-right:calc(-1 * clamp(20px, 4vw, 64px));
+      padding-right:clamp(20px, 4vw, 64px);
+    }
+  }
+  @media (max-width:400px){
+    #main .slider-track{ margin-right:-16px; padding-right:16px; }
+  }
+
+  /* ==========================================================================
+     FOOTER NEWSLETTER ON PHONES
+     The field stacks to a column on a phone but kept the rest of its desktop
+     shape, and the two do not go together. Measured at 375: a 108px tall box
+     still carrying border-radius:100px, so the pill meant for a single-line
+     row became a large rounded blob; and padding of 6px 6px 6px 22px, written
+     for a row where the text needed clearance from the left edge and the
+     button sat against the right -- which in a column leaves everything inside
+     pushed 22px from one side and 6px from the other.
+
+     Stacked, it should read as a small panel holding two controls, not as one
+     enormous pill with a button inside it. The container takes a normal corner
+     and even padding; the input becomes a field in its own right; the button
+     goes full width beneath it.
+     ========================================================================== */
+  @media (max-width:560px){
+    footer .ft-news-field{
+      flex-direction:column;
+      align-items:stretch;
+      border-radius:var(--r-lg);
+      padding:10px;
+      gap:10px;
+    }
+    footer .ft-news-field input{
+      width:100%;
+      padding:13px 16px;
+      border-radius:var(--r-pill);
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    footer .ft-news-field .btn-primary{ width:100%; }
+  }
+
+  /* The footer's three bands ended on three different right edges -- the
+     newsletter and the link columns at 19px from the screen, the legal base at
+     16px. Small, but it is the kind of drift the eye reads as the page not
+     being square. They share one gutter now. */
+  footer .ft-top, footer .ft-cols, footer .ft-base{
+    padding-left:0; padding-right:0;
+  }
 </style>
 </head>
 <body>
@@ -8135,6 +8663,15 @@
           <div class="holo" ref="holo">
             <div class="holo-glow" aria-hidden="true"></div>
 
+            <!-- The product window. It used to be two stat tiles and six bars
+                 on a transparent, borderless card, which on a cream hero read
+                 as a placeholder rather than as software. It is now a dark
+                 surface -- the same #0b0b0d the Eight Sectors and Three Layers
+                 cards use -- so it reads as a screen sitting on the page.
+
+                 Everything in it is still except the live dot. A product shot
+                 does not need to move to be convincing; it needs to look like
+                 something real. -->
             <div class="dash-card">
               <div class="dash-top">
                 <div class="dash-dots"><span></span><span></span><span></span></div>
@@ -8405,15 +8942,14 @@
             class="slider-track deployed-slider-track carousel-track"
             ref="deployedTrack"
           >
-            <!-- Picture at the head, everything else underneath it: sector and
-                 index, title, the problem it solved, the modules that did it,
-                 the measured outcome. The picture carries flex-grow, so on a
+            <!-- Picture at the head, everything else underneath it: sector,
+                 title, the problem it solved, the modules that did it, the
+                 measured outcome. The picture carries flex-grow, so on a
                  tall card the spare height goes into the image rather than
                  opening a hole in the middle of the copy.
 
-                 The index numeral is derived from position (card n of eight),
-                 not new copy. The scene is an inline SVG on each entry, drawn
-                 for that deployment's own story -- see the caseStudies array.
+                 The scene is an inline SVG on each entry, drawn for that
+                 deployment's own story -- see the caseStudies array.
                  The Case Studies slider below renders the same array from its
                  own template, with its own `image` and `solution` prose, and
                  is untouched. -->
@@ -8424,7 +8960,6 @@
               </div>
               <div class="dep-index">
                 <span class="industry-cat">{{ c.category }}</span>
-                <span class="dep-num mono" aria-hidden="true">{{ String(i+1).padStart(2,'0') }}</span>
               </div>
               <h3>{{ c.title }}</h3>
               <p>{{ c.challenge }}</p>
@@ -8457,7 +8992,9 @@
         >
           <article class="portfolio-card" v-for="p in caseStudies" :key="p.title">
             <div class="portfolio-thumb">
-              <img :src="p.image" :alt="p.title + ' — ERP case study'" width="480" height="300" loading="lazy" decoding="async">
+              <span class="pf-scene" v-html="p.scene"></span>
+              <span class="pf-veil"></span>
+              <span class="pf-sheen" aria-hidden="true"></span>
               <span class="portfolio-cat">{{ p.category }}</span>
             </div>
             <div class="portfolio-body">
@@ -8512,7 +9049,8 @@
                   <span class="hero-shape bc1"></span>
                   <span class="hero-shape bc2"></span>
                 </div>
-                <img :src="b.image" :alt="b.title" width="480" height="300" loading="lazy" decoding="async">
+                <span class="blog-scene" v-html="b.scene"></span>
+                <span class="blog-veil"></span>
                 <span class="blog-cat">{{ b.category }}</span>
               </div>
               <div class="blog-body">
@@ -10075,11 +10613,29 @@
           </ul>
         </div>
 
-        <!-- The Download column is removed rather than relinked. Both entries
-             pointed at goConsult, so a visitor who clicked "App Store" expecting
-             a store listing landed on a consultation form; advertising store
-             presence the product does not have is worse than not listing it.
-             Restore this block when real store URLs exist. -->
+        <!-- Download. Restored, but inert: there are still no store listings,
+             so each row is a <span>, not a link. The last time this column
+             existed both entries pointed at goConsult, and a visitor who
+             clicked "App Store" landed on a consultation form. Dimmed rows
+             plus the caption underneath name the state instead of promising a
+             download, and they fill the fifth grid track the row was built
+             for. When the listings go live: swap each <span> for an <a
+             href="..." target="_blank" rel="noopener">, drop the is-soon
+             class and delete the caption. .ft-col a already styles the rest. -->
+        <div class="ft-col">
+          <h2>Download</h2>
+          <ul class="ft-stores">
+            <li>
+              <span class="is-soon">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>App Store</span>
+            </li>
+            <li>
+              <span class="is-soon">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.018 13.298l-3.919 2.218-3.515-3.493 3.543-3.521 3.891 2.202a1.49 1.49 0 0 1 0 2.594zM1.337.924a1.486 1.486 0 0 0-.112.568v21.017c0 .217.045.419.124.6l11.155-11.087L1.337.924zm12.207 10.065l3.258-3.238L3.45.195a1.466 1.466 0 0 0-.946-.179l11.04 10.973zm0 2.067l-11 10.933c.298.036.612-.016.906-.183l13.324-7.54-3.23-3.21z"/></svg>Play Store</span>
+            </li>
+          </ul>
+          <p class="ft-stores-note">Coming soon</p>
+        </div>
 
         <div class="ft-col">
           <h2>Connect</h2>
@@ -10107,8 +10663,6 @@
 
       <div class="ft-base">
         <p class="ft-base-copy">&copy; {{ year }} ZedTac Software Company. All rights reserved.</p>
-        <p>Based in Lahore, Punjab, Pakistan. Email <a href="mailto:admin@zedtac.com">admin@zedtac.com</a> to talk through a deployment. ZedTac connects finance, inventory, supply chain, manufacturing, HR and customer operations onto one governed ledger — and the automation engine acts on that record, so reminders, approvals, postings and reports happen without anyone chasing them. Implementations run in fixed phases under a named project lead, with training, SLA-backed support and quarterly optimization reviews after go-live.</p>
-        <p class="ft-disclaimer">*Disclaimer: figures quoted in case studies reflect individual deployments and are not a guarantee of comparable results.</p>
       </div>
     </div>
   </footer>
@@ -10121,6 +10675,31 @@
    mounted and painted before the loader overlay retires. */
 function ztBootApp(){
 const { createApp } = Vue;
+
+/* ----------------------------------------------------------------------------
+   STORAGE THAT IS ALLOWED TO FAIL
+   localStorage is not guaranteed to exist. A browser set to block site data
+   throws on the property ACCESS itself, not on the read or the write, and
+   Safari's older private mode throws on setItem. Every use below was
+   unguarded, and it cost more than a stored preference:
+
+     - acceptCookies() called setItem BEFORE clearing showCookieBanner, so the
+       throw skipped the line that dismisses the banner. Vue swallows the error
+       into a warning, so the button looked like it simply did nothing and the
+       visitor had no way to get rid of the banner at all. Same for Deny.
+     - mounted() read the key ahead of bindReveal() and the carousel timers, so
+       one throw there took out the rest of the page's setup with it.
+
+   These wrappers fail soft. When storage is unavailable the consent choice is
+   just not remembered between visits, which is the right trade: a banner that
+   asks again beats a banner that cannot be dismissed.
+   -------------------------------------------------------------------------- */
+const safeStorageGet = (key) => {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+};
+const safeStorageSet = (key, value) => {
+  try { localStorage.setItem(key, value); return true; } catch (e) { return false; }
+};
 
 createApp({
   data(){
@@ -10710,7 +11289,7 @@ createApp({
       // single stock bar, a nine-day billing gap closing to two, and so on.
       // `image` is unchanged -- the Case Studies slider below still uses it.
       caseStudies: [
-        { title:'Multi-Plant Production Control', category:'Manufacturing', image:'images/case-manufacturing.svg',
+        { title:'Multi-Plant Production Control', category:'Manufacturing',           image:'images/case-manufacturing.svg',
           // Three separate plant stacks resolving into one work-order line.
           scene:'<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ztD1" cx="50%" cy="30%" r="72%"><stop offset="0" stop-color="#FF9447" stop-opacity=".18"/><stop offset="1" stop-color="#FF9447" stop-opacity="0"/></radialGradient></defs><rect width="320" height="180" fill="#0b0b0d"/><rect width="320" height="180" fill="url(#ztD1)"/><g stroke="#fff" stroke-opacity=".05"><path d="M0 45h320M0 90h320M0 135h320M40 0v180M80 0v180M120 0v180M160 0v180M200 0v180M240 0v180M280 0v180"/></g><g fill="#fff" fill-opacity=".07" stroke="#fff" stroke-opacity=".18"><rect x="26" y="30" width="58" height="40" rx="5"/><rect x="131" y="30" width="58" height="40" rx="5"/><rect x="236" y="30" width="58" height="40" rx="5"/></g><g fill="#fff" fill-opacity=".14"><rect x="36" y="42" width="16" height="16" rx="2"/><rect x="56" y="48" width="16" height="10" rx="2"/><rect x="141" y="46" width="16" height="12" rx="2"/><rect x="161" y="40" width="16" height="18" rx="2"/><rect x="246" y="44" width="16" height="14" rx="2"/><rect x="266" y="50" width="16" height="8" rx="2"/></g><g stroke="#fff" stroke-opacity=".16" stroke-width="1.3" fill="none"><path d="M55 70v14q0 10 10 10h85M160 70v24M265 70v14q0 10-10 10h-85"/></g><rect x="112" y="96" width="96" height="26" rx="7" fill="#FF9447" fill-opacity=".16" stroke="#FF9447" stroke-opacity=".6"/><g fill="#FF9447" fill-opacity=".8"><rect x="124" y="105" width="30" height="4" rx="2"/><rect x="124" y="113" width="18" height="3" rx="1.5"/></g><g stroke="#FF9447" stroke-opacity=".35" stroke-width="1.4" fill="none"><path d="M160 122v14"/></g><rect x="40" y="136" width="240" height="14" rx="7" fill="#fff" fill-opacity=".06" stroke="#fff" stroke-opacity=".16"/><path d="M52 143h172" stroke="#FF9447" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/></svg>',
           challenge:'Three plants planned in separate spreadsheets, so shortages surfaced on the shop floor.',
@@ -10757,7 +11336,7 @@ createApp({
           // A scanned barcode, a directed pick path through the racks, and the
           // three-way match at the end of it.
           scene:'<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ztD6" cx="50%" cy="30%" r="72%"><stop offset="0" stop-color="#FF9447" stop-opacity=".18"/><stop offset="1" stop-color="#FF9447" stop-opacity="0"/></radialGradient></defs><rect width="320" height="180" fill="#0b0b0d"/><rect width="320" height="180" fill="url(#ztD6)"/><g stroke="#fff" stroke-opacity=".05"><path d="M0 45h320M0 90h320M0 135h320M40 0v180M80 0v180M120 0v180M160 0v180M200 0v180M240 0v180M280 0v180"/></g><rect x="26" y="24" width="86" height="44" rx="6" fill="#fff" fill-opacity=".05" stroke="#fff" stroke-opacity=".16"/><g fill="#FF9447" fill-opacity=".7"><rect x="38" y="34" width="3" height="24" rx="1"/><rect x="45" y="34" width="5" height="24" rx="1"/><rect x="54" y="34" width="2" height="24" rx="1"/><rect x="60" y="34" width="5" height="24" rx="1"/><rect x="69" y="34" width="3" height="24" rx="1"/><rect x="76" y="34" width="6" height="24" rx="1"/><rect x="86" y="34" width="2" height="24" rx="1"/><rect x="92" y="34" width="4" height="24" rx="1"/><rect x="100" y="34" width="3" height="24" rx="1"/></g><g stroke="#fff" stroke-opacity=".14" stroke-width="1.3"><path d="M132 30h160M132 58h160M132 86h160"/></g><g fill="#fff" fill-opacity=".08" stroke="#fff" stroke-opacity=".16"><rect x="138" y="34" width="30" height="22" rx="3"/><rect x="176" y="38" width="24" height="18" rx="3"/><rect x="242" y="34" width="30" height="22" rx="3"/><rect x="138" y="62" width="24" height="22" rx="3"/><rect x="208" y="62" width="30" height="22" rx="3"/><rect x="246" y="66" width="24" height="18" rx="3"/></g><rect x="208" y="34" width="26" height="22" rx="3" fill="#FF9447" fill-opacity=".55" stroke="#FF9447" stroke-opacity=".7"/><path d="M118 96h44q10 0 10-10V62q0-10 10-10h39" fill="none" stroke="#FF9447" stroke-opacity=".45" stroke-width="1.6" stroke-dasharray="5 4" stroke-linecap="round"/><g fill="#fff" fill-opacity=".06" stroke="#fff" stroke-opacity=".16"><rect x="40" y="112" width="66" height="40" rx="5"/><rect x="127" y="112" width="66" height="40" rx="5"/><rect x="214" y="112" width="66" height="40" rx="5"/></g><g fill="#fff" fill-opacity=".14"><rect x="50" y="122" width="34" height="4" rx="2"/><rect x="50" y="131" width="24" height="4" rx="2"/><rect x="137" y="122" width="34" height="4" rx="2"/><rect x="137" y="131" width="26" height="4" rx="2"/><rect x="224" y="122" width="34" height="4" rx="2"/><rect x="224" y="131" width="22" height="4" rx="2"/></g><g stroke="#FF9447" stroke-opacity=".85" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M50 143l4 5 9-10M137 143l4 5 9-10M224 143l4 5 9-10"/></g></svg>',
-          challenge:'Manual pick lists and paper receipt notes left order accuracy to individual memory.',
+          challenge:'Manual pick lists and paper goods-receipt notes left order accuracy to individual memory.',
           solution:'Barcode-driven receiving, directed picking and automated three-way matching against purchase orders.',
           result:'Order accuracy up to 99.6%',
           icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="8" y="3.5" width="8" height="6" rx="1"/><rect x="3" y="12" width="8" height="6.5" rx="1"/><rect x="13" y="12" width="8" height="6.5" rx="1"/></svg>',
@@ -10804,12 +11383,18 @@ createApp({
       ],
 
       blogPosts: [
-        { title:'ERP Implementation Failures: The 5 Root Causes We See Most', category:'Implementation', date:'July 2026', image:'images/method-discovery.svg', excerpt:'Most ERP programs do not fail on technology. Here is what actually derails them, and the checkpoints that catch each one early.' },
-        { title:'Cloud ERP vs On-Premise: A CFO Decision Framework', category:'Cloud ERP', date:'July 2026', image:'images/method-golive.svg', excerpt:'Total cost of ownership, data control, compliance and upgrade cadence — compared honestly, without the vendor spin.' },
-        { title:'How to Plan an ERP Data Migration That Actually Reconciles', category:'Data Migration', date:'June 2026', image:'images/method-migration.svg', excerpt:'Cleansing, mapping, dry runs and sign-off gates: the sequence that keeps opening balances accurate at cutover.' },
-        { title:'Business Process Automation: Where to Start Inside Your ERP', category:'Automation', date:'June 2026', image:'images/method-build.svg', excerpt:'Approval chains, three-way matching and exception alerts — the automations that pay for themselves first.' },
-        { title:'Choosing ERP Modules for a Manufacturing Business', category:'Manufacturing', date:'May 2026', image:'images/case-manufacturing.svg', excerpt:'BOMs, routings, MRP and shop-floor costing — which modules matter at each stage of production growth.' },
-        { title:'Driving ERP User Adoption After Go-Live', category:'Training', date:'May 2026', image:'images/method-training.svg', excerpt:'The system works. Getting two hundred people to use it consistently is a separate project — here is how we run it.' },
+        { title:'ERP Implementation Failures: The 5 Root Causes We See Most', category:'Implementation', date:'July 2026', scene:'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ztB1" cx="50%" cy="28%" r="74%"><stop offset="0" stop-color="#FF9447" stop-opacity=".20"/><stop offset="1" stop-color="#FF9447" stop-opacity="0"/></radialGradient></defs><rect width="320" height="200" fill="#0b0b0d"/><rect width="320" height="200" fill="url(#ztB1)"/><g stroke="#fff" stroke-opacity=".05"><path d="M0 50h320M0 100h320M0 150h320M40 0v200M80 0v200M120 0v200M160 0v200M200 0v200M240 0v200M280 0v200"/></g><path d="M24 150 H296" stroke="#fff" stroke-opacity=".16" stroke-width="1.6"/><g stroke="#fff" stroke-opacity=".13" stroke-width="1.4" stroke-dasharray="4 5" fill="none"><path d="M62 150 L52 108"/><path d="M114 150 L106 96"/><path d="M166 150 L160 112"/><path d="M218 150 L214 88"/><path d="M270 150 L266 104"/></g><g fill="#0b0b0d" stroke="#FF9447" stroke-opacity=".85" stroke-width="2"><circle cx="62" cy="150" r="7"/><circle cx="114" cy="150" r="7"/><circle cx="166" cy="150" r="7"/><circle cx="218" cy="150" r="7"/><circle cx="270" cy="150" r="7"/></g><g stroke="#FF9447" stroke-opacity=".9" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M59 150l2.5 3 4-5M111 150l2.5 3 4-5M163 150l2.5 3 4-5M215 150l2.5 3 4-5M267 150l2.5 3 4-5"/></g><g fill="#fff" fill-opacity=".10"><rect x="44" y="96" width="18" height="6" rx="3"/><rect x="96" y="84" width="22" height="6" rx="3"/><rect x="150" y="100" width="20" height="6" rx="3"/><rect x="202" y="76" width="24" height="6" rx="3"/><rect x="256" y="92" width="20" height="6" rx="3"/></g><rect x="24" y="30" width="72" height="8" rx="4" fill="#fff" fill-opacity=".12"/></svg>',
+          image:'images/method-discovery.svg', excerpt:'Most ERP programs do not fail on technology. Here is what actually derails them, and the checkpoints that catch each one early.' },
+        { title:'Cloud ERP vs On-Premise: A CFO Decision Framework', category:'Cloud ERP', date:'July 2026', scene:'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ztB2" cx="50%" cy="28%" r="74%"><stop offset="0" stop-color="#FF9447" stop-opacity=".20"/><stop offset="1" stop-color="#FF9447" stop-opacity="0"/></radialGradient></defs><rect width="320" height="200" fill="#0b0b0d"/><rect width="320" height="200" fill="url(#ztB2)"/><g stroke="#fff" stroke-opacity=".05"><path d="M0 50h320M0 100h320M0 150h320M40 0v200M80 0v200M120 0v200M160 0v200M200 0v200M240 0v200M280 0v200"/></g><path d="M44 74a20 20 0 0 1 38-9 24 24 0 0 1 44 12 18 18 0 0 1-4 35H60a20 20 0 0 1-16-38z" fill="#FF9447" fill-opacity=".16" stroke="#FF9447" stroke-opacity=".6" stroke-width="1.5"/><g fill="#fff" fill-opacity=".14"><rect x="196" y="52" width="72" height="16" rx="3"/><rect x="196" y="74" width="72" height="16" rx="3"/><rect x="196" y="96" width="72" height="16" rx="3"/></g><g fill="#FF9447" fill-opacity=".55"><circle cx="206" cy="60" r="3"/><circle cx="206" cy="82" r="3"/><circle cx="206" cy="104" r="3"/></g><path d="M160 40v92" stroke="#fff" stroke-opacity=".10" stroke-width="1" stroke-dasharray="4 5"/><rect x="40" y="150" width="100" height="14" rx="7" fill="#fff" fill-opacity=".07" stroke="#fff" stroke-opacity=".14"/><rect x="40" y="150" width="66" height="14" rx="7" fill="#FF9447" fill-opacity=".6"/><rect x="180" y="150" width="100" height="14" rx="7" fill="#fff" fill-opacity=".07" stroke="#fff" stroke-opacity=".14"/><rect x="180" y="150" width="88" height="14" rx="7" fill="#fff" fill-opacity=".20"/></svg>',
+          image:'images/method-golive.svg', excerpt:'Total cost of ownership, data control, compliance and upgrade cadence — compared honestly, without the vendor spin.' },
+        { title:'How to Plan an ERP Data Migration That Actually Reconciles', category:'Data Migration', date:'June 2026', scene:'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ztB3" cx="50%" cy="28%" r="74%"><stop offset="0" stop-color="#FF9447" stop-opacity=".20"/><stop offset="1" stop-color="#FF9447" stop-opacity="0"/></radialGradient></defs><rect width="320" height="200" fill="#0b0b0d"/><rect width="320" height="200" fill="url(#ztB3)"/><g stroke="#fff" stroke-opacity=".05"><path d="M0 50h320M0 100h320M0 150h320M40 0v200M80 0v200M120 0v200M160 0v200M200 0v200M240 0v200M280 0v200"/></g><g fill="#fff" fill-opacity=".09" stroke="#fff" stroke-opacity=".16"><rect x="22" y="52" width="76" height="14" rx="3"/><rect x="22" y="74" width="76" height="14" rx="3"/><rect x="22" y="96" width="76" height="14" rx="3"/><rect x="22" y="118" width="76" height="14" rx="3"/></g><path d="M104 60 L146 88 L146 112 L104 140" fill="#FF9447" fill-opacity=".12" stroke="#FF9447" stroke-opacity=".5"/><g stroke="#FF9447" stroke-opacity=".45" stroke-width="1.3" fill="none" stroke-dasharray="4 4"><path d="M146 94 H196"/><path d="M146 106 H196"/></g><g fill="#fff" fill-opacity=".13" stroke="#fff" stroke-opacity=".2"><rect x="200" y="66" width="94" height="16" rx="3"/><rect x="200" y="90" width="94" height="16" rx="3"/><rect x="200" y="114" width="94" height="16" rx="3"/></g><g stroke="#FF9447" stroke-opacity=".9" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M276 72l3 4 6-8M276 96l3 4 6-8M276 120l3 4 6-8"/></g><rect x="200" y="152" width="60" height="8" rx="4" fill="#FF9447" fill-opacity=".5"/></svg>',
+          image:'images/method-migration.svg', excerpt:'Cleansing, mapping, dry runs and sign-off gates: the sequence that keeps opening balances accurate at cutover.' },
+        { title:'Business Process Automation: Where to Start Inside Your ERP', category:'Automation', date:'June 2026', scene:'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ztB4" cx="50%" cy="28%" r="74%"><stop offset="0" stop-color="#FF9447" stop-opacity=".20"/><stop offset="1" stop-color="#FF9447" stop-opacity="0"/></radialGradient></defs><rect width="320" height="200" fill="#0b0b0d"/><rect width="320" height="200" fill="url(#ztB4)"/><g stroke="#fff" stroke-opacity=".05"><path d="M0 50h320M0 100h320M0 150h320M40 0v200M80 0v200M120 0v200M160 0v200M200 0v200M240 0v200M280 0v200"/></g><g fill="#fff" fill-opacity=".08" stroke="#fff" stroke-opacity=".18"><rect x="26" y="40" width="52" height="34" rx="4"/><rect x="26" y="82" width="52" height="34" rx="4"/><rect x="26" y="124" width="52" height="34" rx="4"/></g><g fill="#fff" fill-opacity=".14"><rect x="34" y="50" width="28" height="4" rx="2"/><rect x="34" y="92" width="28" height="4" rx="2"/><rect x="34" y="134" width="28" height="4" rx="2"/></g><g stroke="#fff" stroke-opacity=".16" stroke-width="1.3" fill="none"><path d="M78 57 H104 q10 0 10 10 v22"/><path d="M78 99 H114"/><path d="M78 141 H104 q10 0 10-10 v-22"/></g><circle cx="132" cy="99" r="18" fill="#FF9447" fill-opacity=".16" stroke="#FF9447" stroke-opacity=".7"/><path d="M125 99l5 5 9-11" fill="none" stroke="#FF9447" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><g stroke="#fff" stroke-opacity=".16" stroke-width="1.3" fill="none"><path d="M150 99 H180"/><path d="M212 99 H242"/></g><g fill="#0b0b0d" stroke="#fff" stroke-opacity=".3" stroke-width="1.6"><circle cx="196" cy="99" r="14"/><circle cx="258" cy="99" r="14"/></g><g fill="#FF9447" fill-opacity=".75"><circle cx="196" cy="99" r="5"/></g><path d="M252 99h12M258 93v12" stroke="#fff" stroke-opacity=".35" stroke-width="1.6" stroke-linecap="round"/><rect x="286" y="86" width="10" height="26" rx="5" fill="#FF9447" fill-opacity=".5"/></svg>',
+          image:'images/method-build.svg', excerpt:'Approval chains, three-way matching and exception alerts — the automations that pay for themselves first.' },
+        { title:'Choosing ERP Modules for a Manufacturing Business', category:'Manufacturing', date:'May 2026', scene:'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ztB5" cx="50%" cy="28%" r="74%"><stop offset="0" stop-color="#FF9447" stop-opacity=".20"/><stop offset="1" stop-color="#FF9447" stop-opacity="0"/></radialGradient></defs><rect width="320" height="200" fill="#0b0b0d"/><rect width="320" height="200" fill="url(#ztB5)"/><g stroke="#fff" stroke-opacity=".05"><path d="M0 50h320M0 100h320M0 150h320M40 0v200M80 0v200M120 0v200M160 0v200M200 0v200M240 0v200M280 0v200"/></g><rect x="132" y="30" width="56" height="24" rx="5" fill="#fff" fill-opacity=".12" stroke="#fff" stroke-opacity=".2"/><g stroke="#fff" stroke-opacity=".16" stroke-width="1.3" fill="none"><path d="M160 54 v14 H84 v12"/><path d="M160 68 H236 v12"/><path d="M160 54 v26"/></g><g fill="#fff" fill-opacity=".08" stroke="#fff" stroke-opacity=".16"><rect x="58" y="80" width="52" height="22" rx="4"/><rect x="134" y="80" width="52" height="22" rx="4"/><rect x="210" y="80" width="52" height="22" rx="4"/></g><g stroke="#FF9447" stroke-opacity=".5" stroke-width="1.5" fill="none" stroke-dasharray="5 4"><path d="M84 102 v16 H236 v-16"/></g><g fill="#fff" fill-opacity=".07" stroke="#fff" stroke-opacity=".16"><rect x="40" y="124" width="34" height="20" rx="4"/><rect x="88" y="124" width="34" height="20" rx="4"/><rect x="136" y="124" width="34" height="20" rx="4"/><rect x="184" y="124" width="34" height="20" rx="4"/><rect x="232" y="124" width="34" height="20" rx="4"/></g><rect x="40" y="160" width="226" height="12" rx="6" fill="#fff" fill-opacity=".06" stroke="#fff" stroke-opacity=".14"/><rect x="40" y="160" width="150" height="12" rx="6" fill="#FF9447" fill-opacity=".6"/></svg>',
+          image:'images/case-manufacturing.svg', excerpt:'BOMs, routings, MRP and shop-floor costing — which modules matter at each stage of production growth.' },
+        { title:'Driving ERP User Adoption After Go-Live', category:'Training', date:'May 2026', scene:'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ztB6" cx="50%" cy="28%" r="74%"><stop offset="0" stop-color="#FF9447" stop-opacity=".20"/><stop offset="1" stop-color="#FF9447" stop-opacity="0"/></radialGradient></defs><rect width="320" height="200" fill="#0b0b0d"/><rect width="320" height="200" fill="url(#ztB6)"/><g stroke="#fff" stroke-opacity=".05"><path d="M0 50h320M0 100h320M0 150h320M40 0v200M80 0v200M120 0v200M160 0v200M200 0v200M240 0v200M280 0v200"/></g><rect x="26" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="50" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="74" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="98" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="122" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="146" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="170" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="194" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="218" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="242" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="266" y="40" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="26" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="50" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="74" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="98" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="122" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="146" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="170" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="194" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="218" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="242" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="266" y="60" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="26" y="80" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="50" y="80" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="74" y="80" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="98" y="80" width="16" height="12" rx="3" fill="#FF9447" fill-opacity=".55"/><rect x="122" y="80" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="146" y="80" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="170" y="80" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="194" y="80" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="218" y="80" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="242" y="80" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="266" y="80" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="26" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="50" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="74" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="98" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="122" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="146" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="170" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="194" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="218" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="242" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><rect x="266" y="100" width="16" height="12" rx="3" fill="#fff" fill-opacity=".08"/><path d="M26 156 Q90 150 132 138 T226 112 T294 96" fill="none" stroke="#FF9447" stroke-opacity=".8" stroke-width="2.2" stroke-linecap="round"/><circle cx="294" cy="96" r="4.5" fill="#FF9447"/><path d="M26 168 H294" stroke="#fff" stroke-opacity=".10" stroke-width="1"/></svg>',
+          image:'images/method-training.svg', excerpt:'The system works. Getting two hundred people to use it consistently is a separate project — here is how we run it.' },
       ],
 
       // FAQ tabs. The section's eyebrow/heading/sub above the accordion are
@@ -10942,7 +11527,7 @@ createApp({
   mounted(){
     this.linkFieldLabels();
     this.startShowcaseInterval();
-    if (localStorage.getItem('cookieConsent') === null) {
+    if (safeStorageGet('cookieConsent') === null) {
       this.showCookieBanner = true;
     }
     this.startPortfolioInterval();
@@ -11629,12 +12214,14 @@ createApp({
       setTimeout(() => { this.formSubmitted = false; }, 6000);
     },
     acceptCookies() {
-      localStorage.setItem('cookieConsent', 'accepted');
+      // Dismiss first, remember second. If the write fails the banner still
+      // goes away; the visitor is simply asked again next time.
       this.showCookieBanner = false;
+      safeStorageSet('cookieConsent', 'accepted');
     },
     denyCookies() {
-      localStorage.setItem('cookieConsent', 'denied');
       this.showCookieBanner = false;
+      safeStorageSet('cookieConsent', 'denied');
     },
     // Footer newsletter signup. No backend exists to post this to, so it only
     // validates and shows a success state — the same honesty the consult form
@@ -12503,31 +13090,33 @@ if (THREE) (function () {
      its top edge is at the bottom of the screen, 1 when its bottom edge has
      passed the top. Three phases:
 
-       p < .30   scale 0.76 -> 1, lift 52px -> 0      rising into place
+       p < .30   scale 0.70 -> 1, lift 52px -> 0      rising into place
        p < .84   flat                                  settled, simply itself
-       p >= .84  scale 1 -> 0.90, lift 0               settling back
+       p >= .84  scale 1 -> 0.82, lift 0               settling back
 
      SPEED. Two separate things control it and they do different jobs.
      ENTER_END / EXIT_START set how much SCROLL the move is spread over -- at
      .30 the section is fully arrived a third of the way through its travel
      instead of nearly half, so the same distance is covered in less
-     scrolling and reads faster. EASE is how tightly each frame chases that
-     target; at .20 it closes about two thirds of the remaining gap every
-     five frames, so it tracks the scroll closely instead of trailing it.
-     Raising EASE alone makes it snappier but not quicker; raising it past
-     roughly .3 starts to look stepped rather than smooth.
+     scrolling and reads faster. EASE is how tightly the transform chases
+     that target. It is expressed per 60Hz frame but applied against elapsed
+     time, so the same figure means the same real-world response on a 60Hz
+     and a 120Hz panel. Raising EASE alone makes it snappier but not quicker;
+     raising it past roughly .3 starts to look stepped rather than smooth.
+     This is the dial for "it trails the scroll" -- the stutter that used to
+     be blamed on it had two other causes, both fixed below.
 
      Scale never goes above 1, which is deliberate: at rest the section is
      exactly the size it was designed at, so nothing can spill past the
      container and cause horizontal overflow. The "coming forward" read comes
      from approaching that size, not from exceeding it -- so the way to make
-     the zoom stronger is to start further BELOW 1, which is what 0.76 does.
+     the zoom stronger is to start further BELOW 1, which is what 0.70 does.
      Pushing the top end past 1 would make the content wider than the box that
      holds it, and that is the one change here that could produce horizontal
      overflow.
 
      Transform does not affect layout, so the shrunk section leaves visible
-     air inside a container that has not moved. At 0.76 that is 24% of the
+     air inside a container that has not moved. At 0.70 that is 30% of the
      section's width, which is a lot of air -- it was asked for explicitly and
      raised as a trade-off more than once. If it ever needs pulling back, this
      one constant is the whole dial.
@@ -12549,9 +13138,32 @@ if (THREE) (function () {
      PERFORMANCE. One rAF loop, and only while the section is on screen -- an
      IntersectionObserver starts and stops it. Per frame: one
      getBoundingClientRect (a read) and one transform write, in that order, so
-     no layout is forced mid-frame. Everything is composited: transform only,
-     no opacity, filter, box-shadow or blur. will-change is added when the
-     loop starts and removed when it stops, so the layer is not held for the
+     no layout is forced mid-frame. The module animates transform only.
+
+     WHAT THE MODULE ANIMATES IS NOT WHAT COSTS. An earlier note here claimed
+     there was "no filter, box-shadow or blur" involved. That was true of the
+     transform and false of the section: nine elements inside it carried a
+     backdrop-filter, and a backdrop blur must be resampled at every
+     intermediate scale, so all nine were re-rasterised on every frame of the
+     zoom. That, not the easing, is what made it stutter. Three of the nine
+     rendered nothing at all (opaque grounds above them) and are gone. Of the
+     six that remain, the hover wash now carries its blur only in the states
+     where it is actually visible, and the three chips keep theirs. An earlier
+     pass switched them off through an .is-moving class while the transform
+     ran; that was removed, because toggling a class at the start and end of
+     every movement invalidated style on six elements and repainted at exactly
+     the moment the eye was settling.
+
+     The progress read was the other half, twice over. It was first taken from
+     the stage itself, which the module transforms, so the input moved with the
+     output. It then read the untransformed parent -- correct, but still a
+     getBoundingClientRect on every frame, which forces the browser to flush
+     the transform written on the frame before. That forced synchronous layout
+     was the last of the stutter. The geometry is now measured only when it can
+     change (start, resize, and a ResizeObserver on the section), and each
+     frame reads nothing but window.scrollY.
+
+     will-change is added when the loop starts and removed when it stops, so the layer is not held for the
      life of the page. No library.
 
      REDUCED MOTION. The loop never starts and the transform is left
@@ -12566,12 +13178,13 @@ if (THREE) (function () {
 
   const reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  const ENTER_SCALE = 0.76;   // where it starts as it comes into view
-  const EXIT_SCALE  = 0.90;   // where it settles back to on the way out
+  const ENTER_SCALE = 0.70;   // where it starts as it comes into view
+  const EXIT_SCALE  = 0.82;   // where it settles back to on the way out
   const ENTER_LIFT  = 52;     // px it rises through on the way in
   const ENTER_END   = 0.30;   // progress at which it has arrived
   const EXIT_START  = 0.84;   // progress at which it starts settling back
-  const EASE = 0.20;          // per-frame approach to the target
+  const EASE = 0.26;          // approach to the target, per 60Hz frame
+  const FRAME = 1000 / 60;    // the cadence EASE is expressed against
 
   const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
   const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -12579,11 +13192,47 @@ if (THREE) (function () {
   function createStage(stage){
     let raf = 0, running = false;
     let curS = 1, curY = 0;
+    let last = 0;
+    let refTop = 0, refH = 0;
 
-    function frame(){
-      const r = stage.getBoundingClientRect();          // read
+    // Progress is measured on the UNTRANSFORMED parent (#architecture, the
+    // .wrap), never on the stage itself. Reading the stage fed the transform
+    // straight back into its own input: scaling moves the measured top edge
+    // and shrinks the measured height, so the target drifted while the eased
+    // value chased it and the section rubber-banded instead of tracking the
+    // scroll. The deeper the floor, the stronger the feedback -- which is why
+    // it became obvious when ENTER_SCALE went to 0.70. The .wrap is never
+    // transformed (see the stylesheet note), so it is a fixed reference.
+    const ref = stage.parentElement || stage;
+
+    /* NO getBoundingClientRect IN THE LOOP.
+       Reading a rect forces the browser to flush any pending style and layout
+       first. The loop also wrote a transform at the end of every frame, so
+       each frame's read had to settle the previous frame's write: a forced
+       synchronous layout, sixty times a second, which is what the remaining
+       stutter actually was.
+
+       The geometry the curve needs -- where the section sits in the document,
+       and how tall it is -- does not change while scrolling. So it is measured
+       once and re-measured only when it can genuinely differ: when the loop
+       starts, when the window resizes, and when the section's own height
+       changes. Per frame the only reading is window.scrollY, which is a value
+       the browser already has and does not have to lay anything out to give.  */
+    function measure(){
+      const r = ref.getBoundingClientRect();
+      refTop = r.top + (window.scrollY || window.pageYOffset || 0);
+      refH = r.height;
+    }
+
+    const ro = typeof ResizeObserver === 'function'
+      ? new ResizeObserver(measure) : null;
+    if (ro) ro.observe(ref);
+    window.addEventListener('resize', measure, { passive: true });
+
+    function frame(now){
       const vh = window.innerHeight || 1;
-      const p = clamp((vh - r.top) / (vh + r.height), 0, 1);
+      const top = refTop - (window.scrollY || window.pageYOffset || 0);
+      const p = clamp((vh - top) / (vh + refH), 0, 1);
 
       let s, y;
       if (p < ENTER_END){
@@ -12597,8 +13246,26 @@ if (THREE) (function () {
         y = 0;
       }
 
-      curS += (s - curS) * EASE;
-      curY += (y - curY) * EASE;
+      // Time-corrected smoothing. A fixed per-frame fraction converges twice
+      // as fast on a 120Hz panel as on 60Hz, and lurches after a dropped
+      // frame, because it counts frames rather than time. Deriving the factor
+      // from elapsed time makes the approach take the same real time on any
+      // refresh rate. dt is capped so a stalled tab resumes smoothly instead
+      // of snapping.
+      const dt = last ? Math.min(64, now - last) : FRAME;
+      last = now;
+      const k = 1 - Math.pow(1 - EASE, dt / FRAME);
+
+      curS += (s - curS) * k;
+      curY += (y - curY) * k;
+
+      // Exponential approach never exactly arrives, so snap the last sliver.
+      // Nothing is toggled off the back of this any more -- it only stops a
+      // sub-pixel transform being rewritten for the whole time the section is
+      // on screen.
+      if (Math.abs(s - curS) < 0.0004 && Math.abs(y - curY) < 0.02){
+        curS = s; curY = y;
+      }
 
       stage.style.transform =                            // write
         'translate3d(0,' + curY.toFixed(2) + 'px,0) scale(' + curS.toFixed(4) + ')';
@@ -12609,6 +13276,8 @@ if (THREE) (function () {
     function start(){
       if (running || reduceMQ.matches) return;
       running = true;
+      last = 0;
+      measure();                    // the section may have moved while away
       stage.classList.add('is-live');
       raf = requestAnimationFrame(frame);
     }
@@ -12617,6 +13286,7 @@ if (THREE) (function () {
       running = false;
       cancelAnimationFrame(raf);
       stage.classList.remove('is-live');
+      last = 0;
       // Off screen by now, so this can settle instantly -- nobody sees it.
       stage.style.transform = '';
       curS = 1; curY = 0;
@@ -12643,6 +13313,8 @@ if (THREE) (function () {
       dispose(){
         stop();
         io.disconnect();
+        if (ro) ro.disconnect();
+        window.removeEventListener('resize', measure);
         if (reduceMQ.removeEventListener) reduceMQ.removeEventListener('change', onReduceChange);
         else if (reduceMQ.removeListener) reduceMQ.removeListener(onReduceChange);
       }
@@ -12671,6 +13343,83 @@ if (THREE) (function () {
 
   queueSync();
 })();
+
+/* ============================================================================
+   OFF-SCREEN IDLE -- park decorative animation nobody can see
+   Pairs with the .zt-idle rules in <style>.
+
+   WHY. The page is roughly 14,400px tall and runs 46 infinite CSS animations,
+   all of them all of the time -- including the footer's 24 while the visitor
+   is still on the hero, 10,872px above it. None of that is visible, and it is
+   the difference between an idle compositor and a busy one during a scroll.
+
+   WHAT IT DOES. One IntersectionObserver over the top-level blocks. A block
+   that leaves the viewport (plus half a screen of margin either side) gets
+   .zt-idle, which parks every animation inside it through
+   animation-play-state. Coming back removes it and they resume from where
+   they stopped: paused, not cancelled, so nothing restarts or jumps.
+
+   WHY NOT content-visibility ANYWHERE. Two separate reasons. Most of these
+   blocks paint a full-bleed ::before band wider than their own box, and the
+   paint containment it implies would clip that. The footer has no such band
+   and did use it for a while, but skipping and unskipping a 3563px block
+   while scrolling made its content visibly hide and return, so it came back
+   out. Pausing animations achieves the same saving without touching whether
+   anything renders.
+
+   COST. animation-play-state drives neither layout nor paint, so a toggle is
+   a style recalc on that subtree and nothing else. The observer is passive:
+   no scroll handler, no rAF loop, nothing per frame.
+
+   REDUCED MOTION. Nothing to do. The animations are already suppressed
+   elsewhere and pausing a stopped animation is a no-op.
+
+   LIFECYCLE. Vue's v-if swaps the page subtree on route changes, so this uses
+   the same MutationObserver and debounced re-sync as the modules above and
+   picks up whatever blocks currently exist. A WeakSet keeps each block from
+   being observed twice and lets detached ones be collected.
+   ============================================================================ */
+(function(){
+  // Grandchildren of #main, not children: #main holds one wrapper per route
+  // (.zt-home and friends) and the actual sections are inside it. Observing
+  // the children would mean one 10,872px block that is always intersecting,
+  // so nothing would ever park. The grandchildren are the .wrap sections --
+  // eight of them, 944px to 2874px, against a viewport around 900px.
+  const BLOCKS = '#main > * > *, footer';
+
+  let io = null;
+  const seen = new WeakSet();
+
+  function observer(){
+    if (io) return io;
+    io = new IntersectionObserver(entries => {
+      for (const entry of entries){
+        entry.target.classList.toggle('zt-idle', !entry.isIntersecting);
+      }
+    }, { rootMargin: '50% 0px 50% 0px', threshold: 0 });
+    return io;
+  }
+
+  function sync(){
+    const obs = observer();
+    for (const block of document.querySelectorAll(BLOCKS)){
+      if (seen.has(block)) continue;
+      seen.add(block);
+      obs.observe(block);
+    }
+  }
+
+  let queued = false;
+  function queueSync(){
+    if (queued) return;
+    queued = true;
+    setTimeout(() => { queued = false; sync(); }, 0);
+  }
+
+  new MutationObserver(queueSync).observe(document.body, { childList: true, subtree: true });
+  queueSync();
+})();
+
 </script>
 </body>
 
