@@ -14425,6 +14425,39 @@ if (THREE) (function () {
     if (open) hideChooser();
   }
 
+  /* ---- clicking away closes it ----------------------------------------- */
+  /* An open chat should get out of the way the moment the visitor goes back to
+     the page, the way a menu or a dialog does.
+
+     composedPath, not contains(): the chat's interface lives inside a shadow
+     root, so a click on a message or the composer has a target that the panel
+     element does not contain in the ordinary sense, and contains() would read
+     it as a click on the page and close the chat mid-sentence.
+
+     Capture, so this runs before the launcher's own handler. On the click that
+     opens the panel the state is still 'closed' here and nothing happens; on a
+     click on the pill while open, the pill is on the path and this defers to
+     its handler rather than both firing. */
+  function onPageClick(e){
+    if (!window.botpress || window.botpress.state !== 'opened') return;
+    var path = (e.composedPath && e.composedPath()) || [];
+    for (var i = 0; i < path.length; i++){
+      var n = path[i];
+      if (!n || n.nodeType !== 1) continue;
+      if (n === pill || n === chooser || n === embedPanel) return;
+      if (n.id === 'fab-root' || n.id === 'webchat-root' || n.id === 'zt-chat-dock') return;
+      if (n.classList && n.classList.contains('bpChatContainer')) return;
+    }
+    closePanel();
+  }
+
+  function onPageKey(e){
+    if (e.key === 'Escape' && window.botpress && window.botpress.state === 'opened') closePanel();
+  }
+
+  document.addEventListener('click', onPageClick, true);
+  document.addEventListener('keydown', onPageKey, true);
+
   /* ---- wiring ---------------------------------------------------------- */
   var bound = false;
   function bind(){
