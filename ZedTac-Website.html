@@ -8862,14 +8862,17 @@
         <a href="#" @click.prevent="goAbout" :class="{'nav-active': page === 'about'}">About</a>
         <a href="#" @click.prevent="goConsult" :class="{'nav-active': page === 'consult'}">Contact</a>
 
+        <!-- Login and Get started are gone from the header. An ERP is not a
+             product a visitor signs up for from a marketing page: the next
+             step is always a conversation, which is what every other CTA on
+             the site already asks for. One button says that plainly and
+             leaves the bar less crowded than two competing ones did. -->
         <div class="nav-auth">
-          <a href="#" @click.prevent="openSignup" class="btn btn-primary">Get started</a>
-          <a href="#" @click.prevent="openLogin" class="btn btn-ghost">Login</a>
+          <a href="#" @click.prevent="goConsult" class="btn btn-primary">Book a Demo</a>
         </div>
       </nav>
       <div class="nav-cta">
-        <button @click="showLogin = true" class="btn btn-ghost">Login</button>
-        <a href="#" @click.prevent="openSignup" class="btn btn-primary">Get started</a>
+        <a href="#" @click.prevent="goConsult" class="btn btn-primary nav-demo">Book a Demo</a>
         <button class="nav-burger" :class="{open: navOpen}" @click="navOpen = !navOpen"
                 :aria-label="navOpen ? 'Close menu' : 'Open menu'" :aria-expanded="navOpen ? 'true' : 'false'">
           <span></span><span></span><span></span>
@@ -14270,32 +14273,98 @@ if (THREE) (function () {
   /* ---- the visitor's turn ---------------------------------------------- */
   function stopListening(){
     listening = false;
+    /* Drop the half-sentence too. Without this it survives the bot's reply and
+       is prepended to whatever the visitor says next, which reads as the bot
+       mishearing them. */
+    clearTimeout(silenceTimer);
+    silenceTimer = null;
+    heard = '';
     if (rec){ try { rec.abort(); } catch (e) {} }
+  }
+
+  /* How long a pause means the visitor has finished a sentence. Short enough
+     not to feel laggy, long enough to survive the gap before "...our pricing". */
+  var SILENCE_MS = 900;
+  /* Engines that report a confidence at all and report it this low are usually
+     returning noise. A zero means "not scored", which is common, so it is not
+     treated as a low score. */
+  var MIN_CONFIDENCE = 0.3;
+
+  var heard = '', silenceTimer = null, restarts = 0, restartWindow = 0;
+
+  function flushHeard(){
+    clearTimeout(silenceTimer);
+    silenceTimer = null;
+    var text = heard.trim();
+    heard = '';
+    if (text) window.botpress.sendMessage(text);
+  }
+
+  function scheduleFlush(){
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(flushHeard, SILENCE_MS);
   }
 
   function startListening(){
     if (prefs.mode !== 'voice' || micRefused || listening || speaking || !SR) return;
     if (!rec){
       rec = new SR();
-      rec.interimResults = false;
-      rec.continuous = false;
+
+      /* continuous, so a pause mid-sentence does not end the turn. It used to
+         stop at the first one and send whatever it had, which is how "tell me
+         about... your pricing" reached the bot as "tell me about" and came
+         back answered as something else entirely.
+
+         interimResults are not sent anywhere -- they exist so the silence
+         timer can tell "still talking" from "finished". */
+      rec.continuous = true;
+      rec.interimResults = true;
+      /* Ask for alternatives and take the best-scored one rather than
+         whichever the engine happened to put first. */
+      rec.maxAlternatives = 3;
 
       rec.onresult = function(e){
-        var said = '';
         for (var i = e.resultIndex; i < e.results.length; i++){
-          if (e.results[i].isFinal) said += e.results[i][0].transcript;
+          var res = e.results[i];
+          if (!res.isFinal){ scheduleFlush(); continue; }
+
+          var best = res[0];
+          for (var j = 1; j < res.length; j++){
+            if (res[j] && res[j].confidence > best.confidence) best = res[j];
+          }
+          if (best.confidence > 0 && best.confidence < MIN_CONFIDENCE) continue;
+
+          var part = (best.transcript || '').trim();
+          if (part) heard += (heard ? ' ' : '') + part;
+          scheduleFlush();
         }
-        said = said.trim();
-        if (said) window.botpress.sendMessage(said);
       };
-      rec.onend = function(){ listening = false; };
+
+      rec.onend = function(){
+        listening = false;
+        if (heard.trim()) flushHeard();
+
+        /* Even a continuous recogniser ends on its own -- a long silence, or
+           the engine deciding the turn is over. Nothing used to restart it, so
+           after the first pause the mic was dead while the panel still looked
+           like it was listening and the visitor kept talking to nothing. */
+        if (prefs.mode === 'voice' && !speaking && !micRefused){
+          var now = Date.now();
+          if (now - restartWindow > 10000){ restartWindow = now; restarts = 0; }
+          /* A mic that fails instantly would otherwise spin here. */
+          if (++restarts <= 8) setTimeout(startListening, 250);
+        }
+      };
+
       rec.onerror = function(e){
         listening = false;
         /* A refused or missing mic ends voice for this visit rather than
-           retrying into a permission wall. Silence is not a failure. */
+           retrying into a permission wall. 'no-speech' is just silence, and
+           onend restarts after it. */
         if (e.error === 'not-allowed' || e.error === 'service-not-allowed' ||
             e.error === 'audio-capture'){
           micRefused = true;
+          clearTimeout(silenceTimer);
           setComposerHidden(false);
         }
       };
@@ -14583,6 +14652,10 @@ if (THREE) (function () {
     listen: startListening,
     stop: stopListening,
     prefs: function(){ return { mode: prefs.mode, lang: prefs.lang }; },
+    /* The recogniser itself, so its result handling can be exercised without a
+       microphone -- which is the only way to check the transcript that reaches
+       the bot on a machine that cannot capture audio. */
+    recogniser: function(){ return rec; },
     state: function(){
       return { listening: listening, speaking: speaking, micRefused: micRefused,
                canSpeak: canSpeak, mode: prefs.mode, lang: prefs.lang };
