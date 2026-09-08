@@ -8490,7 +8490,7 @@
      own circle is left alone, because a button promising to talk is worse
      than a plain one that opens a chat you can type into. */
   .zt-voice-fab{
-    position:fixed; bottom:24px; right:24px;
+    position:fixed; bottom:calc(24px + var(--zt-badge-clear, 0px)); right:24px;
     display:flex; align-items:center; gap:11px;
     padding:8px 20px 8px 8px;
     border:0; border-radius:999px;
@@ -8550,6 +8550,29 @@
     .zt-voice-fab .zt-vf-dot{ animation:none; }
   }
 
+  /* ---------- NETLIFY BADGE ----------
+     Netlify injects "Powered by Netlify" into netlify.app deploys; it is not
+     in this file. It arrives as a fixed 202px iframe positioned from the LEFT
+     (left:173px, with a right:0 that is over-constrained and therefore
+     ignored), which on a phone drops it across the cookie banner's Deny
+     button -- and its z-index is 2147483645, so it wins and the button cannot
+     be clicked at all.
+
+     Pinned to the right corner instead, and lifted with the same measurement
+     the chat bubble uses so it clears the banner rather than covering it. */
+  #nl-badge-frame{
+    left:auto !important;
+    right:12px !important;
+    bottom:calc(12px + var(--zt-bp-lift, 0px)) !important;
+  }
+
+  /* The badge takes the corner the chat launcher already had, so the launcher
+     and everything anchored to it step up by the badge's height. Scoped with
+     :has() because the badge only exists on a Netlify deploy -- locally, and
+     on any other host, this resolves to zero and nothing moves. */
+  :root{ --zt-badge-clear:0px; }
+  body:has(#nl-badge-frame){ --zt-badge-clear:76px; }
+
   /* ---------- CHAT MODE CHOOSER ----------
      Voice cannot be the only way in. It needs a microphone the visitor may
      not want to grant, and Firefox has no SpeechRecognition at all, so the
@@ -8562,7 +8585,7 @@
      vw would push this a scrollbar's width off the screen. */
   .zt-chat-chooser{
     position:fixed; right:24px;
-    bottom:calc(88px + var(--zt-bp-lift, 0px));
+    bottom:calc(88px + var(--zt-badge-clear, 0px) + var(--zt-bp-lift, 0px));
     width:min(292px, calc(100% - 48px));
     padding:16px 16px 14px;
     border-radius:18px;
@@ -8657,7 +8680,7 @@
 
   .zt-embed-panel{
     position:fixed; right:24px;
-    bottom:calc(94px + var(--zt-bp-lift, 0px));
+    bottom:calc(94px + var(--zt-badge-clear, 0px) + var(--zt-bp-lift, 0px));
     width:min(400px, calc(100% - 48px));
     /* Ends clear of the nav for the same reason the floating panel does: it is
        stacked below the bar, and at full height its own header goes behind it.
