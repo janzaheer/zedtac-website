@@ -14004,6 +14004,11 @@ if (THREE) (function () {
        phone -- 23px out at 375. */
     '.bpComposerEmojiPicker em-emoji-picker{max-width:100%!important;width:100%!important}',
 
+    /* The "by Botpress" line under the composer. Also settable in the
+       dashboard's footer field, but hidden here so it does not come back on
+       the next config publish. */
+    '.bpComposerFooter{display:none!important}',
+
     /* Composer: give focus somewhere to land. */
     '.bpComposerInputContainer{transition:box-shadow .18s cubic-bezier(.4,0,.2,1)}',
     '.bpComposerInputContainer:focus-within{box-shadow:0 0 0 2px rgba(255,148,71,.34)}',
@@ -14305,20 +14310,42 @@ if (THREE) (function () {
     if (rec){ try { rec.abort(); } catch (e) {} }
   }
 
-  /* How long a pause means the visitor has finished a sentence. Short enough
-     not to feel laggy, long enough to survive the gap before "...our pricing". */
-  var SILENCE_MS = 900;
+  /* How long a pause means the visitor has finished a sentence. Every
+     millisecond here is dead air before the bot even hears the question, so
+     it is kept as short as it can be while still surviving the gap before
+     "...our pricing". */
+  var SILENCE_MS = 650;
   /* Engines that report a confidence at all and report it this low are usually
      returning noise. A zero means "not scored", which is common, so it is not
      treated as a low score. */
   var MIN_CONFIDENCE = 0.3;
+
+  /* No speech engine knows "ZedTac", so it comes back as "zed tack", "zed
+     tech", "said tac" and the bot is asked about a company that does not
+     exist -- which is exactly the "it does not recognise our name" problem.
+     The transcript is corrected before it is sent, because that is the only
+     lever available: Chrome's grammar hinting (SpeechGrammarList) has been
+     accepted-and-ignored for years, so biasing the recogniser is not an
+     option.
+
+     Spelled out as an explicit alternation rather than a loose pattern. A
+     clever regex here would also swallow ordinary phrases like "set a tag",
+     and silently rewriting what someone said is worse than missing one
+     mispronunciation. */
+  var BRAND = new RegExp('\\b(?:' + [
+    'zed\\s?-?\\s?(?:tac|tack|tak|tech|tec|talk|tag|tick|tuck|dac)',
+    '(?:zad|zaid|zed|said|sed|set|zip|zeb)\\s?-?\\s?(?:tac|tack|tech)',
+    'zedtac|zedtack|zedtech|zeddac|zeltac|zetac'
+  ].join('|') + ')\\b', 'gi');
+
+  function correctBrand(text){ return text.replace(BRAND, 'ZedTac'); }
 
   var heard = '', silenceTimer = null, restarts = 0, restartWindow = 0;
 
   function flushHeard(){
     clearTimeout(silenceTimer);
     silenceTimer = null;
-    var text = heard.trim();
+    var text = correctBrand(heard.trim());
     heard = '';
     if (text) window.botpress.sendMessage(text);
   }
