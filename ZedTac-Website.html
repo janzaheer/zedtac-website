@@ -8558,20 +8558,20 @@
      button -- and its z-index is 2147483645, so it wins and the button cannot
      be clicked at all.
 
-     Pinned to the right corner instead, and lifted with the same measurement
-     the chat bubble uses so it clears the banner rather than covering it. */
+     Moved to the left corner, and lifted with the same measurement the chat
+     bubble uses so it clears the banner rather than covering it. Left rather
+     than right on purpose: the right corner is the chat launcher's, and two
+     fixed elements in one corner means one of them has to give way. */
   #nl-badge-frame{
-    left:auto !important;
-    right:12px !important;
+    left:12px !important;
+    right:auto !important;
     bottom:calc(12px + var(--zt-bp-lift, 0px)) !important;
   }
 
-  /* The badge takes the corner the chat launcher already had, so the launcher
-     and everything anchored to it step up by the badge's height. Scoped with
-     :has() because the badge only exists on a Netlify deploy -- locally, and
-     on any other host, this resolves to zero and nothing moves. */
+  /* Nothing has to move for the badge now that it sits in the opposite corner
+     from the chat. Kept as a named zero so the offsets below still read as
+     deliberate rather than looking like the badge was never considered. */
   :root{ --zt-badge-clear:0px; }
-  body:has(#nl-badge-frame){ --zt-badge-clear:76px; }
 
   /* ---------- CHAT MODE CHOOSER ----------
      Voice cannot be the only way in. It needs a microphone the visitor may
