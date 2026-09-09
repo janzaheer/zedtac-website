@@ -8335,6 +8335,29 @@
     .deployed-slider-track .industry-card{ flex:0 0 calc(50% - 8px) !important; }
   }
 
+  /* ---------- back to one card per view on an actual phone ----------
+     The rule above is right down to about 640px and wrong below it. Each card
+     is half the track minus half the 16px gap, which measures 316px at 720px
+     wide and 281px at 641px -- both fine -- but only 262px at 601px and 169px
+     at 390px, where the text column inside it drops to 123px: about fifteen
+     characters a line, so every sentence breaks into a narrow ragged stack.
+     640px is the measured point where the halves fall below ~280px and the
+     body copy stops holding a readable line.
+
+     One card at the full width of the track, not the 82vw this replaced --
+     82vw was a guess at the gutters and left a sliver of the next card
+     showing, which is what the two-card rule was written to get rid of. 100%
+     is measured against the track, so the card lands flush and the next one
+     sits entirely outside it. The carousels each measure their first card at
+     runtime and derive the slide step from it, so the step follows this on
+     its own. */
+  @media (max-width:640px){
+    .blog-section .blog-track .blog-card{ width:100% !important; }
+    .portfolio-track .portfolio-card{ flex:0 0 100% !important; }
+    .industry-slider-track .auto-card{ flex:0 0 100% !important; }
+    .deployed-slider-track .industry-card{ flex:0 0 100% !important; }
+  }
+
   /* Small phones: the side gutter is the first thing to give. */
   @media (max-width:400px){
     .wrap{ padding:0 16px; }
