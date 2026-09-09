@@ -8319,11 +8319,18 @@
     .hero .hero-cta{ margin-top:24px; gap:12px; }
     .hero .hero-pillars{ margin-top:26px; padding-top:20px; }
 
-    /* Cards in the scrolling rows were sized for a tablet. */
-    .blog-section .blog-track .blog-card{ width:78vw !important; }
-    .portfolio-track .portfolio-card{ flex:0 0 82vw !important; }
-    .industry-slider-track .auto-card{ flex:0 0 82vw !important; }
-    .deployed-slider-track .industry-card{ flex:0 0 82vw !important; }
+    /* Two cards per view, not one. 82vw showed a single card with a sliver of
+       the next; half the track minus half the 16px gap lands two of them flush
+       inside it. Measured against the track rather than the viewport, so the
+       gutters are already accounted for -- 82vw had to guess at them.
+
+       Safe for the carousels: each measures its first card at runtime and
+       derives its slide step from that width plus the gap, so the step follows
+       this rather than needing to be kept in step by hand. */
+    .blog-section .blog-track .blog-card{ width:calc(50% - 8px) !important; }
+    .portfolio-track .portfolio-card{ flex:0 0 calc(50% - 8px) !important; }
+    .industry-slider-track .auto-card{ flex:0 0 calc(50% - 8px) !important; }
+    .deployed-slider-track .industry-card{ flex:0 0 calc(50% - 8px) !important; }
   }
 
   /* Small phones: the side gutter is the first thing to give. */
@@ -8667,6 +8674,74 @@
   .zt-embed-toggle{
     position:fixed; left:-9999px; top:0;
     width:1px; height:1px; padding:0; border:0; opacity:0;
+  }
+
+  /* ==========================================================================
+     MOBILE FIXES
+     ========================================================================== */
+
+  /* ---------- the page was 723px wide on a 375px screen ----------
+     Not the content: the closed nav drawer. It is position:fixed and parked
+     off-screen with translateX(100%), which puts its box at 375..723 and
+     stretches the document's scrollable width to match -- .bg-animated then
+     grew to 723 with it. Measured identically on all thirteen routes, which
+     is what gave it away as chrome rather than content.
+
+     html/body already carry overflow-x:clip, so nothing scrolls in a browser
+     that supports it. Safari only got `clip` in 16, and where it is not
+     supported the declaration is dropped and the full 723px comes back --
+     which is exactly the reported symptom: blank space to the right of every
+     section, and a header whose burger has been pushed off the visible area
+     with a gap where the middle used to be.
+
+     So the drawer no longer parks off-screen at all. Fading it in place costs
+     the sideways slide and removes the overflow at its source, in every
+     browser, rather than relying on a property that may be ignored. */
+  @media (max-width:1024px){
+    .nav-links{
+      transform:none;
+      opacity:0; visibility:hidden; pointer-events:none;
+      transition:opacity .24s var(--ease, ease), visibility 0s linear .24s;
+    }
+    .nav-links.open{
+      transform:none;
+      opacity:1; visibility:visible; pointer-events:auto;
+      transition:opacity .24s var(--ease, ease), visibility 0s;
+    }
+  }
+  /* Kept out of the block above rather than nested inside it: a nested @media
+     stopped the parser here and every rule after it -- the whole two-per-view
+     card block -- was dropped without a word. The drawer rules above it
+     applied, which is what made the failure look like a specificity problem
+     instead of a syntax one. */
+  @media (max-width:1024px) and (prefers-reduced-motion:reduce){
+    .nav-links, .nav-links.open{ transition:none; }
+  }
+
+  /* ---------- two cards per view on a phone ----------
+     The tracks are 359px inside a 375px screen with a 16px gap, and the cards
+     were a fixed 308px, so exactly one showed and the second was a sliver.
+     calc(50% - 8px) is that gap halved, which lands two cards flush inside the
+     track at any phone width rather than at one assumed size.
+
+     Safe to change: the carousel measures the first card at runtime and
+     derives its slide step from that width plus the gap, so the step follows
+     this instead of needing to be kept in sync by hand. */
+  @media (max-width:768px){
+    /* The widths themselves live with the other phone card rules further up,
+       which already carried an !important one-per-view sizing -- two places
+       setting the same property is how the first attempt here lost silently
+       to a rule it could not out-weigh.
+
+       The case-studies track is a real scroller, so it gets snapping; the two
+       carousels are transform-driven and must not have it. */
+    .portfolio-track{ scroll-snap-type:x mandatory; }
+
+    /* Half the width needs proportionally less inside it, or the copy clips. */
+    .portfolio-thumb{ height:104px; }
+    .industry-card h3, .auto-card h3, .portfolio-body h3{ font-size:13.5px; line-height:1.3; }
+    .industry-card p, .auto-card p, .portfolio-body p{ font-size:11.5px; line-height:1.5; }
+    .portfolio-cat, .portfolio-result{ font-size:10px; }
   }
 </style>
 </head>
