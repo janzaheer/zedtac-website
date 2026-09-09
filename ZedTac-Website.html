@@ -8862,19 +8862,19 @@
           </button>
           <div class="nav-dropdown">
             <div class="nav-dropdown-grid">
-              <a href="#" @click.prevent="goErpServices" :class="{'nav-active': page === 'erpservices'}">
+              <a href="/erpservices" @click.prevent="goErpServices" :class="{'nav-active': page === 'erpservices'}">
                 <span class="nav-dropdown-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01"/></svg>
                 </span>
                 <span class="nav-dropdown-title">ERP Services</span>
               </a>
-              <a href="#" @click.prevent="goAutomation">
+              <a href="/automation" @click.prevent="goAutomation">
                 <span class="nav-dropdown-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6v3.2M12 18.2v3.2M2.6 12h3.2M18.2 12h3.2M5.3 5.3l2.3 2.3M16.4 16.4l2.3 2.3M18.7 5.3l-2.3 2.3M7.6 16.4l-2.3 2.3"/></svg>
                 </span>
                 <span class="nav-dropdown-title">Automation Services</span>
               </a>
-              <a href="#" @click.prevent="goIndustries" :class="{'nav-active': page === 'industries'}">
+              <a href="/industries" @click.prevent="goIndustries" :class="{'nav-active': page === 'industries'}">
                 <span class="nav-dropdown-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"/><path d="M5 21V7l6-3v17"/><path d="M11 11h8v10"/><path d="M8 10h.01M8 14h.01M15 15h.01"/></svg>
                 </span>
@@ -8890,7 +8890,7 @@
              but goIndustries() had no caller anywhere in the file, so it could
              not be reached by any route a visitor has. -->
 
-        <a href="#" @click.prevent="goPricing" :class="{'nav-active': page === 'pricing'}">Pricing</a>
+        <a href="/pricing" @click.prevent="goPricing" :class="{'nav-active': page === 'pricing'}">Pricing</a>
 
         <div class="nav-item" :class="{'sub-open': mobileSub === 1}">
           <a href="#" role="button" aria-haspopup="true"
@@ -8904,24 +8904,24 @@
           </button>
           <div class="nav-dropdown">
             <div class="nav-dropdown-grid">
-              <a href="#" @click.prevent="goFeatures">
+              <a href="/features" @click.prevent="goFeatures">
                 <span class="nav-dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 13l4 4L19 7"/><path d="M3 19h18"/></svg></span>
                 <span class="nav-dropdown-title">Features &amp; Capabilities</span>
               </a>
-              <a href="#" @click.prevent="goIntegrations">
+              <a href="/integrations" @click.prevent="goIntegrations">
                 <span class="nav-dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.6"/><circle cx="18" cy="18" r="2.6"/><path d="M8.6 6H14a4 4 0 0 1 4 4v5.4"/></svg></span>
                 <span class="nav-dropdown-title">Integrations</span>
               </a>
-              <a href="#" @click.prevent="goDocs">
+              <a href="/docs" @click.prevent="goDocs">
                 <span class="nav-dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h4"/></svg></span>
                 <span class="nav-dropdown-title">Documentation</span>
               </a>
-              <a href="#" @click.prevent="goFaqs" :class="{'nav-active': page === 'faqs'}">
+              <a href="/faqs" @click.prevent="goFaqs" :class="{'nav-active': page === 'faqs'}">
                 <span class="nav-dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.7-.9 1.3v.4"/><path d="M12 17h.01"/></svg></span>
                 <span class="nav-dropdown-title">FAQs</span>
               </a>
               <!-- Relocated here from the retired Solutions dropdown. -->
-              <a href="#" @click.prevent="goOutcomes" :class="{'nav-active': page === 'outcomes'}">
+              <a href="/outcomes" @click.prevent="goOutcomes" :class="{'nav-active': page === 'outcomes'}">
                 <span class="nav-dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 6h7v7"/></svg></span>
                 <span class="nav-dropdown-title">Client Outcomes</span>
               </a>
@@ -8929,8 +8929,8 @@
           </div>
         </div>
 
-        <a href="#" @click.prevent="goAbout" :class="{'nav-active': page === 'about'}">About</a>
-        <a href="#" @click.prevent="goConsult" :class="{'nav-active': page === 'consult'}">Contact</a>
+        <a href="/about" @click.prevent="goAbout" :class="{'nav-active': page === 'about'}">About</a>
+        <a href="/consult" @click.prevent="goConsult" :class="{'nav-active': page === 'consult'}">Contact</a>
 
         <!-- Login and Get started are gone from the header. An ERP is not a
              product a visitor signs up for from a marketing page: the next
@@ -8996,8 +8996,8 @@
             <h1>Run your entire <span class="text-grad">operation</span> then let it <span class="text-grad">run itself</span></h1>
             <p class="hero-sub">ZedTac is an ERP and business automation platform. The ERP connects finance, inventory, supply chain, manufacturing, HR and customer operations onto one ledger — and the automation engine acts on that data, so reminders, approvals, postings and reports happen without anyone chasing them.</p>
             <div class="hero-cta">
-              <a href="#" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
-              <a href="#" @click.prevent="goErp" class="hero-link">See the ERP demo &rarr;</a>
+              <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
+              <a href="/erp" @click.prevent="goErp" class="hero-link">See the ERP demo &rarr;</a>
             </div>
             <!-- The three pillars, stated on the fold. The brief is that AI,
                  ERP and automation read as equally weighted rather than ERP
@@ -9131,7 +9131,7 @@
               <li>Multi-entity, multi-currency, API-first</li>
               <li>Six-phase implementation to go-live</li>
             </ul>
-            <a href="#" @click.prevent="goErpServices" class="btn btn-primary">Explore the ERP Platform</a>
+            <a href="/erpservices" @click.prevent="goErpServices" class="btn btn-primary">Explore the ERP Platform</a>
           </article>
 
           <div class="solution-bridge" aria-hidden="true">
@@ -9147,7 +9147,7 @@
               <li>Rules configured, not coded</li>
               <li>Every run audited, success or failure</li>
             </ul>
-            <a href="#" @click.prevent="goAutomation" class="btn btn-primary">Explore Automation Services</a>
+            <a href="/automation" @click.prevent="goAutomation" class="btn btn-primary">Explore Automation Services</a>
           </article>
         </div>
       </section>
@@ -9436,7 +9436,7 @@
   <div v-else-if="page === 'about'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>An <span class="text-grad">ERP partner</span> built around your <span class="text-grad">operations</span>, not our software</h1>
         <p>We are an enterprise resource planning consultancy and software company, helping organizations replace disconnected tools with a single, governed system of record.</p>
       </section>
@@ -9473,14 +9473,14 @@
 
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">&larr; Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">&larr; Back to Home</a>
         <div class="sec-head" style="max-width:820px;">
           <h1>One governed <span class="text-grad">system of record</span> for the whole operation</h1>
           <p>Finance, inventory, supply chain, manufacturing, HR and customer operations on a single ledger — designed around how your business actually runs, implemented in fixed phases under a named project lead.</p>
         </div>
         <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:26px;">
-          <a href="#" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
-          <a href="#" @click.prevent="scrollToId('services')" class="btn btn-ghost">Explore 14 ERPs</a>
+          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
+          <a href="#services" @click.prevent="scrollToId('services')" class="btn btn-ghost">Explore 14 ERPs</a>
         </div>
         <ul class="hero-pillars" style="margin-top:40px; max-width:760px;">
           <li><span class="hp-key mono">One ledger</span><span class="hp-val">Append-only, corrections are reversing entries</span></li>
@@ -9577,7 +9577,7 @@
             <h2>Supercharge your ERP with <span class="text-grad">intelligent automation</span></h2>
             <p>The ERP records what happened. The automation engine acts on it — chasing overdue payments, routing approvals, posting to the ledger and delivering reports from the same data, with every run audited. It is the second half of the same platform, not a separate product.</p>
             <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:24px;">
-              <a href="#" @click.prevent="goAutomation" class="btn btn-primary">Explore Automation Services</a>
+              <a href="/automation" @click.prevent="goAutomation" class="btn btn-primary">Explore Automation Services</a>
             </div>
           </div>
           <ul class="cross-list">
@@ -9597,7 +9597,7 @@
   <div v-if="page === 'features'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>Everything the platform <span class="text-grad">does</span></h1>
         <p>The complete capability list across ERP and automation — every module, every integration point, every governance control, all included in the platform.</p>
         <div class="pricing-page-note">
@@ -9646,12 +9646,12 @@
   <div v-if="page === 'integrations'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>Connected to the systems you <span class="text-grad">already run</span></h1>
         <p>The ERP becomes your system of record without replacing everything at once. Messaging, accounting, banking and document capture connect through the same event engine your automations run on.</p>
         <div class="hero-cta">
-          <a href="#" @click.prevent="goDocs" class="btn btn-ghost">API Documentation</a>
-          <a href="#" @click.prevent="goConsult" class="btn btn-primary">Discuss an Integration</a>
+          <a href="/docs" @click.prevent="goDocs" class="btn btn-ghost">API Documentation</a>
+          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Discuss an Integration</a>
         </div>
       </section>
     </div>
@@ -9679,7 +9679,7 @@
   <div v-if="page === 'industries'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>Depth where it matters, a <span class="text-grad">shared engine</span> everywhere else</h1>
         <p>Some industries need genuinely bespoke structure. Most need solid core operations with their own vocabulary. The platform is built to do both without turning into two products.</p>
       </section>
@@ -9707,7 +9707,7 @@
         <div class="erp-cta-band reveal">
           <h2>Don’t see your industry?</h2>
           <p>That is usually a configuration question rather than a product one. A discovery call will tell you which it is for you.</p>
-          <a href="#" @click.prevent="goConsult" class="btn btn-ghost">Book a Free Consultation</a>
+          <a href="/consult" @click.prevent="goConsult" class="btn btn-ghost">Book a Free Consultation</a>
         </div>
       </section>
     </div>
@@ -9717,12 +9717,12 @@
   <div v-if="page === 'docs'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>How the platform works, <span class="text-grad">written down</span></h1>
         <p>Architecture, the money workflow, the automation event catalogue and the REST API — the same references our implementation consultants work from.</p>
         <div class="hero-cta">
           <a href="#event-catalogue" @click.prevent="scrollToSection('#event-catalogue')" class="btn btn-primary">Event Catalogue</a>
-          <a href="#" @click.prevent="goAutomation" class="btn btn-ghost">Automation Modules</a>
+          <a href="/automation" @click.prevent="goAutomation" class="btn btn-ghost">Automation Modules</a>
         </div>
       </section>
     </div>
@@ -9791,7 +9791,7 @@
   <div v-if="page === 'faqs'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1 v-html="faqGroups[activeFaqTab].heading"></h1>
         <p>{{ faqGroups[activeFaqTab].sub }}</p>
       </section>
@@ -9823,15 +9823,15 @@
   <div v-if="page === 'automation'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>Your ERP holds the data. <span class="text-grad">Automation</span> makes it act</h1>
         <p>Eleven automation modules built on the same event engine, running on the same ledger and the same customer record. Not a separate product bolted alongside your ERP — the layer that makes it move on its own.</p>
         <div class="hero-cta">
-          <a href="#" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
+          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
           <!-- Routed through scrollToId rather than a bare #hash so the module
                grid clears the sticky header by the live --nav-h instead of
                parking its heading underneath the bar. -->
-          <a href="#" @click.prevent="scrollToId('automation-modules')" class="btn btn-ghost">Explore 11 Modules</a>
+          <a href="#automation-modules" @click.prevent="scrollToId('automation-modules')" class="btn btn-ghost">Explore 11 Modules</a>
         </div>
       </section>
     </div>
@@ -9954,7 +9954,7 @@
             <h2>Automation runs on the <span class="text-grad">same ledger</span> your ERP writes</h2>
             <p>There is no sync, no export and no second source of truth. Services emit events as work happens in the ERP — a booking created, a payment recorded, an invoice received — and the engine acts on those records directly. The ERP is the foundation; automation is what makes it move.</p>
             <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:24px;">
-              <a href="#" @click.prevent="goErpServices" class="btn btn-primary">Explore the ERP Platform</a>
+              <a href="/erpservices" @click.prevent="goErpServices" class="btn btn-primary">Explore the ERP Platform</a>
             </div>
           </div>
           <ul class="cross-list">
@@ -9973,7 +9973,7 @@
   <div v-if="page === 'module'">
     <div class="wrap">
       <section>
-        <a href="#" class="back-link" @click.prevent="goAutomation">← All automation modules</a>
+        <a href="/automation" class="back-link" @click.prevent="goAutomation">← All automation modules</a>
         <div class="module-grid">
           <div>
             <h1 style="font-size:clamp(28px,4vw,44px); line-height:1.12;">{{ automationModules[activeModule].name }}</h1>
@@ -10021,7 +10021,7 @@
               </button>
             </div>
 
-            <a href="#" @click.prevent="goConsult" class="btn btn-primary" style="width:100%; margin-top:22px;">Discuss This Module</a>
+            <a href="/consult" @click.prevent="goConsult" class="btn btn-primary" style="width:100%; margin-top:22px;">Discuss This Module</a>
           </aside>
         </div>
       </section>
@@ -10032,11 +10032,11 @@
   <div v-if="page === 'outcomes'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>The numbers that moved after <span class="text-grad">go-live</span></h1>
         <p>An ERP is only worth what it changes. These are the measures our clients track — baselined before we build, reported from live system data afterwards.</p>
         <div class="hero-cta">
-          <a href="#" @click.prevent="goConsult" class="btn btn-primary">Discuss Your Numbers</a>
+          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Discuss Your Numbers</a>
           <a href="#outcome-compare" @click.prevent="scrollToSection('#outcome-compare')" class="btn btn-ghost">See Before &amp; After</a>
         </div>
       </section>
@@ -10162,7 +10162,7 @@
             </article>
           </div>
           <div style="text-align:center; margin-top:36px;">
-            <a href="#" @click.prevent="goSection('#case-studies')" class="btn btn-ghost">Read the full case studies</a>
+            <a href="/#case-studies" @click.prevent="goSection('#case-studies')" class="btn btn-ghost">Read the full case studies</a>
           </div>
         </section>
       </div>
@@ -10189,7 +10189,7 @@
   <div v-if="page === 'consult'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>Start with a <span class="text-grad">conversation</span>, not a contract</h1>
         <p>Three consultation formats, from a 30-minute call to a full onsite process audit. Every one is run by an implementation consultant who will tell you honestly whether an ERP solves your problem.</p>
         <div class="hero-cta">
@@ -10442,11 +10442,11 @@
   <div v-if="page === 'pricing'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>ERP pricing that starts with your <span class="text-grad">process</span>, not a license count</h1>
         <p>Three implementation packages, scoped by how much of your operation moves onto the system. Every engagement is fixed-price once the discovery audit is complete — no hourly drift, no line items introduced later.</p>
         <div class="hero-cta">
-          <a href="#" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
+          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
           <a href="#compare" @click.prevent="scrollToSection('#compare')" class="btn btn-ghost">Compare All Features</a>
         </div>
         <div class="pricing-page-note">
@@ -10477,7 +10477,7 @@
                   {{ f }}
                 </li>
               </ul>
-              <a href="#" @click.prevent="goConsult" class="btn" :class="plan.popular ? 'btn-primary' : 'btn-ghost'" style="width:100%; margin-top:auto;">{{ plan.cta }}</a>
+              <a href="/consult" @click.prevent="goConsult" class="btn" :class="plan.popular ? 'btn-primary' : 'btn-ghost'" style="width:100%; margin-top:auto;">{{ plan.cta }}</a>
             </div>
           </div>
           <p class="pricing-note">Final pricing depends on module scope, user count, integrations and migration complexity. Book a discovery call and we will return a phased, fixed-price proposal within three business days.</p>
@@ -10568,7 +10568,7 @@
   <div v-if="page === 'erp'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="#" class="back-link" @click.prevent="goHome">← Back to Home</a>
+        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>One ERP platform to run your entire operation</h1>
         <p>Finance, inventory, procurement, manufacturing, HR and business intelligence — delivered as one connected, governed platform and configured to the way your organization actually works.</p>
         <div class="hero-cta">
@@ -10734,7 +10734,7 @@
         <div class="erp-cta-band">
           <h2>See ZedTac ERP running on your own data</h2>
           <p>Book a walkthrough with our consultants and we will demonstrate the exact modules your operation needs, using your own processes as the example.</p>
-          <a href="#" @click.prevent="goConsult" class="btn btn-ghost">Request a Demo</a>
+          <a href="/consult" @click.prevent="goConsult" class="btn btn-ghost">Request a Demo</a>
         </div>
       </section>
     </div>
@@ -10949,19 +10949,19 @@
         <div class="ft-col">
           <h2>Product</h2>
           <ul>
-            <li><a href="#" @click.prevent="goPricing">Pricing</a></li>
-            <li><a href="#" @click.prevent="goErpServices">ERP</a></li>
-            <li><a href="#" @click.prevent="goAutomation">Automation</a></li>
+            <li><a href="/pricing" @click.prevent="goPricing">Pricing</a></li>
+            <li><a href="/erpservices" @click.prevent="goErpServices">ERP</a></li>
+            <li><a href="/automation" @click.prevent="goAutomation">Automation</a></li>
           </ul>
         </div>
 
         <div class="ft-col">
           <h2>Company</h2>
           <ul>
-            <li><a href="#" @click.prevent="goAbout">About Us</a></li>
-            <li><a href="#" @click.prevent="goSection('#case-studies')">Case Studies</a></li>
-            <li><a href="#" @click.prevent="goSection('#blog')">Insights</a></li>
-            <li><a href="#" @click.prevent="goConsult">Contact</a></li>
+            <li><a href="/about" @click.prevent="goAbout">About Us</a></li>
+            <li><a href="/#case-studies" @click.prevent="goSection('#case-studies')">Case Studies</a></li>
+            <li><a href="/#blog" @click.prevent="goSection('#blog')">Insights</a></li>
+            <li><a href="/consult" @click.prevent="goConsult">Contact</a></li>
           </ul>
         </div>
 
@@ -11056,6 +11056,28 @@ const safeStorageSet = (key, value) => {
 /* Exposed for the Botpress bridge at the end of <body>. It drives the app's
    own goSection()/goPage() rather than scrolling the document itself --
    see the reasoning there. */
+/* ---------- URL routing ------------------------------------------------
+   The 14 routes were state-only: `page` changed, the address bar never did.
+   That cost more than tidiness. The browser Back button left the site
+   entirely instead of returning to the previous route, no page could be
+   linked or bookmarked (every share landed on the home page), a reload
+   always dropped the visitor back at home, and search engines only ever saw
+   one page of a fourteen-page site.
+
+   netlify.toml already rewrites /* to this file precisely so client-side
+   routes resolve on a reload or a deep link -- the rewrite was in place and
+   the routing that needed it was never written.
+
+   The path is the state name rather than a lookup table, so there is no map
+   to drift out of step when a route is added. Module pages carry their index
+   as a second segment. */
+const ZT_PAGES = ['home','about','automation','consult','docs','erp','erpservices',
+                  'faqs','features','industries','integrations','module','outcomes','pricing'];
+const ZT_GO = { home:'goHome', about:'goAbout', automation:'goAutomation',
+                consult:'goConsult', docs:'goDocs', erp:'goErp', erpservices:'goErpServices',
+                faqs:'goFaqs', features:'goFeatures', industries:'goIndustries',
+                integrations:'goIntegrations', outcomes:'goOutcomes', pricing:'goPricing' };
+
 window.ztApp = createApp({
   data(){
     return {
@@ -11899,6 +11921,17 @@ window.ztApp = createApp({
     this.bindSectionSpy();
     this.bindServicePin();
     this.bindHeroScene();
+
+    // Restore whatever route the address bar is already showing (a deep link,
+    // a reload or a shared URL), then stamp the entry so the first Back has
+    // somewhere to return to. Back/Forward re-apply without pushing.
+    const first = this.readRoute();
+    if (first && first.page !== this.page) this.applyRoute(first);
+    history.replaceState({ page: this.page, module: this.activeModule }, '', this.routePath());
+    this._onPop = (e) => {
+      this.applyRoute((e.state && e.state.page) ? e.state : this.readRoute());
+    };
+    window.addEventListener('popstate', this._onPop);
   },
   beforeUnmount() {
     clearInterval(this.showcaseInterval);
@@ -11917,6 +11950,7 @@ window.ztApp = createApp({
     this.unbindServicePin();
     this.unbindHeroScene();
     this.stopDemo();
+    if (this._onPop) window.removeEventListener('popstate', this._onPop);
   },
   watch: {
     // Real footage supersedes the scripted walkthrough, so retire its timer.
@@ -11934,6 +11968,9 @@ window.ztApp = createApp({
     // the class is removed, layout is flushed to cancel the running animation,
     // then re-added so it plays from the start.
     page(){
+      // Keep the address bar in step. Skipped while restoring from a popstate
+      // or a deep link, so Back does not push the entry it just returned to.
+      if (!this._routeLocked) this.pushRoute();
       // Forms on the newly rendered route need their labels wired up too.
       this.$nextTick(() => this.linkFieldLabels());
       const el = document.getElementById('main');
@@ -12386,6 +12423,38 @@ window.ztApp = createApp({
     },
 
     // Shared page switcher for the standalone pages.
+    /* ---------- routing helpers ---------- */
+    routePath(){
+      if (this.page === 'home') return '/';
+      if (this.page === 'module') return '/module/' + (this.activeModule || 0);
+      return '/' + this.page;
+    },
+    // Reads a route out of the address bar. Returns null for anything that is
+    // not one of ours, so an unknown path falls through to the home page the
+    // Netlify rewrite already served.
+    readRoute(){
+      const seg = location.pathname.replace(/^\/+|\/+$/g, '').split('/');
+      const name = seg[0] || 'home';
+      if (!ZT_PAGES.includes(name)) return null;
+      return { page: name, module: name === 'module' ? (parseInt(seg[1], 10) || 0) : null };
+    },
+    pushRoute(){
+      const path = this.routePath();
+      if (location.pathname === path) return;
+      history.pushState({ page: this.page, module: this.activeModule }, '', path);
+    },
+    // Applies a route without pushing a new entry -- used for the first paint
+    // and for Back/Forward. Goes through the same go* method a click would, so
+    // a deep link binds the reveal observer and the page-specific timers
+    // exactly as navigating there by hand does.
+    applyRoute(r){
+      if (!r) return;
+      this._routeLocked = true;
+      if (r.page === 'module') this.openModule(r.module || 0);
+      else if (this[ZT_GO[r.page]]) this[ZT_GO[r.page]]();
+      else this.page = r.page;
+      this.$nextTick(() => { this._routeLocked = false; });
+    },
     goPage(name){
       this.page = name;
       this.activeSection = '';
