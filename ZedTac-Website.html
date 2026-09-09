@@ -8489,7 +8489,7 @@
      Only built when the browser can actually run speech; otherwise Botpress's
      own circle is left alone, because a button promising to talk is worse
      than a plain one that opens a chat you can type into. */
-  .zt-voice-fab{
+  .zt-chat-fab{
     position:fixed; bottom:calc(24px + var(--zt-badge-clear, 0px)); right:24px;
     display:flex; align-items:center; gap:11px;
     padding:8px 20px 8px 8px;
@@ -8505,35 +8505,34 @@
      so hiding these by attribute silently does nothing without this. The pill
      was still on screen next to an open panel because of it -- invisible in
      the floating layout only because the panel happened to cover it. */
-  .zt-voice-fab[hidden],
-  .zt-chat-chooser[hidden],
+  .zt-chat-fab[hidden],
   .zt-embed-panel[hidden]{ display:none !important; }
 
-  .zt-voice-fab:hover{ box-shadow:0 20px 44px -12px rgba(0,0,0,.62); }
-  .zt-voice-fab:focus-visible{ outline:2px solid var(--zt-orange-btn,#FF9447); outline-offset:3px; }
+  .zt-chat-fab:hover{ box-shadow:0 20px 44px -12px rgba(0,0,0,.62); }
+  .zt-chat-fab:focus-visible{ outline:2px solid var(--zt-orange-btn,#FF9447); outline-offset:3px; }
 
-  .zt-voice-fab .zt-vf-mic{
+  .zt-chat-fab .zt-cf-icon{
     flex:0 0 auto; width:38px; height:38px; border-radius:50%;
     background:var(--zt-orange-btn,#FF9447);
     display:grid; place-items:center;
   }
-  .zt-voice-fab .zt-vf-mic svg{ width:19px; height:19px; display:block; }
+  .zt-chat-fab .zt-cf-icon svg{ width:19px; height:19px; display:block; }
 
-  .zt-voice-fab .zt-vf-copy{ display:flex; flex-direction:column; gap:2px; }
-  .zt-voice-fab .zt-vf-title{
+  .zt-chat-fab .zt-cf-copy{ display:flex; flex-direction:column; gap:2px; }
+  .zt-chat-fab .zt-cf-title{
     font-size:14px; font-weight:700; line-height:1.15; letter-spacing:.1px;
   }
-  .zt-voice-fab .zt-vf-status{
+  .zt-chat-fab .zt-cf-status{
     display:flex; align-items:center; gap:5px;
     font-size:9px; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
     color:rgba(255,255,255,0.72);
   }
-  .zt-voice-fab .zt-vf-dot{
+  .zt-chat-fab .zt-cf-dot{
     width:6px; height:6px; border-radius:50%; background:#2FD07A;
     box-shadow:0 0 0 0 rgba(47,208,122,.6);
-    animation:ztVfPulse 2.2s var(--ease, ease-out) infinite;
+    animation:ztCfPulse 2.2s var(--ease, ease-out) infinite;
   }
-  @keyframes ztVfPulse{
+  @keyframes ztCfPulse{
     0%   { box-shadow:0 0 0 0 rgba(47,208,122,.55); }
     70%  { box-shadow:0 0 0 7px rgba(47,208,122,0); }
     100% { box-shadow:0 0 0 0 rgba(47,208,122,0); }
@@ -8542,12 +8541,12 @@
      Under 400px the copy is dropped rather than wrapped -- a two-line pill
      eats the corner of a phone screen. */
   @media (max-width:400px){
-    .zt-voice-fab{ padding:8px; gap:0; }
-    .zt-voice-fab .zt-vf-copy{ display:none; }
+    .zt-chat-fab{ padding:8px; gap:0; }
+    .zt-chat-fab .zt-cf-copy{ display:none; }
   }
   @media (prefers-reduced-motion:reduce){
-    .zt-voice-fab{ transition:none; }
-    .zt-voice-fab .zt-vf-dot{ animation:none; }
+    .zt-chat-fab{ transition:none; }
+    .zt-chat-fab .zt-cf-dot{ animation:none; }
   }
 
   /* ---------- HEADER PORTAL BUTTON ----------
@@ -8607,93 +8606,6 @@
      from the chat. Kept as a named zero so the offsets below still read as
      deliberate rather than looking like the badge was never considered. */
   :root{ --zt-badge-clear:0px; }
-
-  /* ---------- CHAT MODE CHOOSER ----------
-     Voice cannot be the only way in. It needs a microphone the visitor may
-     not want to grant, and Firefox has no SpeechRecognition at all, so the
-     launcher asks instead of assuming. Sits above the pill, inside
-     .bpChatContainer, so it shares the widget's stacking context and stays
-     under the nav with everything else.
-
-     Width is capped against a percentage rather than 100vw: on Windows a
-     classic scrollbar is inside the viewport but outside a percentage, and
-     vw would push this a scrollbar's width off the screen. */
-  .zt-chat-chooser{
-    position:fixed; right:24px;
-    bottom:calc(88px + var(--zt-badge-clear, 0px) + var(--zt-bp-lift, 0px));
-    width:min(292px, calc(100% - 48px));
-    padding:16px 16px 14px;
-    border-radius:18px;
-    background:#191615;
-    border:1px solid rgba(255,255,255,0.085);
-    box-shadow:0 26px 60px -20px rgba(0,0,0,.62), 0 4px 14px rgba(0,0,0,.34);
-    color:#fff;
-    animation:ztChooserIn .26s var(--ease, cubic-bezier(.16,1,.3,1));
-  }
-  /* Transform only. An entrance that fades from opacity 0 leaves the panel
-     invisible for as long as the animation fails to advance -- the same trap
-     the chat panel's own entrance fell into. */
-  @keyframes ztChooserIn{
-    from{ transform:translateY(10px) scale(.97); }
-    to  { transform:none; }
-  }
-
-  .zt-chat-chooser .zt-cc-head{
-    margin:0 0 12px; font-size:12px; font-weight:600;
-    letter-spacing:.02em; color:rgba(255,255,255,0.62);
-  }
-  .zt-chat-chooser .zt-cc-opts{ display:flex; flex-direction:column; gap:8px; }
-  .zt-chat-chooser .zt-cc-opt{
-    display:flex; align-items:center; gap:12px; width:100%;
-    padding:11px 13px; border-radius:12px; cursor:pointer;
-    background:rgba(255,255,255,0.045);
-    border:1px solid rgba(255,255,255,0.075);
-    color:#fff; font-family:inherit; text-align:left;
-    transition:background .16s var(--ease, ease), border-color .16s var(--ease, ease);
-  }
-  .zt-chat-chooser .zt-cc-opt:hover{
-    background:rgba(255,148,71,0.13); border-color:rgba(255,148,71,0.42);
-  }
-  .zt-chat-chooser .zt-cc-opt:focus-visible{
-    outline:2px solid var(--zt-orange-btn,#FF9447); outline-offset:2px;
-  }
-  .zt-chat-chooser .zt-cc-ico{
-    flex:0 0 auto; width:34px; height:34px; border-radius:50%;
-    background:var(--zt-orange-btn,#FF9447); color:#26170B;
-    display:grid; place-items:center;
-  }
-  .zt-chat-chooser .zt-cc-ico svg{ width:17px; height:17px; display:block; }
-  .zt-chat-chooser .zt-cc-lab{ display:flex; flex-direction:column; gap:1px; }
-  .zt-chat-chooser .zt-cc-lab b{ font-size:13.5px; font-weight:700; }
-  .zt-chat-chooser .zt-cc-lab i{
-    font-style:normal; font-size:11px; color:rgba(255,255,255,0.55);
-  }
-
-  .zt-chat-chooser .zt-cc-langs{
-    display:flex; gap:7px; margin-top:13px;
-    padding-top:12px; border-top:1px solid rgba(255,255,255,0.075);
-  }
-  .zt-chat-chooser .zt-cc-lang{
-    flex:1; padding:7px 10px; border-radius:9px; cursor:pointer;
-    background:transparent; border:1px solid rgba(255,255,255,0.13);
-    color:rgba(255,255,255,0.66); font-family:inherit; font-size:12px; font-weight:600;
-    transition:background .16s var(--ease, ease), color .16s var(--ease, ease),
-               border-color .16s var(--ease, ease);
-  }
-  .zt-chat-chooser .zt-cc-lang:hover{ color:#fff; border-color:rgba(255,255,255,0.3); }
-  .zt-chat-chooser .zt-cc-lang.is-on{
-    background:var(--zt-orange-btn,#FF9447); border-color:var(--zt-orange-btn,#FF9447);
-    color:#26170B;
-  }
-  /* The Urdu label is Nastaliq; it needs the extra line height to avoid
-     clipping its descenders against the button edge. */
-  .zt-chat-chooser .zt-cc-lang[lang="ur"]{ font-size:13px; line-height:1.5; }
-
-  @media (prefers-reduced-motion:reduce){
-    .zt-chat-chooser{ animation:none; }
-    .zt-chat-chooser .zt-cc-opt,
-    .zt-chat-chooser .zt-cc-lang{ transition:none; }
-  }
 
   /* ---------- EMBEDDED-MODE FALLBACK ----------
      The webchat's dashboard configuration decides whether it floats or embeds.
@@ -14052,6 +13964,12 @@ if (THREE) (function () {
        phone -- 23px out at 375. */
     '.bpComposerEmojiPicker em-emoji-picker{max-width:100%!important;width:100%!important}',
 
+    /* The widget ships a mic in the composer that dictates into the text box.
+       It is the same speech engine that could not hold on to the company's own
+       name, so it is hidden along with the rest of the voice path -- leaving
+       it would put the exact problem back one button away. */
+    '.bpComposerVoiceButton{display:none!important}',
+
     /* The "by Botpress" line under the composer. Also settable in the
        dashboard's footer field, but hidden here so it does not come back on
        the next config publish. */
@@ -14181,59 +14099,28 @@ if (THREE) (function () {
 
 <script>
 /* ============================================================================
-   VOICE + TEXT LAYER FOR THE WEBCHAT
+   CHAT LAUNCHER
 
-   Botpress has no voice mode. The widget ships one mic button that dictates
-   into the text box, and the bot never speaks, so talking is built here out of
-   the browser's own two speech APIs: SpeechRecognition for the visitor's turn,
-   speechSynthesis for the bot's.
+   Botpress can be configured to embed rather than float, and configured that
+   way it builds no bubble and no container of its own -- it waits for elements
+   the page is expected to provide, and if they are missing it never mounts and
+   the chat is invisible with no error anywhere. That is how it once vanished
+   from this site. So the page provides those hosts itself and gives them the
+   geometry a floating panel would have. The widget renders the same interface
+   either way, so the skin in the bridge above fits both.
 
-   Nothing is forced. Clicking the launcher opens a chooser -- talk or type,
-   English or Urdu -- because voice needs a microphone the visitor may not want
-   to grant, and because a browser without SpeechRecognition (Firefox) cannot
-   offer it at all. The choice is remembered, and typing always remains
-   available inside the panel whatever was picked.
-
-   Turn-taking is the design in voice mode: the mic stops before the bot speaks
-   and restarts when it finishes, because an open mic transcribes the reply
-   coming out of the speakers and the bot answers itself.
+   The launcher is ours because the widget's own is a bare circle that says
+   nothing. Voice was tried here and removed: the recogniser could not hold on
+   to the company's own name, and every reply had to be waited through before
+   the visitor could speak again. Typing has neither problem.
    ========================================================================= */
 (function(){
   'use strict';
 
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  var synth = window.speechSynthesis;
-  var canSpeak = !!(SR && synth);
-
-  /* Urdu, Arabic and Persian all sit in these blocks. Reply language is the
-     bot's decision, so the script it comes back in is what is read, not
-     whatever the visitor picked at the door. */
-  var RTL_SCRIPT = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
-
-  var LANGS = {
-    en: { rec: 'en-US', voice: /^en/i,            greet: 'Welcome to ZedTac.' },
-    ur: { rec: 'ur-PK', voice: /^(ur|ar)/i,       greet: 'زیڈٹیک میں خوش آمدید۔' }
-  };
-
-  var PREF_KEY = 'ztChatPrefs';
-  var prefs = { mode: null, lang: 'en' };
-  try {
-    var saved = JSON.parse(localStorage.getItem(PREF_KEY) || 'null');
-    if (saved && typeof saved === 'object'){
-      if (saved.mode === 'voice' || saved.mode === 'text') prefs.mode = saved.mode;
-      if (LANGS[saved.lang]) prefs.lang = saved.lang;
-    }
-  } catch (e) {}
-  function savePrefs(){
-    try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {}
-  }
-
-  var rec = null, listening = false, speaking = false, micRefused = false;
-  var pill = null, chooser = null;
+  var pill = null, embedPanel = null, bound = false;
 
   /* Floating mode builds everything inside #fab-root's shadow root; embedded
-     mode renders the same interface inside #webchat-root's. Either way this is
-     where the skin and the composer rule have to be injected. */
+     mode renders the same interface inside #webchat-root's. */
   function shadow(){
     var ids = ['fab-root', 'webchat-root'];
     for (var i = 0; i < ids.length; i++){
@@ -14258,12 +14145,8 @@ if (THREE) (function () {
     return d;
   }
 
-  /* The host an embedded configuration waits for. Created up front, before the
-     widget looks for it: configured to embed and finding nothing, the widget
-     never mounts at all and the chat is invisible with no error anywhere --
-     which is exactly how it disappeared. Harmless when the widget floats, as
-     nothing then references these ids. */
-  var embedPanel = null;
+  /* Created up front, before the widget looks for it. Harmless when the widget
+     floats, as nothing then references these ids. */
   function ensureEmbedHost(){
     if (embedPanel) return embedPanel;
     embedPanel = document.getElementById('bp-embedded-webchat');
@@ -14286,304 +14169,21 @@ if (THREE) (function () {
     return embedPanel;
   }
 
-  /* ---- the text composer ---------------------------------------------- */
-  /* Hidden only while voice is the active mode and the mic is actually
-     working. The moment either stops being true the keyboard comes back: a
-     panel with no way in is worse than one that looks busier than intended. */
-  function setComposerHidden(hidden){
-    var sr = shadow();
-    if (!sr) return;
-    var st = sr.getElementById('zt-voice-only');
-    if (hidden && !micRefused){
-      if (!st){
-        st = document.createElement('style');
-        st.id = 'zt-voice-only';
-        st.textContent = '.bpComposerContainer{display:none!important}';
-        sr.appendChild(st);
-      }
-    } else if (st){
-      st.remove();
-    }
-  }
-
-  /* ---- the bot's turn -------------------------------------------------- */
-  function voiceFor(text){
-    var list = synth.getVoices() || [];
-    var wanted = RTL_SCRIPT.test(text) ? LANGS.ur.voice : LANGS.en.voice;
-    for (var i = 0; i < list.length; i++) if (wanted.test(list[i].lang)) return list[i];
-    /* Urdu with no Urdu or Arabic voice installed has nothing that can read
-       the script -- an English voice would produce noise, so it is left
-       unspoken and simply read on screen. macOS ships no Urdu voice at all;
-       Windows does once the language pack is present. */
-    return RTL_SCRIPT.test(text) ? null : (list[0] || null);
-  }
-
-  function speak(text, done){
-    if (!text || !canSpeak){ done && done(); return; }
-    var picked = voiceFor(text);
-    if (!picked && RTL_SCRIPT.test(text)){ done && done(); return; }
-
-    try { synth.cancel(); } catch (e) {}
-    var u = new SpeechSynthesisUtterance(text);
-    if (picked){ u.voice = picked; u.lang = picked.lang; }
-    speaking = true;
-
-    var finished = false, guard;
-    function finish(){
-      if (finished) return;
-      finished = true;
-      speaking = false;
-      clearTimeout(guard);
-      done && done();
-    }
-    /* onend cannot be relied on. A machine with no audio output never fires it
-       -- seen while building this -- and nor does a cancelled utterance or a
-       tab backgrounded mid-sentence. Since the mic is only handed back on
-       finish, a missing event would leave the visitor unable to speak and,
-       with the composer hidden, nothing to type into either. */
-    guard = setTimeout(finish, Math.min(30000, 1500 + text.split(/\s+/).length * 450));
-    u.onend = u.onerror = finish;
-    try { synth.speak(u); } catch (e) { finish(); }
-  }
-
-  /* ---- the visitor's turn ---------------------------------------------- */
-  function stopListening(){
-    listening = false;
-    /* Drop the half-sentence too. Without this it survives the bot's reply and
-       is prepended to whatever the visitor says next, which reads as the bot
-       mishearing them. */
-    clearTimeout(silenceTimer);
-    silenceTimer = null;
-    heard = '';
-    if (rec){ try { rec.abort(); } catch (e) {} }
-  }
-
-  /* How long a pause means the visitor has finished a sentence. Every
-     millisecond here is dead air before the bot even hears the question, so
-     it is kept as short as it can be while still surviving the gap before
-     "...our pricing". */
-  var SILENCE_MS = 650;
-  /* Engines that report a confidence at all and report it this low are usually
-     returning noise. A zero means "not scored", which is common, so it is not
-     treated as a low score. */
-  var MIN_CONFIDENCE = 0.3;
-
-  /* No speech engine knows "ZedTac", so it comes back as "zed tack", "zed
-     tech", "said tac" and the bot is asked about a company that does not
-     exist -- which is exactly the "it does not recognise our name" problem.
-     The transcript is corrected before it is sent, because that is the only
-     lever available: Chrome's grammar hinting (SpeechGrammarList) has been
-     accepted-and-ignored for years, so biasing the recogniser is not an
-     option.
-
-     Spelled out as an explicit alternation rather than a loose pattern. A
-     clever regex here would also swallow ordinary phrases like "set a tag",
-     and silently rewriting what someone said is worse than missing one
-     mispronunciation. */
-  var BRAND = new RegExp('\\b(?:' + [
-    'zed\\s?-?\\s?(?:tac|tack|tak|tech|tec|talk|tag|tick|tuck|dac)',
-    '(?:zad|zaid|zed|said|sed|set|zip|zeb)\\s?-?\\s?(?:tac|tack|tech)',
-    'zedtac|zedtack|zedtech|zeddac|zeltac|zetac'
-  ].join('|') + ')\\b', 'gi');
-
-  function correctBrand(text){ return text.replace(BRAND, 'ZedTac'); }
-
-  var heard = '', silenceTimer = null, restarts = 0, restartWindow = 0;
-
-  function flushHeard(){
-    clearTimeout(silenceTimer);
-    silenceTimer = null;
-    var text = correctBrand(heard.trim());
-    heard = '';
-    if (text) window.botpress.sendMessage(text);
-  }
-
-  function scheduleFlush(){
-    clearTimeout(silenceTimer);
-    silenceTimer = setTimeout(flushHeard, SILENCE_MS);
-  }
-
-  function startListening(){
-    if (prefs.mode !== 'voice' || micRefused || listening || speaking || !SR) return;
-    if (!rec){
-      rec = new SR();
-
-      /* continuous, so a pause mid-sentence does not end the turn. It used to
-         stop at the first one and send whatever it had, which is how "tell me
-         about... your pricing" reached the bot as "tell me about" and came
-         back answered as something else entirely.
-
-         interimResults are not sent anywhere -- they exist so the silence
-         timer can tell "still talking" from "finished". */
-      rec.continuous = true;
-      rec.interimResults = true;
-      /* Ask for alternatives and take the best-scored one rather than
-         whichever the engine happened to put first. */
-      rec.maxAlternatives = 3;
-
-      rec.onresult = function(e){
-        for (var i = e.resultIndex; i < e.results.length; i++){
-          var res = e.results[i];
-          if (!res.isFinal){ scheduleFlush(); continue; }
-
-          var best = res[0];
-          for (var j = 1; j < res.length; j++){
-            if (res[j] && res[j].confidence > best.confidence) best = res[j];
-          }
-          if (best.confidence > 0 && best.confidence < MIN_CONFIDENCE) continue;
-
-          var part = (best.transcript || '').trim();
-          if (part) heard += (heard ? ' ' : '') + part;
-          scheduleFlush();
-        }
-      };
-
-      rec.onend = function(){
-        listening = false;
-        if (heard.trim()) flushHeard();
-
-        /* Even a continuous recogniser ends on its own -- a long silence, or
-           the engine deciding the turn is over. Nothing used to restart it, so
-           after the first pause the mic was dead while the panel still looked
-           like it was listening and the visitor kept talking to nothing. */
-        if (prefs.mode === 'voice' && !speaking && !micRefused){
-          var now = Date.now();
-          if (now - restartWindow > 10000){ restartWindow = now; restarts = 0; }
-          /* A mic that fails instantly would otherwise spin here. */
-          if (++restarts <= 8) setTimeout(startListening, 250);
-        }
-      };
-
-      rec.onerror = function(e){
-        listening = false;
-        /* A refused or missing mic ends voice for this visit rather than
-           retrying into a permission wall. 'no-speech' is just silence, and
-           onend restarts after it. */
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed' ||
-            e.error === 'audio-capture'){
-          micRefused = true;
-          clearTimeout(silenceTimer);
-          setComposerHidden(false);
-        }
-      };
-    }
-    rec.lang = LANGS[prefs.lang].rec;
-    try { rec.start(); listening = true; } catch (e) { listening = false; }
-  }
-
-  /* ---- opening in a mode ----------------------------------------------- */
-  function openWith(mode, lang){
-    prefs.mode = mode;
-    if (lang) prefs.lang = lang;
-    savePrefs();
-    hideChooser();
-
+  /* ---- open / close ----------------------------------------------------- */
+  function openPanel(){
     window.botpress.open();
     syncPill();
-
-    if (mode === 'voice' && canSpeak){
-      setComposerHidden(true);
-      speak(LANGS[prefs.lang].greet, startListening);   /* still in the gesture */
-    } else {
-      setComposerHidden(false);
-      try { synth && synth.cancel(); } catch (e) {}
-      stopListening();
-    }
   }
-
   function closePanel(){
-    try { synth && synth.cancel(); } catch (e) {}
-    stopListening();
     window.botpress.close();
     syncPill();
   }
 
-  /* ---- launcher + chooser ---------------------------------------------- */
-  var MIC_SVG =
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" ' +
-    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-    '<rect x="9" y="2" width="6" height="11" rx="3"></rect>' +
-    '<path d="M5 10a7 7 0 0 0 14 0"></path>' +
-    '<line x1="12" y1="17" x2="12" y2="22"></line></svg>';
-
+  /* ---- launcher --------------------------------------------------------- */
   var CHAT_SVG =
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" ' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#26170B" stroke-width="2.1" ' +
     'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
     '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.3-.6L3 21l1.8-5a8.3 8.3 0 0 1-.8-3.6 8.4 8.4 0 0 1 8.5-8.4 8.4 8.4 0 0 1 8.5 8.4z"></path></svg>';
-
-  function buildChooser(){
-    if (chooser) return chooser;
-    chooser = document.createElement('div');
-    chooser.className = 'zt-chat-chooser';
-    chooser.hidden = true;
-    chooser.setAttribute('role', 'dialog');
-    chooser.setAttribute('aria-label', 'Choose how to talk to ZedTac');
-
-    /* Voice is offered only where the browser can run it. Firefox has no
-       SpeechRecognition, so showing the option there would be a button that
-       does nothing. */
-    var voiceBtn = canSpeak
-      ? '<button type="button" class="zt-cc-opt" data-mode="voice">' +
-          '<span class="zt-cc-ico">' + MIC_SVG + '</span>' +
-          '<span class="zt-cc-lab"><b>Talk</b><i>Speak and listen</i></span>' +
-        '</button>'
-      : '';
-
-    chooser.innerHTML =
-      '<p class="zt-cc-head">How would you like to chat?</p>' +
-      '<div class="zt-cc-opts">' + voiceBtn +
-        '<button type="button" class="zt-cc-opt" data-mode="text">' +
-          '<span class="zt-cc-ico">' + CHAT_SVG + '</span>' +
-          '<span class="zt-cc-lab"><b>Chat</b><i>Use the keyboard</i></span>' +
-        '</button>' +
-      '</div>' +
-      '<div class="zt-cc-langs" role="group" aria-label="Language">' +
-        '<button type="button" class="zt-cc-lang" data-lang="en">English</button>' +
-        '<button type="button" class="zt-cc-lang" data-lang="ur" lang="ur">اردو</button>' +
-      '</div>';
-
-    chooser.addEventListener('click', function(e){
-      var opt = e.target.closest('.zt-cc-opt');
-      if (opt){ openWith(opt.getAttribute('data-mode')); return; }
-      var lang = e.target.closest('.zt-cc-lang');
-      if (lang){
-        prefs.lang = lang.getAttribute('data-lang');
-        savePrefs();
-        markLangs();
-      }
-    });
-
-    dock().appendChild(chooser);
-    markLangs();
-    return chooser;
-  }
-
-  function markLangs(){
-    if (!chooser) return;
-    [].forEach.call(chooser.querySelectorAll('.zt-cc-lang'), function(b){
-      var on = b.getAttribute('data-lang') === prefs.lang;
-      b.classList.toggle('is-on', on);
-      b.setAttribute('aria-pressed', on ? 'true' : 'false');
-    });
-  }
-
-  function showChooser(){
-    buildChooser();
-    chooser.hidden = false;
-    document.addEventListener('click', onOutside, true);
-    document.addEventListener('keydown', onEsc, true);
-  }
-  function hideChooser(){
-    if (!chooser) return;
-    chooser.hidden = true;
-    document.removeEventListener('click', onOutside, true);
-    document.removeEventListener('keydown', onEsc, true);
-  }
-  function onOutside(e){
-    if (chooser && !chooser.hidden &&
-        !chooser.contains(e.target) && !(pill && pill.contains(e.target))) hideChooser();
-  }
-  function onEsc(e){ if (e.key === 'Escape') hideChooser(); }
 
   function buildPill(){
     var container = dock();
@@ -14603,18 +14203,17 @@ if (THREE) (function () {
 
     pill = document.createElement('button');
     pill.type = 'button';
-    pill.className = 'zt-voice-fab';
+    pill.className = 'zt-chat-fab';
     pill.setAttribute('aria-label', 'Chat with ZedTac');
     pill.innerHTML =
-      '<span class="zt-vf-mic">' + (canSpeak ? MIC_SVG : CHAT_SVG) + '</span>' +
-      '<span class="zt-vf-copy">' +
-        '<span class="zt-vf-title">' + (canSpeak ? 'Talk to us' : 'Chat with us') + '</span>' +
-        '<span class="zt-vf-status"><span class="zt-vf-dot"></span>Available now</span>' +
+      '<span class="zt-cf-icon">' + CHAT_SVG + '</span>' +
+      '<span class="zt-cf-copy">' +
+        '<span class="zt-cf-title">Chat with us</span>' +
+        '<span class="zt-cf-status"><span class="zt-cf-dot"></span>Available now</span>' +
       '</span>';
 
     pill.addEventListener('click', function(){
-      if (window.botpress.state === 'opened'){ closePanel(); return; }
-      if (!chooser || chooser.hidden) showChooser(); else hideChooser();
+      if (window.botpress.state === 'opened') closePanel(); else openPanel();
     });
 
     container.appendChild(pill);
@@ -14631,25 +14230,12 @@ if (THREE) (function () {
        mode it just renders into the host and leaves it there, so the host is
        what has to follow the open state. */
     if (embedPanel) embedPanel.hidden = !open;
-    if (open) hideChooser();
   }
 
-  /* ---- clicking away closes it ----------------------------------------- */
-  /* An open chat should get out of the way the moment the visitor goes back to
-     the page, the way a menu or a dialog does.
-
-     composedPath, not contains(): the chat's interface lives inside a shadow
-     root, so a click on a message or the composer has a target that the panel
-     element does not contain in the ordinary sense, and contains() would read
-     it as a click on the page and close the chat mid-sentence.
-
-     Capture, so this runs before the launcher's own handler. On the click that
-     opens the panel the state is still 'closed' here and nothing happens; on a
-     click on the pill while open, the pill is on the path and this defers to
-     its handler rather than both firing. */
-  /* The header's X. Matched by its label rather than its position, and with
-     the icon class as a second chance, because both are the widget's own
-     markup and only one of them needs to survive a release. getAttribute, not
+  /* ---- clicking away closes it ------------------------------------------ */
+  /* The header's X. Matched by its label rather than its position, with the
+     icon class as a second chance, because both are the widget's own markup
+     and only one of them needs to survive a release. getAttribute, not
      .className: on an SVG that property is an object, not a string. */
   function isCloseControl(n){
     var label = n.getAttribute && n.getAttribute('aria-label');
@@ -14658,6 +14244,18 @@ if (THREE) (function () {
     return !!(cls && /\blucide-x\b/.test(cls));
   }
 
+  /* An open chat should get out of the way the moment the visitor goes back to
+     the page, the way a menu or a dialog does.
+
+     composedPath, not contains(): the chat's interface lives inside a shadow
+     root, so a click on a message or in the composer has a target the panel
+     element does not contain in the ordinary sense, and contains() would read
+     it as a click on the page and close the chat mid-sentence.
+
+     Capture, so this runs before the launcher's own handler. On the click that
+     opens the panel the state is still 'closed' here and nothing happens; on a
+     click on the pill while open, the pill is on the path and this defers to
+     its handler rather than both firing. */
   function onPageClick(e){
     if (!window.botpress || window.botpress.state !== 'opened') return;
     var path = (e.composedPath && e.composedPath()) || [];
@@ -14668,12 +14266,10 @@ if (THREE) (function () {
       /* That button does nothing on its own in embedded mode. It is written
          for the floating layout, where the widget owns the container it is
          closing; here the page owns it, so the widget has nothing to hide and
-         the click falls on the floor. Honouring it here is what makes it work
-         -- and it stays harmless in floating mode, where close() is idempotent
-         and the widget's own handler does the same thing. */
+         the click falls on the floor. */
       if (isCloseControl(n)){ closePanel(); return; }
 
-      if (n === pill || n === chooser || n === embedPanel) return;
+      if (n === pill || n === embedPanel) return;
       if (n.id === 'fab-root' || n.id === 'webchat-root' || n.id === 'zt-chat-dock') return;
       if (n.classList && n.classList.contains('bpChatContainer')) return;
     }
@@ -14687,28 +14283,13 @@ if (THREE) (function () {
   document.addEventListener('click', onPageClick, true);
   document.addEventListener('keydown', onPageKey, true);
 
-  /* ---- wiring ---------------------------------------------------------- */
-  var bound = false;
+  /* ---- wiring ----------------------------------------------------------- */
   function bind(){
     var bp = window.botpress;
     var sr = shadow();
     if (!sr || !bp || typeof bp.on !== 'function') return false;
     if (bound) return true;
     bound = true;
-
-    bp.on('message', function(m){
-      if (prefs.mode !== 'voice' || !canSpeak) return;   /* typing: stay quiet */
-      var me = (bp.user && bp.user.id) || null;
-      if (!m || (me && m.authorId === me)) return;       /* our own echo */
-      var b = m.block;
-      if (!b || b.type !== 'text' || !b.text) return;
-
-      /* The bot decides the reply language; the mic follows it, so a visitor
-         answered in Urdu is then listened to in Urdu. */
-      prefs.lang = RTL_SCRIPT.test(b.text) ? 'ur' : prefs.lang;
-      stopListening();
-      speak(b.text, startListening);
-    });
 
     buildPill();
 
@@ -14743,20 +14324,13 @@ if (THREE) (function () {
     }, 500);
   }
 
-  /* Console handles for checking this without a microphone. */
-  window.ztVoice = {
-    open: openWith,
-    say: speak,
-    listen: startListening,
-    stop: stopListening,
-    prefs: function(){ return { mode: prefs.mode, lang: prefs.lang }; },
-    /* The recogniser itself, so its result handling can be exercised without a
-       microphone -- which is the only way to check the transcript that reaches
-       the bot on a machine that cannot capture audio. */
-    recogniser: function(){ return rec; },
+  /* Console handles for checking the wiring by hand. */
+  window.ztChat = {
+    open: openPanel,
+    close: closePanel,
     state: function(){
-      return { listening: listening, speaking: speaking, micRefused: micRefused,
-               canSpeak: canSpeak, mode: prefs.mode, lang: prefs.lang };
+      return { botpress: window.botpress && window.botpress.state,
+               pillBuilt: !!pill, embedded: !!(embedPanel && embedPanel.querySelector('#webchat-root')) };
     }
   };
 })();
