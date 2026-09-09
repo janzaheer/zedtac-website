@@ -13412,8 +13412,49 @@ if (THREE) (function () {
     if (!viewport || !track) return null;
 
     let step = 0, travel = 0, position = 0, timer = null, hovered = false, onScreen = true;
+    let originals = null, loopWidth = 0, rewindTimer = null;
+    const SLIDE_MS = 1000;   // matches the .carousel-track CSS transition
+
+    function draw(){
+      track.style.transform = 'translate3d(' + (-position) + 'px,0,0)';
+    }
+
+    /* One duplicate of the card set, appended once. The rewind at the end of
+       the run then lands on a card that looks identical to the one already on
+       screen, so resetting the transform is invisible and the carousel reads
+       as sliding forward forever instead of snapping back to the first card.
+       The copies are decoration: aria-hidden keeps them out of the accessible
+       tree and tabindex -1 keeps their links out of the tab order, so the
+       cards are still announced and reachable exactly once. */
+    function ensureClones(){
+      if (originals) return;
+      /* The guard has to be on the track, not on this closure. A
+         MutationObserver rebuilds an instance whenever Vue re-renders the home
+         page, and a fresh closure starts with originals = null -- so a
+         closure-only check cloned the set again on every rebuild, three deep
+         after two route changes. Adopting the copies already in the DOM makes
+         this idempotent per element however many instances wrap it. */
+      const already = track.querySelector(':scope > [data-zt-clone="1"]');
+      if (already){
+        originals = Array.prototype.slice.call(track.children)
+          .filter(function(c){ return c.getAttribute('data-zt-clone') !== '1'; });
+        if (!originals.length) originals = null;
+        return;
+      }
+      originals = Array.prototype.slice.call(track.children);
+      if (!originals.length){ originals = null; return; }
+      originals.forEach(function(node){
+        const c = node.cloneNode(true);
+        c.setAttribute('aria-hidden', 'true');
+        c.setAttribute('data-zt-clone', '1');
+        c.querySelectorAll('a,button,input,select,textarea,[tabindex]')
+         .forEach(function(f){ f.setAttribute('tabindex', '-1'); });
+        track.appendChild(c);
+      });
+    }
 
     function measure(){
+      ensureClones();
       const first = track.firstElementChild;
       const gap = parseFloat(getComputedStyle(track).columnGap) || 20;
       const cardStep = first ? first.getBoundingClientRect().width + gap : 0;
@@ -13422,18 +13463,51 @@ if (THREE) (function () {
         ? Math.max(1, Math.round((viewport.clientWidth + gap) / cardStep))
         : 1;
       step = cardStep ? cardStep * per : viewport.clientWidth;
-      travel = Math.max(0, track.scrollWidth - viewport.clientWidth);
-      position = Math.min(position, travel);
-      track.style.transform = 'translate3d(' + (-position) + 'px,0,0)';
+      /* The distance after which the pattern repeats: measured as the offset
+         between the first original and its copy rather than counted as
+         cards x width, so it stays exact if the cards are ever not uniform. */
+      const firstClone = originals && track.children[originals.length];
+      loopWidth = (firstClone && originals[0])
+        ? firstClone.offsetLeft - originals[0].offsetLeft
+        : Math.max(0, track.scrollWidth - viewport.clientWidth);
+      travel = loopWidth;
+      if (loopWidth > 0) position = position % loopWidth;
+      draw();
+    }
+
+    /* Snap back by exactly one set, with the transition off so nothing is seen
+       moving. Called once the forward slide has finished, never during it. */
+    function rewind(){
+      if (loopWidth <= 0) return;
+      const inline = track.style.transition;
+      track.style.transition = 'none';
+      position -= loopWidth;
+      draw();
+      void track.offsetWidth;          // flush, so the next write animates again
+      track.style.transition = inline;
     }
 
     function next(){
-      position = position >= travel - 0.5 ? 0 : Math.min(position + step, travel);
-      track.style.transform = 'translate3d(' + (-position) + 'px,0,0)';
+      position += step;
+      draw();
+      if (position >= loopWidth - 0.5){
+        clearTimeout(rewindTimer);
+        rewindTimer = setTimeout(rewind, SLIDE_MS + 40);
+      }
     }
     function prev(){
-      position = position <= 0.5 ? travel : Math.max(position - step, 0);
-      track.style.transform = 'translate3d(' + (-position) + 'px,0,0)';
+      // Going back from the start: jump a set forward with no transition
+      // first, so the animated step still runs backwards from there.
+      if (position <= 0.5 && loopWidth > 0){
+        const inline = track.style.transition;
+        track.style.transition = 'none';
+        position += loopWidth;
+        draw();
+        void track.offsetWidth;
+        track.style.transition = inline;
+      }
+      position = Math.max(0, position - step);
+      draw();
     }
 
     /* Only ever runs while the carousel is actually on screen and the tab is
@@ -13448,6 +13522,8 @@ if (THREE) (function () {
     function stopTimer(){
       if (timer) clearInterval(timer);
       timer = null;
+      clearTimeout(rewindTimer);
+      rewindTimer = null;
     }
 
     function onEnter(){ hovered = true; stopTimer(); }
