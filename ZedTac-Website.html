@@ -11073,6 +11073,28 @@ const safeStorageSet = (key, value) => {
    as a second segment. */
 const ZT_PAGES = ['home','about','automation','consult','docs','erp','erpservices',
                   'faqs','features','industries','integrations','module','outcomes','pricing'];
+/* Per-route <title> and description. Without these every route shared the
+   home page's title: browser tabs, bookmarks, history entries and search
+   results were all indistinguishable across fourteen pages, and a visitor
+   with several tabs open could not tell which was which. The suffix is kept
+   on every entry so the brand still reads in a crowded tab strip. */
+const ZT_META = {
+  home:        ['ZedTac \u2014 Enterprise ERP & Business Automation Platform', null],
+  about:       ['About ZedTac \u2014 ERP Consultancy & Software Company', 'An ERP partner built around your operations: who we are, how we work, and the delivery model behind every implementation.'],
+  pricing:     ['ERP Pricing & Packages \u2014 ZedTac', 'Implementation packages with the scope, modules and support each one includes, and a full feature comparison across tiers.'],
+  consult:     ['Book a Consultation \u2014 ZedTac', 'Three consultation formats, from a 30-minute call to a full onsite process audit, each run by an implementation consultant.'],
+  erp:         ['The ZedTac ERP Platform \u2014 One Governed Ledger', 'Finance, inventory, procurement, manufacturing and HR on a single governed system of record.'],
+  erpservices: ['ERP Services \u2014 Implementation, Migration & Support', 'Fourteen specialist ERP services covering strategy, implementation, data migration, training and ongoing support.'],
+  features:    ['ERP Features \u2014 Modules & Capabilities', 'The modules that make up the ZedTac ERP core and what each one covers.'],
+  automation:  ['Business Automation \u2014 Eleven Modules', 'Event-driven automation for collections, approvals, payroll, CRM and scheduled reporting, reading the same ledger as the ERP.'],
+  integrations:['ERP Integrations \u2014 Connect Your Stack', 'How ZedTac connects to the systems already running in your business.'],
+  industries:  ['ERP by Industry \u2014 Sector Solutions', 'Industry depth where it earns its keep, on one shared engine rather than a separate codebase per vertical.'],
+  outcomes:    ['Customer Outcomes \u2014 Measured Results', 'Deployment patterns across eight industries: the operational problem, what was implemented, and the measurable outcome after go-live.'],
+  docs:        ['Documentation \u2014 ZedTac', 'Product documentation and implementation reference material.'],
+  faqs:        ['ERP FAQs \u2014 ZedTac', 'Common questions on ERP implementation, timelines, migration, pricing and support.'],
+  module:      ['Automation Module \u2014 ZedTac', 'One automation module in detail: the trigger, the rules it applies and what it posts to the ledger.']
+};
+
 const ZT_GO = { home:'goHome', about:'goAbout', automation:'goAutomation',
                 consult:'goConsult', docs:'goDocs', erp:'goErp', erpservices:'goErpServices',
                 faqs:'goFaqs', features:'goFeatures', industries:'goIndustries',
@@ -11927,6 +11949,7 @@ window.ztApp = createApp({
     // somewhere to return to. Back/Forward re-apply without pushing.
     const first = this.readRoute();
     if (first && first.page !== this.page) this.applyRoute(first);
+    this.applyMeta();
     history.replaceState({ page: this.page, module: this.activeModule }, '', this.routePath());
     this._onPop = (e) => {
       this.applyRoute((e.state && e.state.page) ? e.state : this.readRoute());
@@ -11971,6 +11994,7 @@ window.ztApp = createApp({
       // Keep the address bar in step. Skipped while restoring from a popstate
       // or a deep link, so Back does not push the entry it just returned to.
       if (!this._routeLocked) this.pushRoute();
+      this.applyMeta();
       // Forms on the newly rendered route need their labels wired up too.
       this.$nextTick(() => this.linkFieldLabels());
       const el = document.getElementById('main');
@@ -12437,6 +12461,16 @@ window.ztApp = createApp({
       const name = seg[0] || 'home';
       if (!ZT_PAGES.includes(name)) return null;
       return { page: name, module: name === 'module' ? (parseInt(seg[1], 10) || 0) : null };
+    },
+    // Title and description follow the route. Falls back to the home entry for
+    // anything unmapped rather than leaving the previous page's title behind.
+    applyMeta(){
+      const m = ZT_META[this.page] || ZT_META.home;
+      document.title = m[0];
+      if (m[1]){
+        const d = document.querySelector('meta[name="description"]');
+        if (d) d.setAttribute('content', m[1]);
+      }
     },
     pushRoute(){
       const path = this.routePath();
