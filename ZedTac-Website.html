@@ -6838,6 +6838,22 @@
     .zt-home section:not(.hero){ min-height:0; }
   }
 
+  /* Narrow viewports -- phones and tablet portrait. The floor above is the
+     other half of the same idea. One screen per section works while the
+     content is laid out in rows and roughly fills the screen, which is true
+     on a laptop: at 1280x800 the floor adds 20px of slack in total, and at
+     1024x768 only 18px. Once the grids stack to one or two columns the
+     content no longer fills a tall screen and the floor pads the shortfall
+     out as empty space -- measured at 432px on a 430x932 phone, 1080px on a
+     768x1024 tablet and 2444px in a 900x1200 window. Below the stacking
+     breakpoint the sections size to their content instead. 920px is the width
+     the rest of the file already stacks at (.hero, .services-grid, .showcase,
+     .about-grid, .contact-grid), so this turns off with them rather than
+     introducing a breakpoint of its own. Desktop is untouched. */
+  @media (max-width:920px){
+    .zt-home section:not(.hero){ min-height:0; }
+  }
+
 
   /* ==========================================================================
      CARD SCALE FOR FULL-SCREEN SECTIONS
