@@ -11071,6 +11071,11 @@ const safeStorageSet = (key, value) => {
    The path is the state name rather than a lookup table, so there is no map
    to drift out of step when a route is added. Module pages carry their index
    as a second segment. */
+/* Autoplay cadence for every slider on the site. One constant so they stay in
+   step -- they used to run at a mix of 1000ms and 2000ms, which read as several
+   unrelated things moving rather than one rhythm. */
+const ZT_SLIDER_MS = 3000;
+
 const ZT_PAGES = ['home','about','automation','consult','docs','erp','erpservices',
                   'faqs','features','industries','integrations','module','outcomes','pricing'];
 /* Per-route <title> and description. Without these every route shared the
@@ -12113,7 +12118,7 @@ window.ztApp = createApp({
       el.scrollBy({ left: dir * step, behavior: 'smooth' });
     },
     startShowcaseInterval() {
-      this.showcaseInterval = setInterval(() => { if (document.hidden) return; this.showcaseIndex = (this.showcaseIndex + 1) % this.methodology.length; }, 1000);
+      this.showcaseInterval = setInterval(() => { if (document.hidden) return; this.showcaseIndex = (this.showcaseIndex + 1) % this.methodology.length; }, ZT_SLIDER_MS);
     },
     toggleAllErpServices() {
       const collapsing = this.showAllErpServices;
@@ -12163,7 +12168,7 @@ window.ztApp = createApp({
             this.scrollSlider('servicesTrack', 1);
           }
         }
-      }, 2000);
+      }, ZT_SLIDER_MS);
     },
 
     stopServicesInterval() {
@@ -12181,7 +12186,7 @@ window.ztApp = createApp({
             this.scrollSlider('portfolioTrack', 1);
           }
         }
-      }, 1000);
+      }, ZT_SLIDER_MS);
     },
     stopPortfolioInterval() {
       clearInterval(this.portfolioInterval);
@@ -12199,7 +12204,7 @@ window.ztApp = createApp({
             this.scrollSlider('industryTrack', 1);
           }
         }
-      }, 1000);
+      }, ZT_SLIDER_MS);
     },
     stopIndustryInterval() {
       clearInterval(this.industryInterval);
@@ -12216,7 +12221,7 @@ window.ztApp = createApp({
             this.scrollSlider('deployedTrack', 1);
           }
         }
-      }, 1000);
+      }, ZT_SLIDER_MS);
     },
     stopDeployedInterval() {
       clearInterval(this.deployedInterval);
@@ -12234,7 +12239,7 @@ window.ztApp = createApp({
             this.scrollSlider('blogTrack', 1);
           }
         }
-      }, 1000);
+      }, ZT_SLIDER_MS);
     },
     stopBlogInterval() {
       clearInterval(this.blogInterval);
@@ -12254,7 +12259,7 @@ window.ztApp = createApp({
             this.scrollSlider('capTrack', 1);
           }
         }
-      }, 1000);
+      }, ZT_SLIDER_MS);
     },
     stopCapInterval() {
       clearInterval(this.capInterval);
@@ -12271,7 +12276,7 @@ window.ztApp = createApp({
             this.scrollSlider('reviewsTrack', 1);
           }
         }
-      }, 2000);
+      }, ZT_SLIDER_MS);
     },
     stopReviewInterval() {
       clearInterval(this.reviewInterval);
@@ -13391,7 +13396,12 @@ if (THREE) (function () {
     { id: 'carousel-industries', prevLabel: 'Previous industries', nextLabel: 'Next industries' },
     { id: 'carousel-deployed',   prevLabel: 'Previous sectors',    nextLabel: 'Next sectors', paged: true }
   ];
-  const DURATION = 1000; // ms -- both the CSS transition and the autoplay cadence
+  /* Autoplay gap. Was 1000 as well, so a slide began the instant the previous
+     one landed and the track never came to rest -- continuous drift rather than
+     a carousel. At 3000 the card slides for a second and then holds, which is
+     long enough to actually read it. The 1s slide itself is the CSS transition
+     on .carousel-track, unchanged. Matches ZT_SLIDER_MS in the app script. */
+  const DURATION = 3000;
   const reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   function createInstance(root, def){
