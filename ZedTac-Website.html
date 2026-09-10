@@ -8815,12 +8815,6 @@
                 </span>
                 <span class="nav-dropdown-title">Automation Services</span>
               </a>
-              <a href="/erp#erp-industries" @click.prevent="goErpIndustries" :class="{'nav-active': page === 'erp'}">
-                <span class="nav-dropdown-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"/><path d="M5 21V7l6-3v17"/><path d="M11 11h8v10"/><path d="M8 10h.01M8 14h.01M15 15h.01"/></svg>
-                </span>
-                <span class="nav-dropdown-title">Industries</span>
-              </a>
             </div>
           </div>
         </div>
@@ -9506,6 +9500,29 @@
       </div>
     </div>
 
+
+    <div class="wrap">
+      <!-- Industries, folded in from the standalone page it used to have.
+           It sits with the delivery content and ahead of the automation
+           cross-sell, so that band stays the closing hand-off it was built
+           to be. The headline and intro come from the old page's hero and
+           the card grid is unchanged -- only the route it lives on moved. -->
+      <section id="erp-industries">
+        <div class="sec-head" style="margin-bottom:36px;">
+          <h2>Depth where it matters, a <span class="text-grad">shared engine</span> everywhere else</h2>
+          <p>Some industries need genuinely bespoke structure. Most need solid core operations with their own vocabulary. The platform is built to do both without turning into two products.</p>
+        </div>
+        <div class="auto-grid">
+          <article class="auto-card reveal" v-for="(m,i) in industryModel" :key="m.name" :style="{'--d': (i*70)+'ms'}" style="cursor:default;">
+            <div class="auto-head">
+              <span class="auto-area">{{ m.kind }}</span>
+            </div>
+            <h3>{{ m.name }}</h3>
+            <p>{{ m.desc }}</p>
+          </article>
+        </div>
+      </section>
+    </div>
 
     <!-- AUTOMATION CROSS-SELL — the 10-20% of this page that is not ERP -->
     <div class="wrap">
@@ -10218,7 +10235,6 @@
         <p>Finance, inventory, procurement, manufacturing, HR and business intelligence — delivered as one connected, governed platform and configured to the way your organization actually works.</p>
         <div class="hero-cta">
           <a href="#erp-features" class="btn btn-primary">View Core Modules</a>
-          <a href="#erp-industries" class="btn btn-ghost">Industries We Serve</a>
         </div>
 
         <!-- Real footage takes over automatically: drop an MP4 in videos/ and set
@@ -10375,27 +10391,6 @@
         </div>
       </section>
 
-      <!-- Industries, folded in from the standalone page it used to have.
-           It sits last because it reads as the answer to the feature list
-           above it: here is the system, and here is how it meets your
-           sector. The headline and intro come from that page's hero and the
-           grid is unchanged, so the content and its styling are the same --
-           only the route it lives on has moved. -->
-      <section id="erp-industries">
-        <div class="sec-head" style="margin-bottom:36px;">
-          <h2>Depth where it matters, a <span class="text-grad">shared engine</span> everywhere else</h2>
-          <p>Some industries need genuinely bespoke structure. Most need solid core operations with their own vocabulary. The platform is built to do both without turning into two products.</p>
-        </div>
-        <div class="auto-grid">
-          <article class="auto-card reveal" v-for="(m,i) in industryModel" :key="m.name" :style="{'--d': (i*70)+'ms'}" style="cursor:default;">
-            <div class="auto-head">
-              <span class="auto-area">{{ m.kind }}</span>
-            </div>
-            <h3>{{ m.name }}</h3>
-            <p>{{ m.desc }}</p>
-          </article>
-        </div>
-      </section>
     </div>
   </div>
 
@@ -12149,16 +12144,6 @@ window.ztApp = createApp({
     goErpServices(){ this.goPage('erpservices'); },
     goFeatures(){ this.goPage('features'); },
     goIntegrations(){ this.goPage('integrations'); },
-    /* Industries lives inside the ERP page now. Routing through goErp()
-       rather than setting page directly keeps the demo player and the reveal
-       observer bound the way clicking ERP does, then scrollToId offsets for
-       the sticky header and marks the section revealed -- a bare
-       scrollIntoView lands on a blank band because .reveal starts at
-       opacity:0. */
-    goErpIndustries(){
-      this.goErp();
-      this.$nextTick(() => this.scrollToId('erp-industries'));
-    },
     goDocs(){ this.goPage('docs'); },
     goFaqs(){ this.goPage('faqs'); },
     /* About is a page now, not a section on the landing page. Routing through
@@ -13650,14 +13635,14 @@ if (THREE) (function () {
     'automation':         go('goAutomation'),
     'features':           go('goFeatures'),
     'integrations':       go('goIntegrations'),
-    'industries':         go('goErp', 'erp-industries'),
+    'industries':         go('goErpServices', 'erp-industries'),
     'outcomes':           go('goOutcomes'),
     'erp':                go('goErp'),
     'erpservices':        go('goErpServices'),
 
     /* anchors that live on a route other than the landing page */
     'compare':            go('goPricing', 'compare'),
-    'erp-industries':     go('goErp', 'erp-industries'),
+    'erp-industries':     go('goErpServices', 'erp-industries'),
     'erp-features':       go('goErp', 'erp-features'),
     'automation-engine':  go('goAutomation', 'automation-engine'),
     'automation-modules': go('goAutomation', 'automation-modules'),
