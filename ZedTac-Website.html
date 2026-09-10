@@ -6720,11 +6720,11 @@
      section expand naturally past one screen instead of clipping. */
   .zt-home section:not(.hero) > *{ flex:0 0 auto; }
 
-  /* Back to Home used to sit in a spacer <div> ABOVE the section, which meant
-     it was outside the box being centred and it pushed the first screen past
-     the fold by its own height. It is a direct child of the section now (the
-     shape the ERP Services page already used), pinned to the start edge so it
-     does not stretch into a full-width click target. */
+  /* The one back link left on the site: "All automation modules", on a single
+     module's page. It is a direct child of the section rather than sitting in
+     a spacer <div> above it, which is what used to push the first screen past
+     the fold by the link's own height. Pinned to the start edge so it does not
+     stretch into a full-width click target. */
   #main section:not(.hero) > .back-link{ align-self:flex-start; }
 
   /* The "first section on a route" rule that used to sit here sized the first
