@@ -5584,6 +5584,25 @@
   .portfolio-card:hover, .blog-card:hover{
     transform:translateY(-6px);
   }
+
+  /* ---- headroom for the lift above -------------------------------------
+     Every card above rises on hover, but three of the containers holding
+     them clip: .portfolio-track and .blog-track are overflow-x:auto, which
+     makes them scroll containers and so clips the vertical axis too, and
+     .carousel-viewport is overflow:hidden outright. With only 4px of padding
+     above the cards (none at all in the viewport) the top of a lifted card
+     was cut off against the container edge -- most visible in ERP
+     deployments, where the case-study cards override the shared -6px with
+     translateY(-10px) plus a rotateX, and measured 6px outside the box.
+
+     The padding buys the clip box enough room; the matching negative margin
+     pulls the box back up by the same amount, so the cards sit exactly where
+     they did and the section's spacing is unchanged. Only the top needs it --
+     the lift travels upward, and the hover shadow is offset downward into the
+     18-22px already free below. */
+  #case-studies .portfolio-track,
+  .blog-track{ padding-top:16px; margin-top:-12px; }
+  .carousel-viewport{ padding-top:16px; margin-top:-16px; }
   .portfolio-card, .blog-card, .service-card, .auto-card, .industry-card,
   .int-card, .doc-card, .outcome-card, .solution-card, .addon-card,
   .arch-node, .cap-group, .erp-feature, .pricing-card{
