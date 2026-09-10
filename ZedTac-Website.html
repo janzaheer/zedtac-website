@@ -3178,17 +3178,32 @@
   }
 
   /* ---------- MOTION ------------------------------------------------------
-     Reveal is upgraded from fade-up to a slight scale + blur settle, which is
-     what gives the "Framer" feel. Still transform/opacity/filter only. */
+     Reveal is a fade-up with a slight scale. It used to carry filter:blur(6px)
+     in the start state as a "settle", and that was the site's scroll problem.
+
+     Two things were wrong with it. First, a later rule further down restates
+     this transition as opacity and transform only, so filter was never in the
+     transition list that actually applied -- the blur snapped off instead of
+     easing, which is not what it was written to do and not something anyone
+     was seeing. Second, and the reason scrolling stuttered: every element
+     waiting to be revealed sat with a live 6px Gaussian on it. Measured on the
+     landing page at 1440x900 that was 32 elements covering 5.79 million square
+     pixels, each forced onto its own layer and re-blurred whenever it
+     repainted, which during a scroll is constantly. A blur cannot be handed to
+     the compositor the way a transform or an opacity can.
+
+     So the blur is gone and the movement is not: the fade, the 26px rise and
+     the scale all stay, on the two properties the compositor can animate
+     without touching paint. The .zt-idle observer parks animations that scroll
+     off screen, but it works through animation-play-state and so never applied
+     to a filter -- this cost was running the whole time. */
   html.reveal-ready .reveal{
     opacity:0; transform:translate3d(0,26px,0) scale(.985);
-    filter:blur(6px);
-    transition:opacity var(--dur-4) var(--ease), transform var(--dur-4) var(--ease),
-               filter var(--dur-4) var(--ease);
+    transition:opacity var(--dur-4) var(--ease), transform var(--dur-4) var(--ease);
     transition-delay:var(--d,0ms);
   }
   html.reveal-ready .reveal.in{
-    opacity:1; transform:none; filter:none;
+    opacity:1; transform:none;
   }
 
   /* ---------- HERO COMPOSITION ------------------------------------------- */
