@@ -1720,7 +1720,6 @@
   .addon-card::before{
     content:''; position:absolute; inset:-50%; background:var(--grad);
     opacity:0.08; transition:opacity .35s var(--ease); z-index:0;
-    animation:bgDrift 22s ease-in-out infinite alternate;
   }
   .addon-card:hover::before{ opacity:0.18; }
   .addon-card > *{ position:relative; z-index:1; }
@@ -1770,18 +1769,31 @@
 
   .outcome-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; align-items:stretch; }
   @media (max-width:920px){ .outcome-grid{ grid-template-columns:1fr; max-width:460px; margin:0 auto; } }
+  /* overflow:hidden is gone from this card, and that is the point of the two
+     changes below. The "Most Cited" badge is positioned at top:-14px so it
+     straddles the card's top edge -- the same treatment .pricing-card gives
+     it -- but this card clipped its own badge, cutting 12px off a 26px pill
+     and leaving the label barely readable. .pricing-card has no overflow rule,
+     which is why the badge reads correctly there.
+
+     The clipping was only ever needed because ::before sat at inset:-50%, half
+     a card proud on every side. That size was for an `animation:bgDrift` which
+     is not defined anywhere in the file -- the only animation name in the
+     stylesheet with no @keyframes -- so the layer never moved and never needed
+     the room. It is inset:0 now, inheriting the radius so it still follows the
+     rounded corners, and nothing has to be clipped. */
   .outcome-card{
     background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);
-    border-radius:var(--radius); padding:32px 28px; overflow:hidden;
+    border-radius:var(--radius); padding:32px 28px;
     display:flex; flex-direction:column; gap:16px; position:relative;
     transition:transform .25s var(--ease), box-shadow .25s var(--ease);
   }
   .outcome-card:hover{ transform:translateY(-6px); box-shadow:var(--zt-shadow); }
   .outcome-card.popular{ border:2px solid var(--zt-orange-light); box-shadow:var(--zt-shadow); }
   .outcome-card::before{
-    content:''; position:absolute; inset:-50%; background:var(--grad);
+    content:''; position:absolute; inset:0; border-radius:inherit;
+    background:var(--grad);
     opacity:0.08; transition:opacity .35s var(--ease); z-index:0;
-    animation:bgDrift 22s ease-in-out infinite alternate;
   }
   .outcome-card:hover::before{ opacity:0.18; }
   .outcome-icon{
@@ -1814,7 +1826,6 @@
   .review-grid .review-card::before{
     content:''; position:absolute; inset:-50%; background:var(--grad);
     opacity:0; transition:opacity .35s var(--ease); z-index:0;
-    animation:bgDrift 22s ease-in-out infinite alternate;
   }
   .review-grid .review-card:hover::before{ opacity:0.08; }
   .review-grid .review-card > *{ position:relative; z-index:1; }
@@ -6849,7 +6860,15 @@
   .arch-node{ min-height:var(--zt-card-lg); }
   .about-stat{ min-height:var(--zt-card-xs); }
   /* Already close to filling its section; a small lift only. */
-  .outcome-card{ min-height:clamp(300px, 38vh, 440px); }
+  /* .outcome-card is deliberately not in the list above. The heights here are
+     viewport-relative because they fill full-screen sections, and those only
+     exist on .zt-home -- .outcome-card appears on one page, /outcomes, which
+     has none. So the floor was never filling anything; it just grew the card
+     with the window. Measured at 1440 wide: 347px tall on a 900px-high window
+     against 312px of content, but 418px on an 1100px-high one, leaving 106px
+     of empty card because the window was taller. Card height should follow the
+     card, so it is content-driven now. Row-equal heights are unaffected --
+     they come from the grid's align-items:stretch, not from this. */
 
   /* ---- internal padding -------------------------------------------------- */
   .doc-card, .erp-feature, .addon-card, .industry-card{ padding:var(--zt-card-pad); }
@@ -6914,7 +6933,6 @@
       --zt-card-pad:clamp(20px, 4.5vw, 26px);
       --zt-card-pad-lg:clamp(22px, 5vw, 30px);
     }
-    .outcome-card{ min-height:clamp(240px, 28vh, 300px); }
   }
 
   /* Short viewports: the sections themselves already fall back to natural flow
@@ -6927,7 +6945,6 @@
       --zt-card-md:200px;
       --zt-card-lg:260px;
     }
-    .outcome-card{ min-height:240px; }
   }
 
 
