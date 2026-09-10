@@ -10664,7 +10664,17 @@
           </ul>
         </div>
 
-        <!-- Contact Us. mailto:/tel: rather than a form -- there is no contact
+        <div class="ft-col">
+          <h2>Legal</h2>
+          <ul>
+            <li><a href="#" @click.prevent="showPrivacy = true">Privacy Policy</a></li>
+            <li><a href="#" @click.prevent="showTerms = true">Terms of Service</a></li>
+            <li><a href="#" @click.prevent="showCookies = true">Cookies Policy</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Us, last so it sits at the right-hand end of the row.
+             mailto:/tel: rather than a form -- there is no contact
              form on the site any more, and on a phone both of these open the
              mail app and the dialler directly, which is fewer steps than a form
              was. The phone number is not published yet; add it here as
@@ -10673,15 +10683,6 @@
           <h2>Contact Us</h2>
           <ul>
             <li><a href="mailto:admin@zedtac.com">admin@zedtac.com</a></li>
-          </ul>
-        </div>
-
-        <div class="ft-col">
-          <h2>Legal</h2>
-          <ul>
-            <li><a href="#" @click.prevent="showPrivacy = true">Privacy Policy</a></li>
-            <li><a href="#" @click.prevent="showTerms = true">Terms of Service</a></li>
-            <li><a href="#" @click.prevent="showCookies = true">Cookies Policy</a></li>
           </ul>
         </div>
       </div>
