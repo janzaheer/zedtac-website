@@ -1277,29 +1277,8 @@
   .faq-item.open .faq-a{ max-height:300px; }
   .faq-a p{ padding:0 4px 26px 60px; color:var(--zt-ink-soft); font-size:15.5px; line-height:1.7; max-width:640px; }
   @media (max-width:600px){ .faq-a p{ padding-left:4px; } .faq-q-text{ gap:12px; } }
-
-  /* ---------- CONTACT ---------- */
-  .contact-box{
-    background:var(--zt-white);
-    border:1px solid var(--zt-line);
-    border-radius:var(--r-xl);
-    padding:56px 48px;
-    box-shadow:var(--zt-shadow);
-    max-width:1100px;
-    margin:0 auto;
-  }
-  @media (max-width:920px){ .contact-box{ padding:40px 28px; } }
-  .contact-grid{ display:grid; grid-template-columns:0.85fr 1.15fr; gap:56px; }
+    .contact-grid{ display:grid; grid-template-columns:0.85fr 1.15fr; gap:56px; }
   @media (max-width:920px){ .contact-grid{ grid-template-columns:1fr; gap:36px; } }
-  .contact-info-item{ display:flex; gap:14px; margin-top:26px; align-items:flex-start; }
-  .contact-info-item:first-of-type{ margin-top:32px; }
-  .contact-icon{
-    width:40px; height:40px; border-radius:var(--r-sm); background:var(--zt-cream); border:1px solid var(--zt-line);
-    display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--zt-orange-deep);
-  }
-  .contact-icon svg{ width:18px; height:18px; }
-  .contact-info-item strong{ display:block; font-size:14.5px; }
-  .contact-info-item span{ font-size:14px; color:var(--zt-ink-soft); }
 
   .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
   @media (max-width:560px){ .form-grid{ grid-template-columns:1fr; } }
@@ -1642,13 +1621,6 @@
   .erp-feature .num{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--zt-orange-deep); }
   .erp-feature h3{ font-size:17px; margin:10px 0 8px; }
   .erp-feature p{ font-size:14px; color:var(--zt-ink-soft); line-height:1.6; }
-
-  .erp-cta-band{
-    margin-top:0; background:var(--zt-ink-fixed); border-radius:var(--r-lg); padding:48px;
-    text-align:center; color:#fff;
-  }
-  .erp-cta-band h2{ color:var(--zt-orange-light); font-size:clamp(24px,3vw,32px); }
-  .erp-cta-band p{ color:rgba(255,255,255,0.85); margin-top:12px; max-width:460px; margin-left:auto; margin-right:auto; }
   .erp-cta-band .btn-ghost{ border-color:rgba(255,255,255,0.25); color:#fff; margin-top:24px; }
   .erp-cta-band .btn-ghost:hover{ background:rgba(255,255,255,0.12); border-color:#fff; }
   .dark .erp-cta-band h2{ color:var(--zt-orange); }
@@ -1764,34 +1736,7 @@
     overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
   }
   .nav-links a.nav-active{ color:var(--zt-orange-deep); font-weight:700; }
-
-  /* ---------- CONSULTATION PAGE ---------- */
-  .consult-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; align-items:stretch; }
-  @media (max-width:920px){ .consult-grid{ grid-template-columns:1fr; max-width:460px; margin:0 auto; } }
-  .consult-card{
-    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);
-    border-radius:var(--radius); padding:32px 28px;
-    display:flex; flex-direction:column; gap:15px; position:relative;
-    transition:transform .25s var(--ease), box-shadow .25s var(--ease);
-  }
-  .consult-card:hover{ transform:translateY(-6px); box-shadow:var(--zt-shadow); }
-  .consult-card.popular{ border:2px solid var(--zt-orange-light); box-shadow:var(--zt-shadow); }
-  .consult-name{ font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:700; color:#fff; }
-  .consult-price{ font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; color:var(--zt-orange-light); }
-  .consult-meta{ display:flex; flex-wrap:wrap; gap:8px; }
-  .consult-tag{
-    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.05em;
-    color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.14); padding:5px 10px; border-radius:var(--r-pill); white-space:nowrap;
-  }
-  .consult-desc{ font-size:14px; color:rgba(255,255,255,0.7); line-height:1.65; }
-  .consult-who{
-    font-size:12.5px; color:rgba(255,255,255,0.55); line-height:1.5;
-    border-left:2px solid var(--zt-orange); padding-left:12px;
-  }
-  .consult-outcomes{ display:flex; flex-direction:column; gap:11px; flex-grow:1; margin-top:2px; }
-  .consult-outcomes li{ display:flex; align-items:flex-start; gap:10px; font-size:13.5px; color:rgba(255,255,255,0.85); line-height:1.5; }
-  .consult-outcomes li svg{ flex-shrink:0; width:17px; height:17px; color:var(--zt-orange-light); margin-top:2px; }
+    .consult-card.popular{ border:2px solid var(--zt-orange-light); box-shadow:var(--zt-shadow); }
   .consult-card .btn{ width:100%; margin-top:auto; }
   .consult-card .btn-ghost{ border-color:rgba(255,255,255,0.25); color:#fff; }
   .consult-card .btn-ghost:hover{ background:rgba(255,255,255,0.12); border-color:#fff; }
@@ -1805,22 +1750,7 @@
   .step-num{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--zt-orange-deep); }
   .step h3{ font-size:17px; margin:9px 0; line-height:1.3; }
   .step p{ font-size:14px; color:var(--zt-ink-soft); line-height:1.6; }
-
-  /* Consultation form */
-  .consult-form-grid{ display:grid; grid-template-columns:1.15fr 0.85fr; gap:52px; }
-  @media (max-width:920px){ .consult-form-grid{ grid-template-columns:1fr; gap:36px; } }
-  .field-hint{ font-size:12px; color:var(--zt-ink-soft); font-weight:500; }
-  .form-req{ color:var(--zt-orange-deep); }
-  .consult-aside-card{
-    background:var(--zt-cream); border:1px solid var(--zt-line);
-    border-radius:var(--r-md); padding:22px 24px; margin-top:28px;
-  }
-  .consult-aside-card h3{ font-size:15px; margin-bottom:12px; }
-  .consult-aside-card li{
-    display:flex; align-items:flex-start; gap:10px;
-    font-size:13.5px; color:var(--zt-ink-soft); line-height:1.55; margin-top:10px;
-  }
-  .consult-aside-card li svg{ flex-shrink:0; width:16px; height:16px; color:var(--zt-orange-deep); margin-top:2px; }
+    .form-req{ color:var(--zt-orange-deep); }
 
   /* ---------- CLIENT OUTCOMES PAGE ---------- */
   .results-band{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; }
@@ -2291,12 +2221,6 @@
     font-size:14px; color:var(--zt-ink-soft); line-height:1.7;
   }
   .doc-note b{ color:var(--zt-ink); }
-  .hero-link{
-    display:inline-flex; align-items:center; font-size:var(--fs-base); font-weight:700;
-    color:var(--zt-ink); padding:6px 2px; border-bottom:1.5px solid transparent;
-    transition:color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
-  }
-  .hero-link:hover{ color:var(--zt-orange-deep); border-bottom-color:var(--zt-orange); }
   .hero-cta{ flex-wrap:wrap; align-items:center; gap:var(--sp-4); }
 
   .ev-table td.ev-name{ font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--zt-orange-deep); white-space:nowrap; }
@@ -4912,7 +4836,6 @@
     box-shadow:none;
     padding-left:0; padding-right:0;
   }
-  .erp-cta-band{ border:none; }
 
   /* Descendants that assumed a dark plate underneath. */
   .pricing-section .sec-head h2,
@@ -5986,7 +5909,7 @@
 
   /* Row 2: five link columns. */
   .ft-cols{
-    display:grid; grid-template-columns:repeat(5, 1fr);
+    display:grid; grid-template-columns:repeat(6, 1fr);   /* 6th track: Contact Us */
     gap:clamp(20px, 2.4vw, 40px);
     padding:clamp(24px, 2.6vw, 38px) 0;
     border-bottom:1px solid rgba(255,255,255,.10);
@@ -8179,7 +8102,6 @@
     .hero-link{
       min-height:44px;
     }
-    .hero-link{ display:inline-flex; align-items:center; }
     .logo{ min-height:44px; display:inline-flex; align-items:center; }
     /* Keyboard affordance rather than a pointer target, so 2.5.5 does not
        strictly cover it -- but it is a real control once focused and costs one
@@ -8893,7 +8815,7 @@
                 </span>
                 <span class="nav-dropdown-title">Automation Services</span>
               </a>
-              <a href="/industries" @click.prevent="goIndustries" :class="{'nav-active': page === 'industries'}">
+              <a href="/erp#erp-industries" @click.prevent="goErpIndustries" :class="{'nav-active': page === 'erp'}">
                 <span class="nav-dropdown-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"/><path d="M5 21V7l6-3v17"/><path d="M11 11h8v10"/><path d="M8 10h.01M8 14h.01M15 15h.01"/></svg>
                 </span>
@@ -8905,9 +8827,9 @@
 
         <!-- Case Studies stays out of the nav (the section lives on the landing
              page) and Client Outcomes sits under Resources with the rest of the
-             proof material. Industries is listed above: the page was fully built
-             but goIndustries() had no caller anywhere in the file, so it could
-             not be reached by any route a visitor has. -->
+             proof material. Industries is listed above but is no longer a page
+             of its own: it is a section of the ERP page now, and the entry
+             routes there and scrolls to it. -->
 
         <a href="/pricing" @click.prevent="goPricing" :class="{'nav-active': page === 'pricing'}">Pricing</a>
 
@@ -8949,7 +8871,6 @@
         </div>
 
         <a href="/about" @click.prevent="goAbout" :class="{'nav-active': page === 'about'}">About</a>
-        <a href="/consult" @click.prevent="goConsult" :class="{'nav-active': page === 'consult'}">Contact</a>
 
         <!-- Login and Get started are gone from the header. An ERP is not a
              product a visitor signs up for from a marketing page: the next
@@ -9015,8 +8936,7 @@
             <h1>Run your entire <span class="text-grad">operation</span> then let it <span class="text-grad">run itself</span></h1>
             <p class="hero-sub">ZedTac is an ERP and business automation platform. The ERP connects finance, inventory, supply chain, manufacturing, HR and customer operations onto one ledger — and the automation engine acts on that data, so reminders, approvals, postings and reports happen without anyone chasing them.</p>
             <div class="hero-cta">
-              <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
-              <a href="/erp" @click.prevent="goErp" class="hero-link">See the ERP demo &rarr;</a>
+              <a href="/erp" @click.prevent="goErp" class="btn btn-primary">See the ERP demo</a>
             </div>
             <!-- The three pillars, stated on the fold. The brief is that AI,
                  ERP and automation read as equally weighted rather than ERP
@@ -9498,8 +9418,7 @@
           <p>Finance, inventory, supply chain, manufacturing, HR and customer operations on a single ledger — designed around how your business actually runs, implemented in fixed phases under a named project lead.</p>
         </div>
         <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:26px;">
-          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
-          <a href="#services" @click.prevent="scrollToId('services')" class="btn btn-ghost">Explore 14 ERPs</a>
+          <a href="#services" @click.prevent="scrollToId('services')" class="btn btn-primary">Explore 14 ERPs</a>
         </div>
         <ul class="hero-pillars" style="margin-top:40px; max-width:760px;">
           <li><span class="hp-key mono">One ledger</span><span class="hp-val">Append-only, corrections are reversing entries</span></li>
@@ -9669,8 +9588,7 @@
         <h1>Connected to the systems you <span class="text-grad">already run</span></h1>
         <p>The ERP becomes your system of record without replacing everything at once. Messaging, accounting, banking and document capture connect through the same event engine your automations run on.</p>
         <div class="hero-cta">
-          <a href="/docs" @click.prevent="goDocs" class="btn btn-ghost">API Documentation</a>
-          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Discuss an Integration</a>
+          <a href="/docs" @click.prevent="goDocs" class="btn btn-primary">API Documentation</a>
         </div>
       </section>
     </div>
@@ -9694,43 +9612,6 @@
 
   </div>
 
-  <!-- ================= INDUSTRIES PAGE ================= -->
-  <div v-if="page === 'industries'">
-    <div class="wrap">
-      <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
-        <h1>Depth where it matters, a <span class="text-grad">shared engine</span> everywhere else</h1>
-        <p>Some industries need genuinely bespoke structure. Most need solid core operations with their own vocabulary. The platform is built to do both without turning into two products.</p>
-      </section>
-    </div>
-
-    <div class="wrap">
-      <section>
-        <div class="sec-head reveal">
-          <h2>Two ways an industry is <span class="text-grad">supported</span></h2>
-        </div>
-        <div class="auto-grid">
-          <article class="auto-card reveal" v-for="(m,i) in industryModel" :key="m.name" :style="{'--d': (i*70)+'ms'}" style="cursor:default;">
-            <div class="auto-head">
-              <span class="auto-area">{{ m.kind }}</span>
-            </div>
-            <h3>{{ m.name }}</h3>
-            <p>{{ m.desc }}</p>
-          </article>
-        </div>
-      </section>
-    </div>
-
-    <div class="wrap">
-      <section>
-        <div class="erp-cta-band reveal">
-          <h2>Don’t see your industry?</h2>
-          <p>That is usually a configuration question rather than a product one. A discovery call will tell you which it is for you.</p>
-          <a href="/consult" @click.prevent="goConsult" class="btn btn-ghost">Book a Free Consultation</a>
-        </div>
-      </section>
-    </div>
-  </div>
 
   <!-- ================= DOCUMENTATION PAGE ================= -->
   <div v-if="page === 'docs'">
@@ -9846,11 +9727,10 @@
         <h1>Your ERP holds the data. <span class="text-grad">Automation</span> makes it act</h1>
         <p>Eleven automation modules built on the same event engine, running on the same ledger and the same customer record. Not a separate product bolted alongside your ERP — the layer that makes it move on its own.</p>
         <div class="hero-cta">
-          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
           <!-- Routed through scrollToId rather than a bare #hash so the module
                grid clears the sticky header by the live --nav-h instead of
                parking its heading underneath the bar. -->
-          <a href="#automation-modules" @click.prevent="scrollToId('automation-modules')" class="btn btn-ghost">Explore 11 Modules</a>
+          <a href="#automation-modules" @click.prevent="scrollToId('automation-modules')" class="btn btn-primary">Explore 11 Modules</a>
         </div>
       </section>
     </div>
@@ -10040,7 +9920,6 @@
               </button>
             </div>
 
-            <a href="/consult" @click.prevent="goConsult" class="btn btn-primary" style="width:100%; margin-top:22px;">Discuss This Module</a>
           </aside>
         </div>
       </section>
@@ -10055,8 +9934,7 @@
         <h1>The numbers that moved after <span class="text-grad">go-live</span></h1>
         <p>An ERP is only worth what it changes. These are the measures our clients track — baselined before we build, reported from live system data afterwards.</p>
         <div class="hero-cta">
-          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Discuss Your Numbers</a>
-          <a href="#outcome-compare" @click.prevent="scrollToSection('#outcome-compare')" class="btn btn-ghost">See Before &amp; After</a>
+          <a href="#outcome-compare" @click.prevent="scrollToSection('#outcome-compare')" class="btn btn-primary">See Before &amp; After</a>
         </div>
       </section>
     </div>
@@ -10205,257 +10083,6 @@
     </div>
 
   </div>  <!-- ================= CONSULTATION PAGE ================= -->
-  <div v-if="page === 'consult'">
-    <div class="wrap">
-      <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
-        <h1>Start with a <span class="text-grad">conversation</span>, not a contract</h1>
-        <p>Three consultation formats, from a 30-minute call to a full onsite process audit. Every one is run by an implementation consultant who will tell you honestly whether an ERP solves your problem.</p>
-        <div class="hero-cta">
-          <a href="#consult-form" @click.prevent="scrollToSection('#consult-form')" class="btn btn-primary">Request a Consultation</a>
-          <a href="#consult-compare" @click.prevent="scrollToSection('#consult-compare')" class="btn btn-ghost">Compare Formats</a>
-        </div>
-        <div class="pricing-page-note">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
-          No obligation · Reply within one business day · NDA on request
-        </div>
-      </section>
-    </div>
-
-    <!-- CONSULTATION FORMATS -->
-    <div class="wrap">
-      <section>
-        <div class="pricing-section reveal">
-          <div class="sec-head">
-            <h2>Choose the <span class="text-grad">depth</span> that matches your decision</h2>
-            <p>Exploring the idea, building a business case, or ready to scope a rollout — each format is sized for a different stage.</p>
-          </div>
-          <div class="consult-grid">
-            <div class="consult-card reveal" v-for="(c,i) in consultFormats" :key="c.name"
-                 :class="{popular: c.popular}" :style="{'--d': (i*90)+'ms'}">
-              <span class="pricing-badge" v-if="c.popular">Most Requested</span>
-              <div class="consult-name">{{ c.name }}</div>
-              <div class="consult-price">{{ c.price }}</div>
-              <div class="consult-meta">
-                <span class="consult-tag">{{ c.duration }}</span>
-                <span class="consult-tag">{{ c.mode }}</span>
-              </div>
-              <p class="consult-desc">{{ c.desc }}</p>
-              <p class="consult-who"><strong>Best attended by:</strong><br>{{ c.who }}</p>
-              <ul class="consult-outcomes">
-                <li v-for="o in c.outcomes" :key="o">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>
-                  {{ o }}
-                </li>
-              </ul>
-              <a href="#consult-form" @click.prevent="selectFormat(c.name)" class="btn" :class="c.popular ? 'btn-primary' : 'btn-ghost'">{{ c.cta }}</a>
-            </div>
-          </div>
-          <p class="pricing-note">Not sure which fits? Start with the discovery call — we will tell you if a deeper session is worth your team's time.</p>
-        </div>
-      </section>
-    </div>
-
-    <!-- FORMAT COMPARISON -->
-    <div class="wrap" id="consult-compare">
-      <section>
-        <div class="sec-head reveal">
-          <h2>What each <span class="text-grad">format</span> covers, side by side</h2>
-          <p>Exactly what we review in each session and what you walk away holding afterwards.</p>
-        </div>
-        <p class="compare-hint">→ Scroll the table sideways to see all formats</p>
-        <div class="compare-scroll reveal">
-          <table class="compare-table">
-            <caption class="sr-only">Comparison of ZedTac ERP consultation formats</caption>
-            <thead>
-              <tr>
-                <th scope="col">What's covered</th>
-                <th scope="col" v-for="(c,i) in consultFormats" :key="c.name" :class="{'compare-col-featured': i===1}">
-                  {{ c.name }}<span>{{ c.price }}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-for="grp in consultMatrix" :key="grp.group">
-                <tr class="compare-group">
-                  <td :colspan="consultFormats.length + 1">{{ grp.group }}</td>
-                </tr>
-                <tr v-for="row in grp.rows" :key="row.label">
-                  <th scope="row">{{ row.label }}</th>
-                  <td v-for="(v,ci) in row.vals" :key="ci" class="compare-val" :class="{'compare-col-featured': ci===1}">
-                    <span v-if="v === true" class="tick" role="img" aria-label="Included">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>
-                    </span>
-                    <span v-else-if="v === false" class="dash" role="img" aria-label="Not included"></span>
-                    <template v-else>{{ v }}</template>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-
-    <!-- WHAT HAPPENS NEXT -->
-    <div class="about">
-      <div class="wrap">
-        <section>
-          <div class="sec-head reveal">
-            <h2>From request to <span class="text-grad">written proposal</span> in four steps</h2>
-            <p>No chasing, no drawn-out qualification calls before anyone technical will speak to you.</p>
-          </div>
-          <div class="steps-grid">
-            <div class="step reveal" v-for="(s,i) in consultSteps" :key="s.title" :style="{'--d': (i*80)+'ms'}">
-              <div class="step-num">STEP {{ String(i+1).padStart(2,'0') }}</div>
-              <h3>{{ s.title }}</h3>
-              <p>{{ s.desc }}</p>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-
-    <!-- THE FORM -->
-    <div class="wrap" id="consult-form">
-      <section>
-        <div class="contact-box reveal">
-          <div class="consult-form-grid">
-            <div>
-              <h2>Tell us how your <span class="text-grad">operation</span> runs today</h2>
-              <p style="color:var(--zt-ink-soft); margin-top:14px; font-size:15.5px; line-height:1.6;">
-                The more context you give here, the more useful the first session is. Fields marked <span class="form-req">*</span> are required — everything else simply sharpens our preparation.
-              </p>
-
-              <div v-if="formSubmitted" class="form-success" style="margin-top:22px;">Thank you — your consultation request has been received. A consultant will be in touch within one business day.</div>
-
-              <form @submit.prevent="submitForm" style="margin-top:26px;">
-                <div class="form-grid">
-                  <div class="field">
-                    <label>Full name <span class="form-req">*</span></label>
-                    <input type="text" v-model="form.name" required placeholder="Your name">
-                  </div>
-                  <div class="field">
-                    <label>Work email <span class="form-req">*</span></label>
-                    <input type="email" v-model="form.email" required placeholder="you@company.com">
-                  </div>
-                </div>
-                <div class="form-grid">
-                  <div class="field">
-                    <label>Phone / WhatsApp</label>
-                    <input type="tel" v-model="form.phone" placeholder="+92 3xx xxxxxxx">
-                  </div>
-                  <div class="field">
-                    <label>Company</label>
-                    <input type="text" v-model="form.company" placeholder="Company name">
-                  </div>
-                </div>
-                <div class="form-grid">
-                  <div class="field">
-                    <label>Industry</label>
-                    <select v-model="form.industry">
-                      <option value="">Select your industry</option>
-                      <option v-for="ind in industries" :key="ind">{{ ind }}</option>
-                    </select>
-                  </div>
-                  <div class="field">
-                    <label>Team size</label>
-                    <select v-model="form.size">
-                      <option value="">Select team size</option>
-                      <option v-for="sz in teamSizes" :key="sz">{{ sz }}</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-grid">
-                  <div class="field">
-                    <label>Consultation format</label>
-                    <select v-model="form.format">
-                      <option value="">Recommend one for us</option>
-                      <option v-for="c in consultFormats" :key="c.name">{{ c.name }}</option>
-                    </select>
-                  </div>
-                  <div class="field">
-                    <label>ERP service required</label>
-                    <select v-model="form.service">
-                      <option value="">Select a service</option>
-                      <option v-for="s in services" :key="s.title">{{ s.title }}</option>
-                      <option>Not sure yet — advise me</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-grid">
-                  <div class="field">
-                    <label>Systems you run today</label>
-                    <input type="text" v-model="form.systems" placeholder="e.g. QuickBooks, spreadsheets, custom tool">
-                  </div>
-                  <div class="field">
-                    <label>Target go-live</label>
-                    <select v-model="form.timeline">
-                      <option value="">Select a timeline</option>
-                      <option v-for="t in timelines" :key="t">{{ t }}</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="field">
-                  <label>What are you trying to fix? <span class="form-req">*</span></label>
-                  <textarea v-model="form.message" required placeholder="Which process costs you the most time or causes the most errors today? What reporting can you not get out of your current setup?"></textarea>
-                  <span class="field-hint">Two or three sentences is plenty — we will ask the rest on the call.</span>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;">Request a Consultation</button>
-              </form>
-            </div>
-
-            <div>
-              <div class="contact-info-item">
-                <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/></svg></div>
-                <div><strong>Email</strong><span>admin@zedtac.com</span></div>
-              </div>
-              <div class="contact-info-item">
-                <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L7.9 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg></div>
-                <div><strong>Phone / WhatsApp</strong><span>0336 6206020</span></div>
-              </div>
-              <div class="contact-info-item">
-                <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-                <div><strong>Office</strong><span>Lahore, Punjab, Pakistan</span></div>
-              </div>
-              <div class="contact-info-item">
-                <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 1.9"/></svg></div>
-                <div><strong>Response time</strong><span>Within one business day</span></div>
-              </div>
-
-              <div class="consult-aside-card">
-                <h3>What you will not get</h3>
-                <ul>
-                  <li v-for="n in consultReassurance" :key="n">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                    {{ n }}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- HOW TO PREPARE -->
-    <div class="wrap">
-      <section>
-        <div class="sec-head reveal">
-          <h2>Six things worth <span class="text-grad">knowing</span> before we talk</h2>
-          <p>None of this is mandatory — bring what you have. It simply means we spend the session solving rather than gathering.</p>
-        </div>
-        <div class="erp-features">
-          <div class="erp-feature reveal" v-for="(p,i) in consultPrepare" :key="p.title" :style="{'--d': (i*70)+'ms'}">
-            <div class="num">{{ String(i+1).padStart(2,'0') }}</div>
-            <h3>{{ p.title }}</h3>
-            <p>{{ p.desc }}</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-  </div>
 
   <!-- ================= PRICING PAGE ================= -->
   <div v-if="page === 'pricing'">
@@ -10465,8 +10092,7 @@
         <h1>ERP pricing that starts with your <span class="text-grad">process</span>, not a license count</h1>
         <p>Three implementation packages, scoped by how much of your operation moves onto the system. Every engagement is fixed-price once the discovery audit is complete — no hourly drift, no line items introduced later.</p>
         <div class="hero-cta">
-          <a href="/consult" @click.prevent="goConsult" class="btn btn-primary">Book a Free Consultation</a>
-          <a href="#compare" @click.prevent="scrollToSection('#compare')" class="btn btn-ghost">Compare All Features</a>
+          <a href="#compare" @click.prevent="scrollToSection('#compare')" class="btn btn-primary">Compare All Features</a>
         </div>
         <div class="pricing-page-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
@@ -10496,7 +10122,7 @@
                   {{ f }}
                 </li>
               </ul>
-              <a href="/consult" @click.prevent="goConsult" class="btn" :class="plan.popular ? 'btn-primary' : 'btn-ghost'" style="width:100%; margin-top:auto;">{{ plan.cta }}</a>
+              <a href="#" @click.prevent="openSignup" class="btn" :class="plan.popular ? 'btn-primary' : 'btn-ghost'" style="width:100%; margin-top:auto;">{{ plan.cta }}</a>
             </div>
           </div>
           <p class="pricing-note">Final pricing depends on module scope, user count, integrations and migration complexity. Book a discovery call and we will return a phased, fixed-price proposal within three business days.</p>
@@ -10591,8 +10217,8 @@
         <h1>One ERP platform to run your entire operation</h1>
         <p>Finance, inventory, procurement, manufacturing, HR and business intelligence — delivered as one connected, governed platform and configured to the way your organization actually works.</p>
         <div class="hero-cta">
-          <a href="#erp-contact" class="btn btn-primary">Request a Live Demo</a>
-          <a href="#erp-features" class="btn btn-ghost">View Core Modules</a>
+          <a href="#erp-features" class="btn btn-primary">View Core Modules</a>
+          <a href="#erp-industries" class="btn btn-ghost">Industries We Serve</a>
         </div>
 
         <!-- Real footage takes over automatically: drop an MP4 in videos/ and set
@@ -10749,11 +10375,25 @@
         </div>
       </section>
 
-      <section id="erp-contact">
-        <div class="erp-cta-band">
-          <h2>See ZedTac ERP running on your own data</h2>
-          <p>Book a walkthrough with our consultants and we will demonstrate the exact modules your operation needs, using your own processes as the example.</p>
-          <a href="/consult" @click.prevent="goConsult" class="btn btn-ghost">Request a Demo</a>
+      <!-- Industries, folded in from the standalone page it used to have.
+           It sits last because it reads as the answer to the feature list
+           above it: here is the system, and here is how it meets your
+           sector. The headline and intro come from that page's hero and the
+           grid is unchanged, so the content and its styling are the same --
+           only the route it lives on has moved. -->
+      <section id="erp-industries">
+        <div class="sec-head" style="margin-bottom:36px;">
+          <h2>Depth where it matters, a <span class="text-grad">shared engine</span> everywhere else</h2>
+          <p>Some industries need genuinely bespoke structure. Most need solid core operations with their own vocabulary. The platform is built to do both without turning into two products.</p>
+        </div>
+        <div class="auto-grid">
+          <article class="auto-card reveal" v-for="(m,i) in industryModel" :key="m.name" :style="{'--d': (i*70)+'ms'}" style="cursor:default;">
+            <div class="auto-head">
+              <span class="auto-area">{{ m.kind }}</span>
+            </div>
+            <h3>{{ m.name }}</h3>
+            <p>{{ m.desc }}</p>
+          </article>
         </div>
       </section>
     </div>
@@ -10835,10 +10475,6 @@
       <p class="modal-switch">
         Already have an account?
         <button type="button" @click="openLogin">Log in</button>
-      </p>
-      <p class="modal-switch alt">
-        Prefer to talk to someone?
-        <button type="button" @click="showSignup = false; goConsult()">Contact sales</button>
       </p>
     </div>
   </div>
@@ -10980,19 +10616,17 @@
             <li><a href="/about" @click.prevent="goAbout">About Us</a></li>
             <li><a href="/#case-studies" @click.prevent="goSection('#case-studies')">Case Studies</a></li>
             <li><a href="/#blog" @click.prevent="goSection('#blog')">Insights</a></li>
-            <li><a href="/consult" @click.prevent="goConsult">Contact</a></li>
           </ul>
         </div>
 
         <!-- Download. Restored, but inert: there are still no store listings,
-             so each row is a <span>, not a link. The last time this column
-             existed both entries pointed at goConsult, and a visitor who
-             clicked "App Store" landed on a consultation form. Dimmed rows
-             plus the caption underneath name the state instead of promising a
-             download, and they fill the fifth grid track the row was built
-             for. When the listings go live: swap each <span> for an <a
-             href="..." target="_blank" rel="noopener">, drop the is-soon
-             class and delete the caption. .ft-col a already styles the rest. -->
+             so each row is a <span>, not a link. An earlier version of this
+             column linked both rows to the consultation page, so a visitor who
+             clicked "App Store" landed on a form instead. Dimmed rows plus the
+             caption underneath name the state instead of promising a download.
+             When the listings go live: swap each <span> for an <a href="..."
+             target="_blank" rel="noopener">, drop the is-soon class and delete
+             the caption. .ft-col a already styles the rest. -->
         <div class="ft-col">
           <h2>Download</h2>
           <ul class="ft-stores">
@@ -11019,6 +10653,18 @@
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.5l.4-3H13.5V8.4c0-.87.24-1.46 1.5-1.46h1.6V4.35C16.3 4.24 15.34 4 14.2 4 11.87 4 10.3 5.4 10.3 8.1v2.4H7.8v3h2.5V21h3.2z"/></svg>Facebook</a></li>
             <li><a href="https://wa.me/923366206020" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.5 0-9.96 4.46-9.96 9.96 0 1.76.46 3.42 1.26 4.86L2 22l5.32-1.28a9.9 9.9 0 0 0 4.72 1.2h.01c5.5 0 9.96-4.46 9.96-9.96C22 6.46 17.55 2 12.04 2zm0 18.2h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.13.76.83-3.05-.2-.31a8.18 8.18 0 0 1-1.26-4.35c0-4.53 3.68-8.2 8.27-8.2 2.21 0 4.28.86 5.84 2.42a8.15 8.15 0 0 1 2.42 5.79c0 4.53-3.71 8.27-8.27 8.27z"/></svg>WhatsApp</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Us. mailto:/tel: rather than a form -- there is no contact
+             form on the site any more, and on a phone both of these open the
+             mail app and the dialler directly, which is fewer steps than a form
+             was. The phone number is not published yet; add it here as
+             <li><a href="tel:+…">…</a></li> once it is confirmed. -->
+        <div class="ft-col">
+          <h2>Contact Us</h2>
+          <ul>
+            <li><a href="mailto:admin@zedtac.com">admin@zedtac.com</a></li>
           </ul>
         </div>
 
@@ -11095,8 +10741,8 @@ const safeStorageSet = (key, value) => {
    unrelated things moving rather than one rhythm. */
 const ZT_SLIDER_MS = 3000;
 
-const ZT_PAGES = ['home','about','automation','consult','docs','erp','erpservices',
-                  'faqs','features','industries','integrations','module','outcomes','pricing'];
+const ZT_PAGES = ['home','about','automation','docs','erp','erpservices',
+                  'faqs','features','integrations','module','outcomes','pricing'];
 /* Per-route <title> and description. Without these every route shared the
    home page's title: browser tabs, bookmarks, history entries and search
    results were all indistinguishable across fourteen pages, and a visitor
@@ -11106,13 +10752,11 @@ const ZT_META = {
   home:        ['ZedTac \u2014 Enterprise ERP & Business Automation Platform', null],
   about:       ['About ZedTac \u2014 ERP Consultancy & Software Company', 'An ERP partner built around your operations: who we are, how we work, and the delivery model behind every implementation.'],
   pricing:     ['ERP Pricing & Packages \u2014 ZedTac', 'Implementation packages with the scope, modules and support each one includes, and a full feature comparison across tiers.'],
-  consult:     ['Book a Consultation \u2014 ZedTac', 'Three consultation formats, from a 30-minute call to a full onsite process audit, each run by an implementation consultant.'],
   erp:         ['The ZedTac ERP Platform \u2014 One Governed Ledger', 'Finance, inventory, procurement, manufacturing and HR on a single governed system of record.'],
   erpservices: ['ERP Services \u2014 Implementation, Migration & Support', 'Fourteen specialist ERP services covering strategy, implementation, data migration, training and ongoing support.'],
   features:    ['ERP Features \u2014 Modules & Capabilities', 'The modules that make up the ZedTac ERP core and what each one covers.'],
   automation:  ['Business Automation \u2014 Eleven Modules', 'Event-driven automation for collections, approvals, payroll, CRM and scheduled reporting, reading the same ledger as the ERP.'],
   integrations:['ERP Integrations \u2014 Connect Your Stack', 'How ZedTac connects to the systems already running in your business.'],
-  industries:  ['ERP by Industry \u2014 Sector Solutions', 'Industry depth where it earns its keep, on one shared engine rather than a separate codebase per vertical.'],
   outcomes:    ['Customer Outcomes \u2014 Measured Results', 'Deployment patterns across eight industries: the operational problem, what was implemented, and the measurable outcome after go-live.'],
   docs:        ['Documentation \u2014 ZedTac', 'Product documentation and implementation reference material.'],
   faqs:        ['ERP FAQs \u2014 ZedTac', 'Common questions on ERP implementation, timelines, migration, pricing and support.'],
@@ -11120,8 +10764,8 @@ const ZT_META = {
 };
 
 const ZT_GO = { home:'goHome', about:'goAbout', automation:'goAutomation',
-                consult:'goConsult', docs:'goDocs', erp:'goErp', erpservices:'goErpServices',
-                faqs:'goFaqs', features:'goFeatures', industries:'goIndustries',
+                docs:'goDocs', erp:'goErp', erpservices:'goErpServices',
+                faqs:'goFaqs', features:'goFeatures',
                 integrations:'goIntegrations', outcomes:'goOutcomes', pricing:'goPricing' };
 
 window.ztApp = createApp({
@@ -11162,12 +10806,7 @@ window.ztApp = createApp({
       signupError: '',
       signup: { name:'', email:'', company:'', password:'', confirm:'', terms:false },
       showTerms: false,
-      formSubmitted: false,
       year: new Date().getFullYear(),
-      form: {
-        name:'', email:'', phone:'', company:'', industry:'', size:'',
-        service:'', format:'', systems:'', timeline:'', message:'',
-      },
 
       // ---- ERP demo walkthrough player ------------------------------------
       // Point demoVideoSrc at a real MP4 (e.g. 'videos/zedtac-erp-demo.mp4')
@@ -11591,23 +11230,6 @@ window.ztApp = createApp({
       ],
 
       // Consultation formats offered before an implementation is scoped.
-      consultFormats: [
-        { name:'Discovery Call', price:'Free', duration:'30 minutes', mode:'Remote',
-          desc:'A first conversation to understand your operation and tell you honestly whether ERP is the right answer.',
-          who:'Owner, operations lead or finance lead',
-          outcomes:['A read on whether ERP fits your problem', 'Rough scope and budget range', 'Which package is likely right', 'No obligation and no follow-up pressure'],
-          cta:'Book a Discovery Call', popular:false },
-        { name:'Process Deep-Dive', price:'Free', duration:'90 minutes', mode:'Remote or onsite',
-          desc:'A working session across departments to map current workflows and surface where the real bottlenecks sit.',
-          who:'Department heads from finance, operations and IT',
-          outcomes:['Documented as-is process map', 'Prioritized list of bottlenecks', 'Indicative module shortlist', 'Draft implementation timeline'],
-          cta:'Book a Deep-Dive', popular:true },
-        { name:'Onsite Process Audit', price:'Credited', duration:'1–2 full days', mode:'Onsite at your site',
-          desc:'A full audit of systems, data quality and workflows, delivered as a written findings report. The fee is credited in full against your implementation.',
-          who:'Leadership plus process owners across every site',
-          outcomes:['Written findings and risk report', 'Data-readiness assessment', 'Fixed-price implementation proposal', 'Phase plan with cutover dates'],
-          cta:'Request an Audit', popular:false },
-      ],
 
       // Comparison of the three consultation formats.
       consultMatrix: [
@@ -12527,7 +12149,16 @@ window.ztApp = createApp({
     goErpServices(){ this.goPage('erpservices'); },
     goFeatures(){ this.goPage('features'); },
     goIntegrations(){ this.goPage('integrations'); },
-    goIndustries(){ this.goPage('industries'); },
+    /* Industries lives inside the ERP page now. Routing through goErp()
+       rather than setting page directly keeps the demo player and the reveal
+       observer bound the way clicking ERP does, then scrollToId offsets for
+       the sticky header and marks the section revealed -- a bare
+       scrollIntoView lands on a blank band because .reveal starts at
+       opacity:0. */
+    goErpIndustries(){
+      this.goErp();
+      this.$nextTick(() => this.scrollToId('erp-industries'));
+    },
     goDocs(){ this.goPage('docs'); },
     goFaqs(){ this.goPage('faqs'); },
     /* About is a page now, not a section on the landing page. Routing through
@@ -12556,21 +12187,6 @@ window.ztApp = createApp({
       this.stopDemo();
       window.scrollTo(0, 0);
       this.queueReveal();
-    },
-    goConsult(){
-      this.page = 'consult';
-      this.navOpen = false;
-      this.stopDemo();
-      window.scrollTo(0, 0);
-      this.queueReveal();
-    },
-    // Preselects a consultation format, then drops the visitor on the form.
-    selectFormat(name){
-      this.form.format = name;
-      this.$nextTick(() => {
-        const el = document.getElementById('consult-form');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      });
     },
     // (Re)binds the scroll-reveal observer after a page switch renders.
     queueReveal(){ this.$nextTick(() => this.bindReveal()); },
@@ -12683,17 +12299,6 @@ window.ztApp = createApp({
       window.removeEventListener('resize', this._revealScroll);
       document.removeEventListener('visibilitychange', this._revealScroll);
       this._revealScroll = null;
-    },
-    submitForm(){
-      // Frontend-only demo: no backend is connected.
-      // To make this live, wire this up to a service like EmailJS, Formspree,
-      // or your own API endpoint, then POST this.form to it.
-      this.formSubmitted = true;
-      this.form = {
-        name:'', email:'', phone:'', company:'', industry:'', size:'',
-        service:'', format:'', systems:'', timeline:'', message:'',
-      };
-      setTimeout(() => { this.formSubmitted = false; }, 6000);
     },
     acceptCookies() {
       // Dismiss first, remember second. If the write fails the banner still
@@ -14026,7 +13631,7 @@ if (THREE) (function () {
      is for the landing page, where goSection() routes home first and then
      scrolls. Every id that exists in the document is listed, because a bare
      getElementById() only ever sees the route currently rendered -- ask for
-     #erp-contact from the pricing page and there is nothing there to find. */
+     #erp-features from the pricing page and there is nothing there to find. */
   function go(method, id){
     return function(a){ a[method](); if (id) a.scrollToId(id); };
   }
@@ -14038,8 +13643,6 @@ if (THREE) (function () {
     /* whole routes */
     'home':               go('goHome'),
     'pricing':            go('goPricing'),
-    'contact':            go('goConsult', 'consult-form'),
-    'consult':            go('goConsult'),
     'about':              go('goAbout'),
     'faq':                go('goFaqs'),
     'faqs':               go('goFaqs'),
@@ -14047,16 +13650,14 @@ if (THREE) (function () {
     'automation':         go('goAutomation'),
     'features':           go('goFeatures'),
     'integrations':       go('goIntegrations'),
-    'industries':         go('goIndustries'),
+    'industries':         go('goErp', 'erp-industries'),
     'outcomes':           go('goOutcomes'),
     'erp':                go('goErp'),
     'erpservices':        go('goErpServices'),
 
     /* anchors that live on a route other than the landing page */
-    'consult-form':       go('goConsult', 'consult-form'),
-    'consult-compare':    go('goConsult', 'consult-compare'),
     'compare':            go('goPricing', 'compare'),
-    'erp-contact':        go('goErp', 'erp-contact'),
+    'erp-industries':     go('goErp', 'erp-industries'),
     'erp-features':       go('goErp', 'erp-features'),
     'automation-engine':  go('goAutomation', 'automation-engine'),
     'automation-modules': go('goAutomation', 'automation-modules'),
