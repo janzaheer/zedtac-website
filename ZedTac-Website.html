@@ -8234,6 +8234,29 @@
   }
   #main .sec-head{ margin-bottom:clamp(26px, 2.6vw, 40px); }
 
+  /* FIRST SECTION ON A ROUTE.
+     The rhythm above is written for sections that sit between other sections,
+     where 9vw of air on both sides separates one band of content from the
+     next. The first section has nothing above it but the bar, so the same
+     figure is not separating anything -- it just pushes the headline down the
+     screen. Measured on ERP Services at 1440x900 it left the hero 737px tall,
+     82% of the viewport, of which 259px was padding.
+
+     .erp-hero is the shared first section: all ten routes use it, so setting
+     it here keeps every Services page on one height rather than each page
+     carrying its own figure. Written as #main .wrap > section.erp-hero
+     because the rule above is an id, a class and an element with !important,
+     and a bare .erp-hero does not outrank it.
+
+     Still a clamp on viewport width, so it scales the way the rest of the
+     system does rather than stepping at a breakpoint. The bar is sticky and
+     therefore still in flow, so it takes its own height at the top of the
+     document and the floor here does not have to clear it. */
+  #main .wrap > section.erp-hero{
+    padding-top:clamp(28px, 3.4vw, 52px) !important;
+    padding-bottom:clamp(24px, 3vw, 44px) !important;
+  }
+
   /* The hero takes whichever is larger: the shared rhythm, or enough room to
      clear the bar that sits over it. The bar is fixed and about 84px tall, so
      between roughly 550px and 1030px wide the rhythm alone is shorter than the
@@ -9369,7 +9392,6 @@
   <div v-else-if="page === 'about'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>An <span class="text-grad">ERP partner</span> built around your <span class="text-grad">operations</span>, not our software</h1>
         <p>We are an enterprise resource planning consultancy and software company, helping organizations replace disconnected tools with a single, governed system of record.</p>
       </section>
@@ -9406,7 +9428,6 @@
 
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">&larr; Back to Home</a>
         <div class="sec-head" style="max-width:820px;">
           <h1>One governed <span class="text-grad">system of record</span> for the whole operation</h1>
           <p>Finance, inventory, supply chain, manufacturing, HR and customer operations on a single ledger — designed around how your business actually runs, implemented in fixed phases under a named project lead.</p>
@@ -9552,7 +9573,6 @@
   <div v-if="page === 'features'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>Everything the platform <span class="text-grad">does</span></h1>
         <p>The complete capability list across ERP and automation — every module, every integration point, every governance control, all included in the platform.</p>
         <div class="pricing-page-note">
@@ -9601,7 +9621,6 @@
   <div v-if="page === 'integrations'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>Connected to the systems you <span class="text-grad">already run</span></h1>
         <p>The ERP becomes your system of record without replacing everything at once. Messaging, accounting, banking and document capture connect through the same event engine your automations run on.</p>
         <div class="hero-cta">
@@ -9634,7 +9653,6 @@
   <div v-if="page === 'docs'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>How the platform works, <span class="text-grad">written down</span></h1>
         <p>Architecture, the money workflow, the automation event catalogue and the REST API — the same references our implementation consultants work from.</p>
         <div class="hero-cta">
@@ -9708,7 +9726,6 @@
   <div v-if="page === 'faqs'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1 v-html="faqGroups[activeFaqTab].heading"></h1>
         <p>{{ faqGroups[activeFaqTab].sub }}</p>
       </section>
@@ -9740,7 +9757,6 @@
   <div v-if="page === 'automation'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>Your ERP holds the data. <span class="text-grad">Automation</span> makes it act</h1>
         <p>Eleven automation modules built on the same event engine, running on the same ledger and the same customer record. Not a separate product bolted alongside your ERP — the layer that makes it move on its own.</p>
         <div class="hero-cta">
@@ -9947,7 +9963,6 @@
   <div v-if="page === 'outcomes'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>The numbers that moved after <span class="text-grad">go-live</span></h1>
         <p>An ERP is only worth what it changes. These are the measures our clients track — baselined before we build, reported from live system data afterwards.</p>
         <div class="hero-cta">
@@ -10105,7 +10120,6 @@
   <div v-if="page === 'pricing'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>ERP pricing that starts with your <span class="text-grad">process</span>, not a license count</h1>
         <p>Three implementation packages, scoped by how much of your operation moves onto the system. Every engagement is fixed-price once the discovery audit is complete — no hourly drift, no line items introduced later.</p>
         <div class="hero-cta">
@@ -10230,7 +10244,6 @@
   <div v-if="page === 'erp'">
     <div class="wrap">
       <section class="erp-hero">
-        <a href="/" class="back-link" @click.prevent="goHome">← Back to Home</a>
         <h1>One ERP platform to run your entire operation</h1>
         <p>Finance, inventory, procurement, manufacturing, HR and business intelligence — delivered as one connected, governed platform and configured to the way your organization actually works.</p>
         <div class="hero-cta">
