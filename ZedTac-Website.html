@@ -10009,6 +10009,62 @@
     text-decoration-color:rgba(var(--white-rgb),.55);
   }
 
+
+  /* ==========================================================================
+     ERP DEMO MOCKUP (/erp)
+     This has always been a dark dashboard -- .demo-side was #1A1826, .demo-main
+     #12111A, and the screen's own text #E8E6F0. The grounds mapped to charcoal
+     correctly. Its muted label tones did not: #7E7A96 and #9E99B8 are
+     mid-tones, so the luminance pass read them as "dark" and sent them to ink.
+     On a charcoal dashboard that put ink on charcoal, and 27 elements -- the
+     sidebar items, the breadcrumb, the user, every KPI label and the icon
+     strokes -- went invisible. A per-colour mapping could not know which
+     ground they sat on; this block supplies that.
+     ========================================================================== */
+  :root .demo-screen{
+    --zt-accent:var(--white);
+    --zt-accent-rgb:var(--white-rgb);
+    --zt-accent-contrast:var(--ink);
+    --zt-ink:var(--white);
+    --zt-ink-soft:rgba(var(--white-rgb),.78);
+    --zt-line:rgba(var(--white-rgb),.18);
+    --zt-primary:var(--white);
+    --zt-orange:var(--white);       --zt-orange-mid:var(--white);
+    --zt-orange-deep:var(--white);  --zt-orange-light:var(--white);
+    --ai:var(--white); --cy:var(--white); --grad:var(--white);
+
+    color:rgba(var(--white-rgb),.88);
+  }
+  /* The pinned literals are on the descendants, not on tokens, so they have to
+     be released before the screen's colour can reach them. */
+  :root .demo-screen *{ color:inherit; }
+
+  /* The muted tones, restored as muted white rather than muted ink. Declared
+     after the inherit rule so they win on source order. */
+  :root .demo-crumb,
+  :root .demo-user,
+  :root .demo-nav em,
+  :root .demo-kpi span{ color:rgba(var(--white-rgb),.62); }
+
+  /* The values the dashboard is actually showing stay full strength. */
+  :root .demo-kpi strong,
+  :root .demo-crumb b,
+  :root .demo-brand span,
+  :root .demo-nav .is-active,
+  :root .demo-nav em.is-active{ color:var(--white); }
+
+  /* The sidebar brand mark was `background:var(--grad); color:#fff` -- an
+     orange tile with white letters. --grad is white here, so the tile went
+     white and took the letters with it. It keeps the white tile and inverts
+     its type, which is what the nav's Portal button and the card chips do. */
+  :root .demo-brand b{ color:var(--ink); }
+
+  /* Icons were drawn with a charcoal stroke; following the text keeps them
+     correct in every state without naming each one. */
+  :root .demo-screen svg{ stroke:currentColor; }
+  :root .demo-screen svg [stroke="#1A1A1A"]{ stroke:currentColor; }
+  :root .demo-screen svg [fill="#1A1A1A"]{ fill:currentColor; }
+
 </style>
 </head>
 <body>
