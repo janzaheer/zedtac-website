@@ -8872,6 +8872,23 @@
     --zt-line:rgba(var(--white-rgb),.18);
     --surface-line:rgba(var(--white-rgb),.18);
     --glass-line:rgba(var(--white-rgb),.18);
+
+    /* The legacy aliases have to be restated here, not just on :root.
+       A custom property resolves its var() where it is DECLARED, so
+       `--zt-primary:var(--zt-accent)` on :root freezes to the root accent --
+       ink -- and that frozen value is what inherits down. Flipping
+       --zt-accent in this block therefore did nothing for the ~200 rules that
+       paint from an alias instead of from --zt-accent directly, which is why
+       the footer's column links turned charcoal-on-charcoal on hover and
+       vanished. Restating them here makes them re-resolve in this scope. */
+    --zt-primary:var(--white);
+    --zt-orange:var(--white);        --zt-orange-mid:var(--white);
+    --zt-orange-btn:var(--white);    --zt-orange-display:var(--white);
+    --zt-orange-deep:var(--white);   --zt-orange-light:var(--white);
+    --zt-tag-fill:var(--white);
+    --ai:var(--white);   --ai-deep:var(--white);  --ai-soft:var(--white);
+    --cy:var(--white);   --cy-deep:var(--white);
+    --grad:var(--white); --grad-brand-ai:var(--white);
   }
 
   /* The header floats over the hero, and that hero used to be dark in both
@@ -9036,13 +9053,22 @@
   }
 
   /* --- inputs ---- */
+  /* --zt-line, not a hard-coded ink alpha: the footer's newsletter field sits
+     on the charcoal ground, where rgba(26,26,26,.14) is invisible -- the box
+     disappeared and only the placeholder was left floating. --zt-line is
+     ink-alpha in light scopes and white-alpha in dark ones, so one rule is
+     right in both. */
   :root .field input, :root .field select, :root .field textarea,
   :root .ft-news-field{
     background:var(--zt-accent-contrast);
-    border:1px solid rgba(var(--ink-rgb),.14);
+    border:1px solid var(--zt-line);
     color:var(--zt-accent);
     transition:all .3s ease;
   }
+  /* And a touch of lift so the field reads as an input on the dark ground
+     rather than as a bare outline -- which is what it had before this
+     layer. */
+  :root .ft-news-field{ background:rgba(var(--white-rgb),.06); }
   :root .field input:focus, :root .field select:focus,
   :root .field textarea:focus, :root .ft-news-field:focus{
     border-color:var(--zt-accent);
@@ -9141,6 +9167,23 @@
     --zt-line:rgba(var(--white-rgb),.18);
     --surface-line:rgba(var(--white-rgb),.18);
     --glass-line:rgba(var(--white-rgb),.18);
+
+    /* The legacy aliases have to be restated here, not just on :root.
+       A custom property resolves its var() where it is DECLARED, so
+       `--zt-primary:var(--zt-accent)` on :root freezes to the root accent --
+       ink -- and that frozen value is what inherits down. Flipping
+       --zt-accent in this block therefore did nothing for the ~200 rules that
+       paint from an alias instead of from --zt-accent directly, which is why
+       the footer's column links turned charcoal-on-charcoal on hover and
+       vanished. Restating them here makes them re-resolve in this scope. */
+    --zt-primary:var(--white);
+    --zt-orange:var(--white);        --zt-orange-mid:var(--white);
+    --zt-orange-btn:var(--white);    --zt-orange-display:var(--white);
+    --zt-orange-deep:var(--white);   --zt-orange-light:var(--white);
+    --zt-tag-fill:var(--white);
+    --ai:var(--white);   --ai-deep:var(--white);  --ai-soft:var(--white);
+    --cy:var(--white);   --cy-deep:var(--white);
+    --grad:var(--white); --grad-brand-ai:var(--white);
   }
   /* Copy inside them that was painted with a literal rather than a token. */
   :root .cross-band h2, :root .cross-band h3, :root .cross-band p,
@@ -9171,6 +9214,17 @@
       --zt-line:rgba(var(--ink-rgb),.14);
       --surface-line:rgba(var(--ink-rgb),.14);
       --glass-line:rgba(var(--ink-rgb),.14);
+      /* Same reason the dark scopes restate them: an alias declared on :root
+         freezes to the root accent, so flipping --zt-accent alone leaves every
+         alias-painted rule on the value it inherited. */
+      --zt-primary:var(--ink);
+      --zt-orange:var(--ink);        --zt-orange-mid:var(--ink);
+      --zt-orange-btn:var(--ink);    --zt-orange-display:var(--ink);
+      --zt-orange-deep:var(--ink);   --zt-orange-light:var(--ink);
+      --zt-tag-fill:var(--ink);
+      --ai:var(--ink);   --ai-deep:var(--ink);  --ai-soft:var(--ink);
+      --cy:var(--ink);   --cy-deep:var(--ink);
+      --grad:var(--ink); --grad-brand-ai:var(--ink);
       background:var(--white) !important;
       border:1px solid rgba(var(--ink-rgb),.14) !important;
     }
@@ -9203,6 +9257,17 @@
       --zt-line:rgba(var(--ink-rgb),.14);
       --surface-line:rgba(var(--ink-rgb),.14);
       --glass-line:rgba(var(--ink-rgb),.14);
+      /* Same reason the dark scopes restate them: an alias declared on :root
+         freezes to the root accent, so flipping --zt-accent alone leaves every
+         alias-painted rule on the value it inherited. */
+      --zt-primary:var(--ink);
+      --zt-orange:var(--ink);        --zt-orange-mid:var(--ink);
+      --zt-orange-btn:var(--ink);    --zt-orange-display:var(--ink);
+      --zt-orange-deep:var(--ink);   --zt-orange-light:var(--ink);
+      --zt-tag-fill:var(--ink);
+      --ai:var(--ink);   --ai-deep:var(--ink);  --ai-soft:var(--ink);
+      --cy:var(--ink);   --cy-deep:var(--ink);
+      --grad:var(--ink); --grad-brand-ai:var(--ink);
     }
     :root .nav-links.open{
       background:var(--white) !important;
@@ -9266,6 +9331,17 @@
     --zt-ink:var(--ink);
     --zt-ink-soft:rgba(var(--ink-rgb),.78);
     --zt-line:rgba(var(--ink-rgb),.14);
+    /* Same reason the dark scopes restate them: an alias declared on :root
+       freezes to the root accent, so flipping --zt-accent alone leaves every
+       alias-painted rule on the value it inherited. */
+    --zt-primary:var(--ink);
+    --zt-orange:var(--ink);        --zt-orange-mid:var(--ink);
+    --zt-orange-btn:var(--ink);    --zt-orange-display:var(--ink);
+    --zt-orange-deep:var(--ink);   --zt-orange-light:var(--ink);
+    --zt-tag-fill:var(--ink);
+    --ai:var(--ink);   --ai-deep:var(--ink);  --ai-soft:var(--ink);
+    --cy:var(--ink);   --cy-deep:var(--ink);
+    --grad:var(--ink); --grad-brand-ai:var(--ink);
 
     background-color:var(--white);
     background-image:none;
@@ -9746,9 +9822,15 @@
        Without it the chip appears but the label never brightens, so the hover
        reads as half-applied. The background needs no !important; nothing
        else declares one. */
+    /* .nav-active is included: it paints the same white chip from --glass-2
+       but left its colour white, so the current page's link was white on
+       white -- invisible on every route except home. Active and hover now
+       read identically. */
     :root .nav-links > a:hover,
     :root .nav-links > .nav-item > a:hover,
-    :root .nav-item:hover > a{
+    :root .nav-item:hover > a,
+    :root .nav-links a.nav-active,
+    :root .nav-links > .nav-item > a.nav-active{
       background:var(--white);
       color:var(--ink) !important;
       border:1px solid rgba(var(--ink-rgb),.14);
@@ -9905,6 +9987,28 @@
     :root .ab-end{ flex-direction:column; align-items:flex-start; }
     :root .ab-end .btn{ width:100%; justify-content:center; }
   }
+
+  /* ---- footer column links ------------------------------------------------
+     These used to change colour on hover (--zt-primary, the brand orange). In
+     a two-colour palette that alias resolves to white, and the links are
+     already white -- so the hover became a no-op: nothing moved. They get the
+     same treatment the header nav uses instead, a muted rest lifting to full
+     white, plus an underline so the affordance does not rely on a 28% step
+     in lightness alone. */
+  :root footer .ft-col a{
+    color:rgba(var(--white-rgb),.72);
+    text-decoration:none;
+    transition:color .2s var(--ease, ease), text-decoration-color .2s var(--ease, ease);
+  }
+  :root footer .ft-col a:hover,
+  :root footer .ft-col a:focus-visible{
+    color:var(--white);
+    text-decoration:underline;
+    text-underline-offset:3px;
+    text-decoration-thickness:1px;
+    text-decoration-color:rgba(var(--white-rgb),.55);
+  }
+
 </style>
 </head>
 <body>
