@@ -10457,11 +10457,32 @@
       transition:background-color .18s var(--ease, ease),
                  color .18s var(--ease, ease);
     }
+    /* Every path into a hovered/pressed state, not just the link's own. The
+       one that was missing is the parent: `.nav-item:hover > a` is declared
+       unscoped further up this file as `color:#FFFFFF; background:var(--glass-2)`,
+       and --glass-2 resolves to pure white -- so white type on a white ground.
+
+       It fires without the link ever being hovered, because hovering the
+       disclosure button hovers the .nav-item that contains it. On a phone that
+       is not a hover at all: Android Chrome leaves the state on the element
+       after a tap, so expanding a section left its own row unreadable until
+       you touched something else. Reported from a device; it does not
+       reproduce with a scripted click, which is why the earlier passes missed
+       it.
+
+       :focus-within is here for the same reason by a different route -- the
+       button inside the row taking focus. */
     .nav-links > a:hover,
     .nav-links > a:active,
+    .nav-links > a:focus,
     .nav-links > .nav-item > a:hover,
-    .nav-links > .nav-item > a:active{
+    .nav-links > .nav-item > a:active,
+    .nav-links > .nav-item > a:focus,
+    .nav-links .nav-item:hover > a,
+    .nav-links .nav-item:focus-within > a,
+    .nav-links .nav-item.sub-open > a{
       background:rgba(255,255,255,.08);
+      color:#FFFFFF !important;
     }
     /* The section you are in, marked on the row that collapses it. Without
        this, landing on /erpservices showed nothing at all until you opened
