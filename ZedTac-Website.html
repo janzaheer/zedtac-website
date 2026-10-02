@@ -10397,22 +10397,20 @@
       background:rgba(255,255,255,.08);
       color:#FFFFFF;
       transform:translateX(3px);
-      /* The left accent is an inset shadow rather than a pseudo-element. The
-         pseudo was measured at a 0px used height in the open drawer in both
-         states -- the rule matched and never painted -- while this rides the
-         same declaration block as the ground and the travel, which were
-         measured working. It also follows the 12px radius for free. */
-      box-shadow:inset 3px 0 0 rgba(255,255,255,.55);
     }
 
     /* The page you are actually on is marked harder than a finger resting on
-       a row, because the two are not the same thing and the phone test could
-       not tell them apart: a brighter ground, a full-strength accent and the
-       label at full white, all of which persist with no pointer involved. */
+       a row, because the two are not the same thing: a brighter ground, the
+       label at full white and in medium, and the inverted icon tile, all of
+       which persist with no pointer involved.
+
+       No left accent bar on any of these. It was a white 3px edge running down
+       the inside of the row and it was the first thing noticed in the dark
+       panel -- it read as a stray white line rather than as a marker. The
+       ground, the weight and the tile say the same thing without it. */
     .nav-links .nav-dropdown a.nav-active{
       background:rgba(255,255,255,.15);
       color:#FFFFFF;
-      box-shadow:inset 3px 0 0 #FFFFFF;
       font-weight:600;
     }
 
@@ -10484,15 +10482,36 @@
       background:rgba(255,255,255,.08);
       color:#FFFFFF !important;
     }
-    /* The section you are in, marked on the row that collapses it. Without
-       this, landing on /erpservices showed nothing at all until you opened
-       Services by hand -- the submenu starts closed, so the marked row inside
-       it was not on screen. :has() puts the mark on the parent instead. */
-    .nav-links > a.nav-active,
-    .nav-links > .nav-item > a.nav-active,
-    .nav-links > .nav-item:has(.nav-active) > a{
-      background:rgba(255,255,255,.15);
-      box-shadow:inset 3px 0 0 #FFFFFF;
+    /* Only a row that IS the current page is marked. An earlier pass also
+       marked the parent of a current child, via
+       `.nav-item:has(.nav-active) > a`, so that landing on /erpservices showed
+       something before you opened Services by hand. In use that read as the
+       wrong thing: Services stayed lit while you were opening and reading
+       Resources, so the menu claimed you had selected something you had not.
+       The submenu carries its own mark; the row that collapses it does not
+       need one. */
+    .nav-links > a.nav-active{
+      background:rgba(255,255,255,.12);
+      color:#FFFFFF !important;
+    }
+
+    /* No ring. The unscoped `.nav-links a.nav-active` chip rule carries
+       `0 0 0 1px var(--surface-line)`, and --surface-line is flipped to white
+       for this panel, so every marked row wore a white outline -- read as a
+       white line down its left edge against the charcoal. */
+    .nav-links a.nav-active{ box-shadow:none; }
+
+    /* A section parent is a disclosure trigger, not a page -- its own markup
+       says so (role="button", href="#", never navigates). Vue still marks it
+       .nav-active for every page underneath it, so on /erpservices the
+       Services row was lit permanently: open Resources, read it, and Services
+       still claimed to be the selection. The mark belongs on the row inside
+       the submenu, which carries it.
+
+       background, not just the ring: with the rule above removed the generic
+       chip rule would paint --glass here instead. */
+    .nav-links > .nav-item > a.nav-active{
+      background:transparent;
       color:#FFFFFF !important;
     }
 
