@@ -10216,8 +10216,14 @@
   }
 
   /* ---- 2. the links panel becomes a side drawer ---------------------------
-     It was a full-screen sheet. Anchoring it to the right edge and capping its
-     width turns it into a panel with the page still visible beside it.
+     It was a full-screen sheet. Anchoring it to one edge and capping its width
+     turns it into a panel.
+
+     Left edge, charcoal ground, and a scrim the page does not read through --
+     all three from testing the first version on an actual phone. The white
+     panel left the hero legible down its edge and competed with the menu for
+     attention; the panel is now the same charcoal as the bar above it, which
+     is also the only surface pair this monochrome palette has.
 
      The reveal is a clip-path wipe, NOT translateX. Parking this panel
      off-screen with translateX(100%) is what made the document 723px wide on a
@@ -10240,25 +10246,65 @@
        is closed, so nothing is positioned against it. */
     .nav{ will-change:auto; }
 
-    .nav-links{
-      inset:var(--nav-h, 64px) 0 0 auto;   /* top right bottom left:auto */
-      width:min(92vw, 400px);
+    /* Tokens back to the dark pair for the drawer's subtree. The white-panel
+       pass further up sets them to ink because the panel used to be white; it
+       is charcoal now, so flipping them here lets every rule that paints from
+       a token follow, instead of restating each one. */
+    :root .nav-links,
+    :root .nav-links.open{
+      --zt-ink:var(--white);
+      --zt-ink-soft:rgba(255,255,255,.72);
+      --zt-line:rgba(255,255,255,.14);
+      --surface-line:rgba(255,255,255,.14);
+      --glass-line:rgba(255,255,255,.14);
+      --zt-accent:var(--white);
+      --zt-accent-rgb:255,255,255;
+      --zt-accent-contrast:var(--ink);
+      --zt-primary:var(--white);
+      --zt-orange:var(--white);       --zt-orange-mid:var(--white);
+      --zt-orange-btn:var(--white);   --zt-orange-display:var(--white);
+      --zt-orange-deep:var(--white);  --zt-orange-light:var(--white);
+      --zt-tag-fill:var(--white);
+      --ai:var(--white);   --ai-deep:var(--white);  --ai-soft:var(--white);
+      --cy:var(--white);   --cy-deep:var(--white);
+      --grad:var(--white); --grad-brand-ai:var(--white);
+    }
+
+    /* :root on these two for one reason only: the white-panel pass writes
+       `:root .nav-links.open{ background:var(--white) !important; border:... }`
+       at (0,3,0), and a plain `.nav-links.open` at (0,2,0) loses to it even
+       carrying !important. Measured: the panel stayed white while the tokens
+       above had already flipped the type to white, so the drawer opened blank.
+       The prefix is specificity matching, nothing more. */
+    :root .nav-links{
+      inset:var(--nav-h, 64px) auto 0 0;   /* top right:auto bottom left */
+      width:min(90vw, 360px);
       height:auto;
-      padding:18px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+      padding:18px 14px calc(24px + env(safe-area-inset-bottom, 0px));
       gap:2px;
-      border-left:1px solid rgba(var(--ink-rgb), .12);
+      border:0;
+      border-right:1px solid rgba(255,255,255,.12);
       border-radius:0;
-      clip-path:inset(0 0 0 100%);
+      box-shadow:18px 0 48px -24px rgba(0,0,0,.7);
+      /* Wipes in from the left now: the clip opens from the right edge of the
+         box, so the panel grows out of the screen edge the thumb sits on. */
+      clip-path:inset(0 100% 0 0);
       transition:opacity .2s var(--ease, ease),
                  clip-path .34s cubic-bezier(.22,1,.36,1),
                  visibility 0s linear .34s;
     }
-    .nav-links.open{
+    :root .nav-links.open{
+      background:var(--zt-ink-fixed) !important;
+      border:0;
+      border-right:1px solid rgba(255,255,255,.12);
       clip-path:inset(0 0 0 0);
       transition:opacity .2s var(--ease, ease),
                  clip-path .34s cubic-bezier(.22,1,.36,1),
                  visibility 0s;
     }
+    /* The mesh wash behind the panel is two light-ground radial gradients.
+       On charcoal it reads as two grey smudges, so it goes. */
+    .nav-links::before{ display:none; }
 
     /* The page behind the panel is dimmed and stops taking taps. Painted on
        .nav::after, which the header pass above turned off, so no new element
@@ -10268,10 +10314,40 @@
     .nav:has(.nav-links.open)::after{
       content:''; display:block !important;
       position:fixed; inset:var(--nav-h, 64px) 0 0 0;
-      background:rgba(var(--ink-rgb), .38);
-      -webkit-backdrop-filter:blur(2px);
-              backdrop-filter:blur(2px);
-      z-index:-1; pointer-events:auto;
+      /* .nav::after is a 2px hairline further up this file, and height:2px
+         survives into here: measured 390x2 instead of 390x764, so the scrim
+         was a thin line under the bar and the page stayed fully visible
+         beside the panel. bottom:0 only stretches a box whose height is auto. */
+      height:auto; width:auto;
+      /* Opaque, not a dim. At .94 the hero's headline still ghosted through
+         beside the panel, which is the thing that was reported. A solid ground
+         also drops the backdrop blur, which is the most expensive thing a
+         phone would have been asked to paint here. #0A0A0A rather than the
+         panel's #1A1A1A so the panel still reads as a surface sitting on
+         something, instead of the two merging into one flat field. */
+      background:#0A0A0A;
+      /* opacity:1 is load-bearing. This same pseudo-element is the nav's
+         hairline, and `.nav.nav-over-hero:not(.is-stuck)::after` fades it to
+         .5 over the hero. Inherited here that made the scrim half-transparent:
+         painting correctly, covering the full 390x764, and still letting the
+         headline read straight through it -- which is exactly what was
+         reported from the phone. Equal specificity to that rule, so this wins
+         on source order alone; it is the last thing in the stylesheet. */
+      opacity:1;
+      /* 0, and the number matters. The panel is not a sibling of this pseudo:
+         it sits inside .nav-inner, which carries position:relative/z-index:1
+         and so opens its own stacking context. A z-index on the panel is
+         therefore sealed inside that context and cannot lift it over a
+         sibling of .nav-inner -- measured: panel z=2, scrim z=1, and the scrim
+         still painted over the whole menu because equal z-index fell back to
+         paint order and ::after comes last.
+
+         So the scrim is ordered against .nav-inner instead: 0 puts it under
+         .nav-inner's 1, which carries the panel with it, while staying inside
+         .nav's own stacking context at z-index 1000 and therefore over the
+         page. (-1 does not work either -- that paints it behind .nav's
+         background and the page showed straight through.) */
+      z-index:0; pointer-events:auto;
     }
   }
   @media (max-width:1024px) and (prefers-reduced-motion:reduce){
@@ -10307,17 +10383,27 @@
     }
     .nav-links .nav-dropdown a:hover,
     .nav-links .nav-dropdown a:focus-visible,
-    .nav-links .nav-dropdown a:active,
-    .nav-links .nav-dropdown a.nav-active{
-      background:rgba(var(--ink-rgb), .07);
-      color:var(--ink);
+    .nav-links .nav-dropdown a:active{
+      background:rgba(255,255,255,.08);
+      color:#FFFFFF;
       transform:translateX(3px);
       /* The left accent is an inset shadow rather than a pseudo-element. The
          pseudo was measured at a 0px used height in the open drawer in both
          states -- the rule matched and never painted -- while this rides the
          same declaration block as the ground and the travel, which were
          measured working. It also follows the 12px radius for free. */
-      box-shadow:inset 3px 0 0 var(--ink);
+      box-shadow:inset 3px 0 0 rgba(255,255,255,.55);
+    }
+
+    /* The page you are actually on is marked harder than a finger resting on
+       a row, because the two are not the same thing and the phone test could
+       not tell them apart: a brighter ground, a full-strength accent and the
+       label at full white, all of which persist with no pointer involved. */
+    .nav-links .nav-dropdown a.nav-active{
+      background:rgba(255,255,255,.15);
+      color:#FFFFFF;
+      box-shadow:inset 3px 0 0 #FFFFFF;
+      font-weight:600;
     }
 
     /* !important because an earlier max-width:1040px pass paints every icon
@@ -10329,11 +10415,14 @@
     .nav-links .nav-dropdown a:focus-visible .nav-dropdown-icon,
     .nav-links .nav-dropdown a:active .nav-dropdown-icon,
     .nav-links .nav-dropdown a.nav-active .nav-dropdown-icon{
-      background:var(--ink) !important;
-      border-color:var(--ink) !important;
-      color:var(--white) !important;
+      background:#FFFFFF !important;
+      border-color:#FFFFFF !important;
+      color:var(--ink) !important;
     }
     .nav-links .nav-dropdown-icon{
+      background:rgba(255,255,255,.07) !important;
+      border:1px solid rgba(255,255,255,.16) !important;
+      color:#FFFFFF !important;
       width:34px; height:34px; border-radius:10px;
       transition:background-color .18s var(--ease, ease),
                  border-color .18s var(--ease, ease),
@@ -10351,12 +10440,39 @@
     }
     .nav-links > a:hover,
     .nav-links > a:active,
-    .nav-links > a.nav-active,
     .nav-links > .nav-item > a:hover,
-    .nav-links > .nav-item > a:active,
-    .nav-links > .nav-item > a.nav-active{
-      background:rgba(var(--ink-rgb), .07);
+    .nav-links > .nav-item > a:active{
+      background:rgba(255,255,255,.08);
     }
+    /* The section you are in, marked on the row that collapses it. Without
+       this, landing on /erpservices showed nothing at all until you opened
+       Services by hand -- the submenu starts closed, so the marked row inside
+       it was not on screen. :has() puts the mark on the parent instead. */
+    .nav-links > a.nav-active,
+    .nav-links > .nav-item > a.nav-active,
+    .nav-links > .nav-item:has(.nav-active) > a{
+      background:rgba(255,255,255,.15);
+      box-shadow:inset 3px 0 0 #FFFFFF;
+      color:#FFFFFF !important;
+    }
+
+    /* Everything else that the white-panel pass painted for a light ground. */
+    :root .nav-links.open .nav-sub-toggle{
+      background:rgba(255,255,255,.08) !important;
+      border-color:rgba(255,255,255,.22) !important;
+      color:#FFFFFF !important;
+    }
+    :root .nav-links.open .nav-auth{ border-top-color:rgba(255,255,255,.14); }
+    :root .nav-links.open .nav-auth .btn-ghost{
+      color:#FFFFFF !important;
+      background:rgba(255,255,255,.06) !important;
+      border-color:rgba(255,255,255,.28) !important;
+    }
+    /* The burger is the drawer's close X. It sits on the charcoal bar, not on
+       the panel -- the panel starts below the bar now -- so the ink it was
+       given for the white panel would have been black on black. */
+    :root .nav-burger.open span{ background:#FFFFFF !important; }
+    :root .nav-burger.open{ border-color:rgba(255,255,255,.35) !important; }
   }
 
 </style>
