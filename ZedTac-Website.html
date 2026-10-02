@@ -6093,10 +6093,17 @@
   /* The separate primary hairline is redundant now the ramp ends on brand. */
   .nav::after{ display:none !important; }
 
-  /* Stays put. `is-hidden` slid the whole bar off-screen on scroll-down, which
-     is why it vanished; the scroll handler still toggles the class, it simply
-     no longer moves anything. is-stuck (the shadow) is untouched. */
-  .nav.is-hidden{ transform:none !important; }
+  /* Stays put on a laptop or a desktop. `is-hidden` slid the whole bar
+     off-screen on scroll-down, which is why it vanished there; the scroll
+     handler still toggles the class, it simply no longer moves anything above
+     1024px. is-stuck (the shadow) is untouched.
+
+     Phones and tablets DO get the slide -- the rule that restores it is in the
+     "MOBILE / TABLET HEADER + DRAWER" block at the end of this stylesheet,
+     where the rest of the small-screen header behaviour lives. */
+  @media (min-width:1025px){
+    .nav.is-hidden{ transform:none !important; }
+  }
   .nav{ position:sticky; top:0; z-index:1000; }
 
   /* --- dropdowns: same ramp, same borders, same hover ---------------------- */
@@ -10137,6 +10144,179 @@
   :root .demo-screen svg{ stroke:currentColor; }
   :root .demo-screen svg [stroke="#1A1A1A"]{ stroke:currentColor; }
   :root .demo-screen svg [fill="#1A1A1A"]{ fill:currentColor; }
+
+  /* ==========================================================================
+     MOBILE / TABLET HEADER + DRAWER  (<=1024px only)
+     Both behaviours here are deliberately phone-and-tablet only: on a laptop
+     the bar stays pinned and the links stay in the bar. 1024px is the existing
+     breakpoint where the burger appears and .nav-links becomes a panel, so
+     nothing new is invented -- these rules attach to that same switch.
+     ========================================================================== */
+
+  /* ---- 1. the bar hides on scroll-down and returns on scroll-up -----------
+     The scroll handler in <head> has toggled `is-hidden` all along: it adds
+     the class past 260px of downward travel, drops it the moment the user
+     moves up, holds the bar open while the drawer is showing, and never
+     touches it under prefers-reduced-motion. What was missing is that the
+     override further up this file set transform:none !important on every
+     screen, so the class moved nothing. That override is now scoped to
+     >=1025px and this is its small-screen half.
+
+     No transition is declared here: .nav already carries
+     transition:transform .42s cubic-bezier(.22,1,.36,1), so the travel eases
+     rather than jumps. The bar's height never changes, so --nav-h stays valid
+     and the hero does not reflow.
+
+     The motion preference is folded into the query rather than wrapped around
+     it: a nested @media further up this file silently dropped every rule after
+     it, and that failure is not worth repeating for one line. */
+  @media (max-width:1024px) and (prefers-reduced-motion:no-preference){
+    .nav.is-hidden{ transform:translateY(calc(-100% - 20px)) !important; }
+  }
+
+  /* ---- 2. the links panel becomes a side drawer ---------------------------
+     It was a full-screen sheet. Anchoring it to the right edge and capping its
+     width turns it into a panel with the page still visible beside it.
+
+     The reveal is a clip-path wipe, NOT translateX. Parking this panel
+     off-screen with translateX(100%) is what made the document 723px wide on a
+     375px screen -- the measurement is written up in the "page was 723px wide"
+     block above, and it is why the drawer was changed to fade in place.
+     clip-path contributes nothing to layout or to scrollable overflow in any
+     state, so the panel can travel without bringing that back. */
+  @media (max-width:1024px){
+    /* .nav carries will-change:transform for the slide above, and that alone
+       -- transform:none included -- makes .nav the containing block for any
+       position:fixed descendant. The panel is one, so its inset resolved
+       against the 374x72 header pill instead of the viewport: measured at
+       359x44, parked under the bar. The old full-screen rules hid this by
+       setting width:100%/height:100dvh explicitly rather than relying on the
+       insets at all.
+
+       Dropping the hint below 1024px makes position:fixed mean what it says
+       again. The slide still transitions -- will-change is a hint, not the
+       animation -- and when `is-hidden` does apply a real transform the panel
+       is closed, so nothing is positioned against it. */
+    .nav{ will-change:auto; }
+
+    .nav-links{
+      inset:var(--nav-h, 64px) 0 0 auto;   /* top right bottom left:auto */
+      width:min(92vw, 400px);
+      height:auto;
+      padding:18px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+      gap:2px;
+      border-left:1px solid rgba(var(--ink-rgb), .12);
+      border-radius:0;
+      clip-path:inset(0 0 0 100%);
+      transition:opacity .2s var(--ease, ease),
+                 clip-path .34s cubic-bezier(.22,1,.36,1),
+                 visibility 0s linear .34s;
+    }
+    .nav-links.open{
+      clip-path:inset(0 0 0 0);
+      transition:opacity .2s var(--ease, ease),
+                 clip-path .34s cubic-bezier(.22,1,.36,1),
+                 visibility 0s;
+    }
+
+    /* The page behind the panel is dimmed and stops taking taps. Painted on
+       .nav::after, which the header pass above turned off, so no new element
+       is needed; :has() is the only way a pseudo-element can know the panel is
+       open. Where :has() is unsupported the drawer simply opens without the
+       dim -- nothing breaks. */
+    .nav:has(.nav-links.open)::after{
+      content:''; display:block !important;
+      position:fixed; inset:var(--nav-h, 64px) 0 0 0;
+      background:rgba(var(--ink-rgb), .38);
+      -webkit-backdrop-filter:blur(2px);
+              backdrop-filter:blur(2px);
+      z-index:-1; pointer-events:auto;
+    }
+  }
+  @media (max-width:1024px) and (prefers-reduced-motion:reduce){
+    .nav-links, .nav-links.open{ transition:opacity .01s linear, visibility 0s; }
+  }
+
+  /* ---- 3. every row in the drawer is a target, not a line of text ---------
+     :active and .nav-active are listed with :hover on purpose. A phone has no
+     hover state, so the tap highlight is the only feedback a touch user ever
+     sees; leaving it on :hover alone is what makes a mobile menu feel dead.
+
+     Three cues at once, because one is easy to miss on a small screen under
+     a thumb: a filled ground, a left accent bar that grows in, and a few
+     pixels of travel. The icon tile inverts with them so the row reads as one
+     object rather than a label that happened to change colour. */
+  @media (max-width:1024px){
+    .nav-links .nav-dropdown{ padding:6px 0 10px 6px; }
+    .nav-links .nav-dropdown-grid{ gap:2px; }
+
+    .nav-links .nav-dropdown a{
+      position:relative;
+      display:flex; align-items:center; gap:12px;
+      padding:12px 14px 12px 16px;
+      border-radius:12px;
+      font-size:15.5px; font-weight:500;
+      color:var(--zt-ink);
+      background:transparent;
+      -webkit-tap-highlight-color:transparent;
+      transition:background-color .18s var(--ease, ease),
+                 color .18s var(--ease, ease),
+                 box-shadow .18s var(--ease, ease),
+                 transform .18s var(--ease, ease);
+    }
+    .nav-links .nav-dropdown a:hover,
+    .nav-links .nav-dropdown a:focus-visible,
+    .nav-links .nav-dropdown a:active,
+    .nav-links .nav-dropdown a.nav-active{
+      background:rgba(var(--ink-rgb), .07);
+      color:var(--ink);
+      transform:translateX(3px);
+      /* The left accent is an inset shadow rather than a pseudo-element. The
+         pseudo was measured at a 0px used height in the open drawer in both
+         states -- the rule matched and never painted -- while this rides the
+         same declaration block as the ground and the travel, which were
+         measured working. It also follows the 12px radius for free. */
+      box-shadow:inset 3px 0 0 var(--ink);
+    }
+
+    /* !important because an earlier max-width:1040px pass paints every icon
+       tile in the open drawer with `background: ... !important; color: ...
+       !important`. Specificity cannot reach past that, so the inverted state
+       has to match its weight -- measured: without these the tile stayed on
+       its resting fill while the row around it highlighted. */
+    .nav-links .nav-dropdown a:hover .nav-dropdown-icon,
+    .nav-links .nav-dropdown a:focus-visible .nav-dropdown-icon,
+    .nav-links .nav-dropdown a:active .nav-dropdown-icon,
+    .nav-links .nav-dropdown a.nav-active .nav-dropdown-icon{
+      background:var(--ink) !important;
+      border-color:var(--ink) !important;
+      color:var(--white) !important;
+    }
+    .nav-links .nav-dropdown-icon{
+      width:34px; height:34px; border-radius:10px;
+      transition:background-color .18s var(--ease, ease),
+                 border-color .18s var(--ease, ease),
+                 color .18s var(--ease, ease);
+    }
+
+    /* The top-level rows get the same treatment at their own size, so the two
+       levels read as one list rather than two different menus. */
+    .nav-links > a,
+    .nav-links > .nav-item > a{
+      border-radius:12px; padding:12px 14px;
+      -webkit-tap-highlight-color:transparent;
+      transition:background-color .18s var(--ease, ease),
+                 color .18s var(--ease, ease);
+    }
+    .nav-links > a:hover,
+    .nav-links > a:active,
+    .nav-links > a.nav-active,
+    .nav-links > .nav-item > a:hover,
+    .nav-links > .nav-item > a:active,
+    .nav-links > .nav-item > a.nav-active{
+      background:rgba(var(--ink-rgb), .07);
+    }
+  }
 
 </style>
 </head>
