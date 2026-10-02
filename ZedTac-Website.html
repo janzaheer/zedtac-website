@@ -9906,14 +9906,33 @@
        but left its colour white, so the current page's link was white on
        white -- invisible on every route except home.
 
-       Active keeps the chip. It is the only thing marking the current page in
-       the bar -- the underline sweep below is a hover state and does not fire
-       for it -- so taking the chip away here would leave the route unmarked. */
+       The chip is gone from the active link too. An earlier pass kept it on
+       the grounds that the underline sweep was hover-only and the route would
+       otherwise go unmarked -- that was wrong. `.nav-links a.nav-active::after`
+       sets scaleX(1) and wins, so the active link already carries the same 2px
+       underline as a hovered one. (It reads as scaleX(0) if you measure it
+       after injecting `*{transition:none}`: the universal selector does not
+       match pseudo-elements, so the ::after transition is still live and, in a
+       renderer that is not ticking animations, reports its start value. With
+       `*,*::before,*::after` it reports scaleX(1).)
+
+       Colour still has to be split by where the link sits, because dropping
+       the chip drops the surface its ink was written for. In the bar the link
+       is on charcoal and takes white; in the dropdown it is on the white panel
+       and keeps ink, which it needs explicitly -- `.nav-dropdown a` carries a
+       white `!important` colour that would otherwise leave it white on
+       white. */
     :root .nav-links a.nav-active,
     :root .nav-links > .nav-item > a.nav-active{
-      background:var(--white);
+      background:transparent;
+      border:0;
+    }
+    :root .nav-links > a.nav-active,
+    :root .nav-links > .nav-item > a.nav-active{
+      color:#FFFFFF !important;
+    }
+    :root .nav-dropdown a.nav-active{
       color:var(--ink) !important;
-      border:1px solid rgba(var(--ink-rgb),.14);
     }
 
     /* Hover is the underline on its own. The white chip this used to paint
