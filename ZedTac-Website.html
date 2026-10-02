@@ -999,8 +999,29 @@
   .pricing-section .btn-ghost{ color:#1A1A1A; border-color:rgba(26,26,26,.14); }
   .pricing-section .btn-ghost:hover{ border-color:var(--zt-orange); color:var(--zt-orange-deep); }
   .pricing-section .pricing-note{ color:rgba(255,255,255,0.6); }
-  .pricing-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; align-items:stretch; }
-  @media (max-width:920px){ .pricing-grid{ grid-template-columns:1fr; max-width:440px; margin:0 auto; } }
+  /* Fluid instead of stepped: the track takes as many columns as fit at a
+     readable card width, so the count follows the container rather than a list
+     of breakpoints.
+
+     280px floor. That number is not new -- it is the width measured for the
+     carousel cards further down this file (the two-up rule at ~640px), where
+     body copy stops holding a line below it. min(100%, 280px) is what prevents
+     a horizontal scrollbar: when the container is narrower than the floor the
+     track collapses to the container width instead of forcing a 280px column.
+
+     Three plans render here, so auto-fit resolves to three columns on a desktop
+     (~379px each at 1280px, ~421px at the 1760px .wrap cap) and the unused
+     fourth track collapses to 0. Two columns at 768px, one at 390px -- all
+     measured in the browser, not assumed.
+
+     Replaces repeat(3,1fr) plus the 920px step. The step's max-width:440px and
+     margin:0 auto went with it: they capped a single stretched card in the
+     800-920px band, where there are now two columns. */
+  .pricing-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap:24px; align-items:stretch;
+  }
   .pricing-card{
     background:rgba(255,255,255,0.05); color:#FFFFFF; border:1px solid rgba(255,255,255,0.12); border-radius:var(--radius);
     padding:36px 30px; display:flex; flex-direction:column; gap:20px; position:relative;
@@ -1606,9 +1627,16 @@
     .demo-stage .demo-line path.line{ stroke-dashoffset:0 !important; }
   }
 
-  .erp-features{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:20px; }
-  @media (max-width:920px){ .erp-features{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:620px){ .erp-features{ grid-template-columns:1fr; } }
+  /* Fluid; see .pricing-grid for the min(100%, ...) reasoning. 260px floor --
+     icon, one heading line and a short description, so it reads tighter than a
+     plan card. Six rows render on /pricing: four columns at 1280px (279px
+     each), two at 768px, one at 390px. Replaces repeat(3,1fr) plus the 920px
+     and 620px steps. */
+  .erp-features{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap:22px; margin-top:20px;
+  }
   .erp-feature{
     background:var(--zt-white); border:1px solid var(--zt-line); border-radius:var(--r-md); padding:24px; position:relative; overflow:hidden;
     transition:transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease);
@@ -1708,9 +1736,13 @@
   @media (max-width:860px){ .compare-hint{ display:block; } }
 
   /* Add-on services */
-  .addon-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-  @media (max-width:920px){ .addon-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:620px){ .addon-grid{ grid-template-columns:1fr; } }
+  /* Fluid; see .pricing-grid. 260px floor, six add-ons: four columns at
+     1280px, two at 768px, one at 390px. */
+  .addon-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap:20px;
+  }
   .addon-card{
     background:var(--zt-white); border:1px solid var(--zt-line); border-radius:var(--r-md); position:relative; overflow:hidden;
     padding:24px; display:flex; flex-direction:column; gap:8px;
@@ -1767,8 +1799,19 @@
   }
   .result-stat span{ display:block; font-size:13.5px; color:var(--zt-ink-soft); margin-top:8px; line-height:1.5; }
 
-  .outcome-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; align-items:stretch; }
-  @media (max-width:920px){ .outcome-grid{ grid-template-columns:1fr; max-width:460px; margin:0 auto; } }
+  /* Fluid; see .pricing-grid. 300px floor -- these pillars carry the longest
+     body copy of any card here. Three render, so this resolves to three columns
+     on a desktop, the same arrangement repeat(3,1fr) gave, and now reflows
+     through two on the way down instead of dropping straight to one at 920px.
+
+     The step's max-width:460px and margin:0 auto went with it, for the same
+     reason as .pricing-grid: they capped a single stretched card in a band that
+     now holds two columns. */
+  .outcome-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap:24px; align-items:stretch;
+  }
   /* overflow:hidden is gone from this card, and that is the point of the two
      changes below. The "Most Cited" badge is positioned at top:-14px so it
      straddles the card's top edge -- the same treatment .pricing-card gives
@@ -1815,9 +1858,13 @@
     max-width:760px;
   }
 
-  .review-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
-  @media (max-width:980px){ .review-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:640px){ .review-grid{ grid-template-columns:1fr; } }
+  /* Fluid; see .pricing-grid. 280px floor, six reviews: three columns at
+     1280px, down to one at 390px. */
+  .review-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap:24px;
+  }
   .review-grid .review-card{
     min-height:0; background:var(--zt-white); border-color:var(--zt-line); position:relative; overflow:hidden;
     transition:transform .25s var(--ease), box-shadow .25s var(--ease);
@@ -1839,10 +1886,17 @@
   .review-grid .stars{ color:var(--zt-orange); }
   .review-grid .review-quote{ font-size:16px; }
 
-  .industry-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
-  @media (max-width:1080px){ .industry-grid{ grid-template-columns:repeat(3,1fr); } }
-  @media (max-width:820px){ .industry-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:520px){ .industry-grid{ grid-template-columns:1fr; } }
+  /* Fluid; see .pricing-grid. 240px floor rather than 280px: this card's type
+     is the smallest on the page (15.5px heading, 13px body), so it holds a line
+     in a narrower column. Eight case studies -> four columns at 1280px. 240px
+     reproduces the old 4/3/2/1 step points to within about 20px of viewport
+     width, so the arrangement is unchanged in practice and four media queries
+     go away. */
+  .industry-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap:18px;
+  }
   .industry-card{
     background:var(--zt-white); border:1px solid var(--zt-line); border-radius:var(--r-md);
     padding:22px 20px; display:flex; flex-direction:column; gap:9px;
@@ -1887,9 +1941,15 @@
   .pillar-bridge b{ color:var(--zt-ink); }
 
 
-  .auto-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
-  @media (max-width:980px){ .auto-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:640px){ .auto-grid{ grid-template-columns:1fr; } }
+  /* Fluid; see .pricing-grid. 270px floor. Three tracks share this class and
+     each renders six cards from a slice(0,6) that a "show all" toggle expands at
+     runtime, so the item count changes under what was a fixed three-column
+     track. Four columns at 1280px. */
+  .auto-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+    gap:22px;
+  }
   .auto-card{ /* Base styles are now handled by the design system layer */
     padding:30px 26px; /* Match service-card padding */
     display:flex; flex-direction:column; /* Keep flex layout */
@@ -2198,9 +2258,18 @@
   .int-head{ margin-bottom:22px; }
   .int-head h2{ font-size:20px; }
   .int-head p{ font-size:14px; color:var(--zt-ink-soft); margin-top:6px; }
-  .int-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-  @media (max-width:920px){ .int-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:600px){ .int-grid{ grid-template-columns:1fr; } }
+  /* Fluid; see .pricing-grid. 260px floor. The count comes from g.items and
+     differs per group -- 3, 4, 3, 3 on /integrations -- which is the case a
+     fixed three-column track handles worst. .int-card is itself a grid (see the
+     1fr rule further down); only the outer track changes here.
+
+     Applies above 1024px only -- the 1024px block below sets this to
+     display:block and the section becomes a divided list rather than boxes. */
+  .int-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap:20px;
+  }
   .int-card{
     background:var(--zt-white); border:1px solid var(--zt-line); border-radius:var(--r-md);
     padding:22px 20px; display:flex; flex-direction:column; gap:10px;
@@ -2210,9 +2279,13 @@
   .int-card h3{ font-size:15.5px; font-family:'Space Grotesk',sans-serif; }
   .int-card p{ font-size:13px; color:var(--zt-ink-soft); line-height:1.6; flex-grow:1; }
 
-  .doc-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-  @media (max-width:920px){ .doc-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:600px){ .doc-grid{ grid-template-columns:1fr; } }
+  /* Fluid; see .pricing-grid. 260px floor, six doc groups: four columns at
+     1280px, one at 390px. */
+  .doc-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap:20px;
+  }
   .doc-card{
     background:var(--zt-white); border:1px solid var(--zt-line); border-radius:var(--r-md);
     padding:24px 22px; display:flex; flex-direction:column; gap:10px;
