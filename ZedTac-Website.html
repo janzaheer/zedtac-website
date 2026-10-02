@@ -10277,15 +10277,13 @@
        above had already flipped the type to white, so the drawer opened blank.
        The prefix is specificity matching, nothing more. */
     :root .nav-links{
-      inset:var(--nav-h, 64px) auto 0 0;   /* top right:auto bottom left */
-      width:min(90vw, 360px);
+      inset:var(--nav-h, 64px) 0 0 0;
+      width:100%;
       height:auto;
-      padding:18px 14px calc(24px + env(safe-area-inset-bottom, 0px));
+      padding:18px 16px calc(24px + env(safe-area-inset-bottom, 0px));
       gap:2px;
       border:0;
-      border-right:1px solid rgba(255,255,255,.12);
       border-radius:0;
-      box-shadow:18px 0 48px -24px rgba(0,0,0,.7);
       /* Wipes in from the left now: the clip opens from the right edge of the
          box, so the panel grows out of the screen edge the thumb sits on. */
       clip-path:inset(0 100% 0 0);
@@ -10296,7 +10294,6 @@
     :root .nav-links.open{
       background:var(--zt-ink-fixed) !important;
       border:0;
-      border-right:1px solid rgba(255,255,255,.12);
       clip-path:inset(0 0 0 0);
       transition:opacity .2s var(--ease, ease),
                  clip-path .34s cubic-bezier(.22,1,.36,1),
@@ -10353,6 +10350,19 @@
   @media (max-width:1024px) and (prefers-reduced-motion:reduce){
     .nav-links, .nav-links.open{ transition:opacity .01s linear, visibility 0s; }
   }
+
+  /* Why the panel is the full width rather than a 360px leaf with the page
+     beside it: a part-width panel has to put something in the space it leaves,
+     and neither option survived being looked at on a device. The page showing
+     through was the first complaint -- the hero stayed legible and competed
+     with the menu. Covering it with an opaque ground was the second: a 39px
+     strip on a phone and a 408px field on a tablet, both of which read as a
+     black stripe rather than as depth, because there is nothing in them.
+
+     So the menu takes the screen. It still opens from the left -- the
+     clip-path wipe runs left to right and the list is left-aligned -- and the
+     scrim stays underneath it, where it covers the page during the wipe and
+     keeps the page from taking taps while the menu is up. */
 
   /* ---- 3. every row in the drawer is a target, not a line of text ---------
      :active and .nav-active are listed with :hover on purpose. A phone has no
@@ -10411,17 +10421,26 @@
        !important`. Specificity cannot reach past that, so the inverted state
        has to match its weight -- measured: without these the tile stayed on
        its resting fill while the row around it highlighted. */
-    .nav-links .nav-dropdown a:hover .nav-dropdown-icon,
-    .nav-links .nav-dropdown a:focus-visible .nav-dropdown-icon,
-    .nav-links .nav-dropdown a:active .nav-dropdown-icon,
-    .nav-links .nav-dropdown a.nav-active .nav-dropdown-icon{
+    /* Both of these carry :root for specificity, and the order between them
+       matters. The light-panel pass sets `.nav-links.open .nav-dropdown-icon`
+       to a solid white fill with !important at (0,3,0); the resting rule below
+       was written at (0,2,0) and lost, so every tile stayed white while the
+       glyph on it had already been turned white -- measured at contrast 1.0 on
+       six tiles, which is the white-on-white that was reported. At (0,4,0) it
+       wins, and the hover/active rule above sits at (0,5,0) so the inverted
+       tile still beats the resting one. */
+    :root .nav-links.open .nav-dropdown a:hover .nav-dropdown-icon,
+    :root .nav-links.open .nav-dropdown a:focus-visible .nav-dropdown-icon,
+    :root .nav-links.open .nav-dropdown a:active .nav-dropdown-icon,
+    :root .nav-links.open .nav-dropdown a.nav-active .nav-dropdown-icon{
       background:#FFFFFF !important;
       border-color:#FFFFFF !important;
       color:var(--ink) !important;
     }
+    :root .nav-links.open .nav-dropdown-icon,
     .nav-links .nav-dropdown-icon{
-      background:rgba(255,255,255,.07) !important;
-      border:1px solid rgba(255,255,255,.16) !important;
+      background:rgba(255,255,255,.08) !important;
+      border:1px solid rgba(255,255,255,.18) !important;
       color:#FFFFFF !important;
       width:34px; height:34px; border-radius:10px;
       transition:background-color .18s var(--ease, ease),
