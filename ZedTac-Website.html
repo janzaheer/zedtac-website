@@ -9904,16 +9904,38 @@
        else declares one. */
     /* .nav-active is included: it paints the same white chip from --glass-2
        but left its colour white, so the current page's link was white on
-       white -- invisible on every route except home. Active and hover now
-       read identically. */
-    :root .nav-links > a:hover,
-    :root .nav-links > .nav-item > a:hover,
-    :root .nav-item:hover > a,
+       white -- invisible on every route except home.
+
+       Active keeps the chip. It is the only thing marking the current page in
+       the bar -- the underline sweep below is a hover state and does not fire
+       for it -- so taking the chip away here would leave the route unmarked. */
     :root .nav-links a.nav-active,
     :root .nav-links > .nav-item > a.nav-active{
       background:var(--white);
       color:var(--ink) !important;
       border:1px solid rgba(var(--ink-rgb),.14);
+    }
+
+    /* Hover is the underline on its own. The white chip this used to paint
+       read as a circle sitting behind the label, which is not wanted; the
+       2px sweep under the word already says the same thing more quietly.
+
+       The colour has to be restated rather than just dropped. This block set
+       var(--ink) to sit on the white chip, and ink on the charcoal bar is
+       exactly the invisible-label bug the block was written to fix -- so with
+       the chip gone the label goes back to white, which is what the rules
+       further up the file (.nav-links > a:hover) always intended before this
+       layer overrode them.
+
+       The border goes with it: it was the chip's outline, and at rest these
+       links have none, so keeping it would shift the label by a pixel on
+       hover. */
+    :root .nav-links > a:hover,
+    :root .nav-links > .nav-item > a:hover,
+    :root .nav-item:hover > a{
+      background:transparent;
+      color:#FFFFFF !important;
+      border:0;
     }
 
     :root .nav-dropdown a:hover,
